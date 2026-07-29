@@ -135,10 +135,10 @@ estimado —
   tipografía real, después de `document.fonts.ready`. Hace falta medirla porque el
   `font-size` es fluido (clamp) y porque con la tipografía de respaldo la métrica es otra.
 
-De ahí sale todo el encuadre: el lienzo mide exactamente , la cámara se
-ubica en  y la pelota reposa a un radio del borde de abajo. Un
-`ResizeObserver` lo recalcula cuando cambia el tamaño, y la animación se detiene cuando el
-hero sale de pantalla o la pestaña pasa a segundo plano.
+De ahí sale todo el encuadre, en vez de constantes a ojo: el lienzo mide exactamente
+`diámetro + recorrido`, la cámara se ubica en `(H/d) / tan(fov/2)` y la pelota reposa a un
+radio del borde de abajo. Un `ResizeObserver` lo recalcula cuando cambia el tamaño, y la
+animación se detiene cuando el hero sale de pantalla o la pestaña pasa a segundo plano.
 
 ⚠️ El recorrido es **corto**: la pelota mide ~80 % del alto de las letras, así que entre las
 dos líneas quedan unos **30 px en desktop y 10 en mobile**. Si se quisiera un pique más
