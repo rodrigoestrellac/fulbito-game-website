@@ -72,6 +72,34 @@ VARIANTES = [
      "GAME in small widely-spaced gold uppercase letters. "
      f"Spell it exactly FULBITO and THE GAME. {PALETA} {FONDO}"),
 
+    # ── Ronda 2 (Rodrigo: "la pelota no es la teamgeist, es una pelota vintage").
+    #    La 1 quedo linda pero con paneles curvos anchos: lee medio a pelota de
+    #    voley. Estas tres van a lo seguro sobre "esto es una pelota de futbol".
+    ("5-clasica",
+     "A single classic soccer ball emblem for a video game logo, seen straight on: "
+     "the traditional pattern of regular pentagons and hexagons. Bold flat vector "
+     "illustration with a thick dark outline around the ball and around every panel, "
+     "flat colors only, no gradients and no gloss — the weight of an arcade cabinet "
+     "emblem. The pentagons are deep night green, the hexagons alternate cream and "
+     f"gold. {PALETA} No text, no letters, no ground shadow. {FONDO}"),
+
+    ("6-turbina",
+     "A single soccer ball emblem for a video game logo, seen straight on. Its "
+     "surface is made of interlocking curved panels of two kinds: peanut-shaped "
+     "panels and three-armed turbine-shaped panels, fitted together with no straight "
+     "seams anywhere — a modern thermally-bonded ball. Bold flat vector "
+     "illustration, thick dark outline, flat colors only, no gradients, no gloss. "
+     f"Cream ball, seams and panel outlines in deep night green, gold accents. {PALETA} "
+     f"No text, no letters, no ground shadow. {FONDO}"),
+
+    ("7-vintage",
+     "A single vintage 1950s leather soccer ball emblem for a video game logo, seen "
+     "straight on: eighteen long rectangular leather panels in six groups of three, "
+     "with visible stitching and a laced opening. Bold flat vector illustration with "
+     "a thick dark outline, flat colors only, no gradients and no photographic "
+     "texture — an arcade emblem, not a photo. Warm gold and cream leather, seams in "
+     f"deep night green. {PALETA} No text, no letters, no ground shadow. {FONDO}"),
+
     ("4-escudo",
      "A football crest emblem for a video game logo: a simple shield shape "
      "outlined in gold, containing a soccer ball built from six curved "

@@ -47,12 +47,17 @@ ese bloque cuando se publica una versión nueva (es una constante, 4 líneas).
 El hero y las secciones de features funcionan **con capturas solas**. Si en algún momento
 hay clips grabados (Game Bar / OBS, 1080p60), se activan solos al dejarlos acá:
 
-| archivo | dónde entra |
-|---|---|
-| `assets/video/hero.mp4` | fondo del hero (reemplaza la imagen) |
-| `assets/video/gol.mp4` | feature "el momento del gol" |
-| `assets/video/firma.mp4` | feature "jugadas firma" |
-| `assets/video/penal.mp4` | feature "penales" |
+Hay **tres huecos** declarados en el HTML, cada uno con un `data-video`. El clip
+reemplaza a la captura que está de fondo, en la misma caja y sin salto de layout:
+
+| archivo | sección | qué mostrar |
+|---|---|---|
+| `assets/video/hero.mp4` | hero, arriba de todo | loop general de cámara TV, sin nada que llame la atención — es fondo detrás del wordmark |
+| `assets/video/gol.mp4` | 09', "El gol" | gol + red que se hincha + confeti + replay |
+| `assets/video/firma.mp4` | 23', "Cada uno tiene la suya" | una jugada firma bien vistosa (Martillazo o Gigante) |
+
+Para agregar un cuarto: un `<div class="banda rev" data-video="assets/video/loquesea.mp4">`
+con una `<img>` adentro, y el nombre en `CLIPS`. Nada más.
 
 Además del archivo, hay que agregar su nombre al array `CLIPS` de `js/main.js`
 (una línea). Es a propósito: sondear con `HEAD` dejaba errores 404 en la consola.
@@ -107,24 +112,42 @@ textura de sprites de baja resolución — para que lea como profundidad de camp
 
 ## El mark de la pelota
 
-`assets/brand/pelota.webp` sale de `tools/pelota-fuente.png`, que lo generó **Gemini**
-(`gemini-3-pro-image`) con `tools/gen_logo.py` — variante `1-pelota-arcade`. El modelo
-lo devuelve sobre un fondo magenta plano y `build_assets.py` lo recorta por croma,
-erosionando un pixel el alfa para matar el fleco del antialias.
+Es un **render 3D de la pelota Teamgeist que ya está en el repo de la app**
+(`website/assets/ball/teamgeist.glb`), el mismo modelo que rebota en el hero de
+`fulbito.futbol`. No es una imitación ni un dibujo: es el modelo, renderizado.
 
-Para probar otras variantes: `python tools/gen_logo.py` (usa `GOOGLE_AI_API_KEY` del
-`.env` de la app; **cuesta ~USD 0.15 por imagen** con el modelo pro, ~0.04 con
-`--flash`). Los candidatos van a `tools/logo_candidatos/`, que está en `.gitignore`.
-Cuando se elige uno, se copia a `tools/pelota-fuente.png` y se corre `build_assets.py`.
+`assets/brand/pelota.webp` sale de `tools/pelota-fuente.png`, y ese PNG se rinde así:
 
-⚠️ Los prompts describen el patrón de paneles **sin nombrar ninguna marca**, y la
-variante de escudo se descartó justamente porque parecía un badge de club. Mismo
-criterio que el resto del sitio (ver § Chequeo de marcas).
+1. Servir el repo: `python -m http.server 8899`
+2. Abrir `http://127.0.0.1:8899/tools/render3d/` — carga el GLB con three.js, lo
+   ilumina con una luz clave dorada (para atarlo a la paleta sin repintar el modelo)
+   y lo rinde a 1024×1024 **con transparencia**. Cuando el título dice `LISTO`,
+   `window.PELOTA_PNG` tiene el dataURL.
+3. Guardar ese PNG como `tools/pelota-fuente.png` y correr `python tools/build_assets.py`,
+   que lo recorta al alfa, lo centra y saca de ahí el mark, los favicons, el `.ico`
+   y la `og-image`.
 
-Alternativa disponible: el mark de línea que usa la app
-(`fulbito/src/assets/teamgeist.png`, ícono de Javier Flowers / Noun Project). Para
-volver a él, apuntar `MARK_SRC` ahí y poner `MARK_CHROMA = False` en `build_assets.py`
-— y reponer el crédito en el footer.
+`tools/render3d/` trae su propia copia de three.js y del GLB (~1,4 MB) justamente
+para que esto se pueda repetir sin depender de dónde esté el repo de la app.
+
+**Licencia**: el modelo es «Adidas Teamgeist Ball (Germany 2006)» de Armellino
+Raffaele (Sketchfab), **CC BY 4.0** → la atribución es obligatoria y está en el footer
+del sitio. Las texturas ya venían editadas: **verificado que los PNG del GLB traen sólo
+las formas de los paneles, sin logos ni estrellas.**
+
+<details>
+<summary>Camino descartado: generar la pelota con Gemini</summary>
+
+`tools/gen_logo.py` genera variantes de logo con `gemini-3-pro-image` (usa
+`GOOGLE_AI_API_KEY` del `.env` de la app; **~USD 0.15 por imagen**, ~0.04 con
+`--flash`). Salen a `tools/logo_candidatos/`, que está en `.gitignore`.
+
+Se probaron siete. La mejor (`1-pelota-arcade`) estuvo un rato en el sitio y se cayó
+por dos motivos: **no era la Teamgeist** y, con esos paneles curvos anchos, **leía como
+pelota de vóley**. También se descartaron un lockup con el texto (el wordmark en CSS es
+texto real: escala, se indexa y lo lee un lector de pantalla) y un escudo, que parecía
+badge de club — justo lo que el sitio evita. El script queda por si sirve para otra cosa.
+</details>
 
 ## Legal
 

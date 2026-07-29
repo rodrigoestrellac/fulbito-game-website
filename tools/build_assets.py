@@ -31,14 +31,17 @@ FONT_OSWALD = os.path.join(RAIZ, "fulbito", "api", "assets", "fonts", "Oswald-Bo
 # El mark de la pelota Teamgeist es el MISMO de la app (fulbito/src/assets):
 # el sitio del juego hereda la identidad, no inventa una nueva.
 # Ícono original: Javier Flowers / Noun Project — crédito en el footer del sitio.
-# El mark de la pelota lo genero Gemini (tools/gen_logo.py, variante
-# "1-pelota-arcade", modelo gemini-3-pro-image) sobre un fondo magenta plano que
-# este script recorta. Es la pelota de Fulbito con el contorno grueso y el peso de
-# un emblema de arcade, para que pegue con el relieve del wordmark.
-# El mark de linea de la app (fulbito/src/assets/teamgeist.png) quedo como
-# alternativa: cambiar MARK_SRC y volver a correr el script.
+# El mark de la pelota es un RENDER 3D del modelo que ya esta en el repo de la
+# app: «Adidas Teamgeist Ball (Germany 2006)» de Armellino Raffaele (Sketchfab),
+# CC-BY-4.0, con las texturas ya editadas — verificado: los PNG del GLB traen
+# solo las formas de los paneles, sin logos ni estrellas. La atribucion CC-BY va
+# en el footer del sitio.
+#   Se rinde con three.js en tools/render3d/ (ver README § El mark de la pelota).
+#   Aca solo se recorta y se escala el PNG con alfa que sale de ahi.
+# ⚠️ Vuelto atras (2026-07-29): antes esto usaba una pelota generada por Gemini
+#    (tools/gen_logo.py). Quedaba linda pero leia como pelota de VOLEY, y no era
+#    la Teamgeist. El script queda por si sirve para otra cosa.
 MARK_SRC = os.path.join(HERE, "pelota-fuente.png")
-MARK_CHROMA = True     # el fuente viene con fondo magenta a recortar
 
 ORO = (201, 169, 78)
 NOCHE = (13, 27, 15)
@@ -139,54 +142,13 @@ def build_shots():
 
 
 # ── El mark de la pelota ─────────────────────────────────────────────────────
-def mark(size, color=ORO):
-    """El Teamgeist de la app, recoloreado y con alfa. La fuente es line-art
-    negro sobre blanco: la tinta pasa a ser el alfa, así queda con los bordes
-    suaves y sirve sobre cualquier fondo."""
+def mark(size):
+    """El render con alfa, recortado a la pelota y centrado en un cuadrado."""
     if not os.path.exists(MARK_SRC):
-        print("!! falta", MARK_SRC)
+        print("!! falta", MARK_SRC, "- rendealo con tools/render_pelota.md")
         sys.exit(1)
-    src = Image.open(MARK_SRC)
-    if src.mode in ("RGBA", "LA"):
-        # si ya viene con alfa, el blanco de atrás no existe: uso la luminancia
-        # del compuesto sobre blanco
-        fondo = Image.new("RGB", src.size, (255, 255, 255))
-        fondo.paste(src, (0, 0), src.getchannel("A"))
-        src = fondo
-    if MARK_CHROMA:
-        return _sacar_croma(src.convert("RGB"), size)
-    tinta = src.convert("L").point(lambda v: 255 - v)          # negro -> opaco
-    # el line-art es fino: al lado de un Oswald 700 enorme se ve anemico
-    tinta = tinta.filter(ImageFilter.MaxFilter(7))
-    im = Image.new("RGBA", src.size, color + (0,))
-    im.putalpha(tinta)
-    return im.resize((size, size), Image.LANCZOS)
-
-
-def _sacar_croma(src, size, tol=(52, 128)):
-    """Recorta el fondo plano del PNG que devuelve Gemini. La clave se toma del
-    borde de la imagen (no se hardcodea el magenta: el modelo no clava el hex).
-    Despues se ERODA el alfa un pixel, que es lo que mata el fleco de color que
-    queda en el antialias del contorno."""
-    import collections
-    a = src.load()
-    W, H = src.size
-    borde = [a[x, 0] for x in range(0, W, 4)] + [a[x, H - 1] for x in range(0, W, 4)]           + [a[0, y] for y in range(0, H, 4)] + [a[W - 1, y] for y in range(0, H, 4)]
-    clave = collections.Counter(borde).most_common(1)[0][0]
-
-    dist = Image.new("L", src.size)
-    dp = dist.load()
-    t0, t1 = tol
-    for y in range(H):
-        for x in range(W):
-            r, g, b = a[x, y]
-            d = ((r - clave[0]) ** 2 + (g - clave[1]) ** 2 + (b - clave[2]) ** 2) ** 0.5
-            dp[x, y] = 0 if d <= t0 else (255 if d >= t1 else int(255 * (d - t0) / (t1 - t0)))
-    dist = dist.filter(ImageFilter.MinFilter(3))
-
-    im = src.convert("RGBA")
-    im.putalpha(dist)
-    caja = dist.point(lambda v: 255 if v > 24 else 0).getbbox()
+    im = Image.open(MARK_SRC).convert("RGBA")
+    caja = im.split()[-1].getbbox()
     if caja:
         im = im.crop(caja)
     lado = max(im.size)
@@ -205,7 +167,7 @@ def icon_tile(size, radio=0.22, ss=4):
         b = int(S * .02)
         d.rounded_rectangle([b, b, S - 1 - b, S - 1 - b], radius=int(S * radio * .92),
                             outline=ORO, width=max(1, int(S * .022)))
-    m = mark(int(S * 0.70))
+    m = mark(int(S * 0.74))
     im.alpha_composite(m, ((S - m.width) // 2, (S - m.height) // 2))
     return im.resize((size, size), Image.LANCZOS)
 

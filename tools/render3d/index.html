@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Render del mark — pelota Teamgeist 3D</title>
+<!--
+  Renderiza la pelota Teamgeist del repo (teamgeist.glb, el MISMO modelo que usa
+  la app en su hero) a un PNG cuadrado con transparencia, para usarla como mark
+  del sitio del juego.
+
+  Cómo se usa (no hace falta a mano: lo hace tools/render_pelota.py):
+     1. servir game-website:  python -m http.server 8899
+     2. abrir http://127.0.0.1:8899/tools/render3d/
+     3. cuando dice LISTO, window.PELOTA_PNG tiene el dataURL
+
+  El modelo es «Adidas Teamgeist Ball (Germany 2006)» de Armellino Raffaele
+  (Sketchfab), CC-BY-4.0, con las texturas YA editadas para sacarle las marcas —
+  verificado: los PNG del GLB sólo traen las formas de los paneles, sin logos ni
+  estrellas. La atribución CC-BY va en el footer del sitio.
+-->
+<script type="importmap">
+  { "imports": { "three": "./vendor/three/three.module.min.js" } }
+</script>
+<style>
+  body { margin: 0; background: #0D1B0F; color: #C9A94E;
+         font: 14px/1.5 system-ui, sans-serif; padding: 20px; }
+  /* el tablero a cuadros deja ver que el alfa quedó limpio */
+  #caja { width: 512px; height: 512px; margin: 16px 0;
+    background-image:
+      linear-gradient(45deg, #1b241b 25%, transparent 25%, transparent 75%, #1b241b 75%),
+      linear-gradient(45deg, #1b241b 25%, transparent 25%, transparent 75%, #1b241b 75%);
+    background-size: 32px 32px; background-position: 0 0, 16px 16px; }
+  #estado { font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+</style>
+</head>
+<body>
+<p id="estado">Cargando…</p>
+<div id="caja"></div>
+
+<script type="module">
+import {
+  WebGLRenderer, PerspectiveCamera, Scene, Group,
+  DirectionalLight, AmbientLight, PMREMGenerator, Box3, Vector3,
+  ACESFilmicToneMapping,
+} from 'three';
+import { GLTFLoader } from './vendor/jsm/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from './vendor/jsm/libs/meshopt_decoder.module.js';
+import { RoomEnvironment } from './vendor/jsm/environments/RoomEnvironment.js';
+
+const LADO = 512;   // se renderiza a 2x = 1024 px reales
+const estado = document.getElementById('estado');
+
+const renderer = new WebGLRenderer({ alpha: true, antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(2);
+renderer.setSize(LADO, LADO, false);
+renderer.toneMapping = ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.18;
+const lienzo = renderer.domElement;
+lienzo.style.width = lienzo.style.height = LADO + 'px';
+document.getElementById('caja').appendChild(lienzo);
+
+const escena = new Scene();
+const camara = new PerspectiveCamera(30, 1, 0.1, 100);
+camara.position.set(0, 0, 4.4);
+
+// El entorno es lo que le da el brillo de 3D de verdad (reflejo suave en los
+// paneles). Sin esto la pelota queda plana y no se gana nada contra un vector.
+const pmrem = new PMREMGenerator(renderer);
+escena.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+// Luz principal DORADA desde arriba a la izquierda: ata la pelota a la paleta
+// del sitio sin repintar el modelo. Relleno frío tenue del otro lado para que
+// el lado en sombra no se coma el dibujo de los paneles.
+const clave = new DirectionalLight(0xF2DFA6, 2.6);
+clave.position.set(-2.4, 3.0, 2.2);
+escena.add(clave);
+const relleno = new DirectionalLight(0x8FA98C, 0.55);
+relleno.position.set(2.6, -1.2, 1.4);
+escena.add(relleno);
+escena.add(new AmbientLight(0xF0EDE4, 0.35));
+
+const pelota = new Group();
+escena.add(pelota);
+
+const cargador = new GLTFLoader();
+cargador.setMeshoptDecoder(MeshoptDecoder);
+cargador.load('./teamgeist.glb', (gltf) => {
+  const modelo = gltf.scene;
+  // normalizo a radio 1 igual que la app, así el encuadre es predecible
+  const caja = new Box3().setFromObject(modelo);
+  const centro = caja.getCenter(new Vector3());
+  const radio = caja.getSize(new Vector3()).length() / (2 * Math.sqrt(3));
+  modelo.position.sub(centro);
+  modelo.scale.setScalar(1 / radio);
+  modelo.traverse((o) => {
+    if (o.isMesh && o.material) {
+      o.material.envMapIntensity = 1.15;
+      if (o.material.map) o.material.map.anisotropy = 8;
+    }
+  });
+  pelota.add(modelo);
+  // ángulo elegido a ojo: se ven tres paneles enteros y la costura del medio,
+  // que es lo que hace reconocible a esta pelota
+  pelota.rotation.set(0.34, -0.62, 0.06);
+
+  // el modelo trae el mapa de entorno recién en el primer frame: dos pasadas
+  renderer.render(escena, camara);
+  renderer.render(escena, camara);
+
+  window.PELOTA_PNG = lienzo.toDataURL('image/png');
+  estado.textContent = 'Listo — ' + Math.round(window.PELOTA_PNG.length / 1024) + ' KB de dataURL';
+  document.title = 'LISTO';
+}, undefined, (e) => {
+  estado.textContent = 'Error cargando el GLB: ' + e.message;
+});
+</script>
+</body>
+</html>
