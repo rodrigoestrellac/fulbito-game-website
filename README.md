@@ -105,7 +105,28 @@ tiene, las tarjetas de jugadas firma usan los **retratos** (renders limpios) en 
 jugada en acción, y el hero le aplica un desenfoque graduado a la tribuna — que es una
 textura de sprites de baja resolución — para que lea como profundidad de campo.
 
+## El mark de la pelota
+
+`assets/brand/pelota.webp` sale de `tools/pelota-fuente.png`, que lo generó **Gemini**
+(`gemini-3-pro-image`) con `tools/gen_logo.py` — variante `1-pelota-arcade`. El modelo
+lo devuelve sobre un fondo magenta plano y `build_assets.py` lo recorta por croma,
+erosionando un pixel el alfa para matar el fleco del antialias.
+
+Para probar otras variantes: `python tools/gen_logo.py` (usa `GOOGLE_AI_API_KEY` del
+`.env` de la app; **cuesta ~USD 0.15 por imagen** con el modelo pro, ~0.04 con
+`--flash`). Los candidatos van a `tools/logo_candidatos/`, que está en `.gitignore`.
+Cuando se elige uno, se copia a `tools/pelota-fuente.png` y se corre `build_assets.py`.
+
+⚠️ Los prompts describen el patrón de paneles **sin nombrar ninguna marca**, y la
+variante de escudo se descartó justamente porque parecía un badge de club. Mismo
+criterio que el resto del sitio (ver § Chequeo de marcas).
+
+Alternativa disponible: el mark de línea que usa la app
+(`fulbito/src/assets/teamgeist.png`, ícono de Javier Flowers / Noun Project). Para
+volver a él, apuntar `MARK_SRC` ahí y poner `MARK_CHROMA = False` en `build_assets.py`
+— y reponer el crédito en el footer.
+
 ## Legal
 
 Proyecto personal, sin fines comerciales. No está afiliado ni autorizado por ningún club,
-jugador, marca ni liga. Pelota Teamgeist: modelo CC-BY (atribución en el footer).
+jugador, marca ni liga.

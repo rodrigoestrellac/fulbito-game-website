@@ -7,7 +7,7 @@ otros repos. Idempotente: se puede correr las veces que haga falta.
     python tools/build_assets.py
 
 Produce:
-    assets/brand/teamgeist.webp    el mark de la pelota, dorado, con alfa
+    assets/brand/pelota.webp       el mark de la pelota, con alfa
     assets/brand/*.png|ico|jpg     favicons, apple-touch, og-image, ícono del instalador
     assets/roster/*.webp           retratos recortados a busto, 480x480
     assets/firmas/*.webp           los mismos retratos a 720x720, p/ las tarjetas grandes
@@ -31,7 +31,14 @@ FONT_OSWALD = os.path.join(RAIZ, "fulbito", "api", "assets", "fonts", "Oswald-Bo
 # El mark de la pelota Teamgeist es el MISMO de la app (fulbito/src/assets):
 # el sitio del juego hereda la identidad, no inventa una nueva.
 # Ícono original: Javier Flowers / Noun Project — crédito en el footer del sitio.
-MARK_SRC = os.path.join(RAIZ, "fulbito", "src", "assets", "teamgeist.png")
+# El mark de la pelota lo genero Gemini (tools/gen_logo.py, variante
+# "1-pelota-arcade", modelo gemini-3-pro-image) sobre un fondo magenta plano que
+# este script recorta. Es la pelota de Fulbito con el contorno grueso y el peso de
+# un emblema de arcade, para que pegue con el relieve del wordmark.
+# El mark de linea de la app (fulbito/src/assets/teamgeist.png) quedo como
+# alternativa: cambiar MARK_SRC y volver a correr el script.
+MARK_SRC = os.path.join(HERE, "pelota-fuente.png")
+MARK_CHROMA = True     # el fuente viene con fondo magenta a recortar
 
 ORO = (201, 169, 78)
 NOCHE = (13, 27, 15)
@@ -146,14 +153,46 @@ def mark(size, color=ORO):
         fondo = Image.new("RGB", src.size, (255, 255, 255))
         fondo.paste(src, (0, 0), src.getchannel("A"))
         src = fondo
+    if MARK_CHROMA:
+        return _sacar_croma(src.convert("RGB"), size)
     tinta = src.convert("L").point(lambda v: 255 - v)          # negro -> opaco
-    # el line-art original es fino: al lado de un Oswald 700 enorme se ve
-    # anemico. Un engorde de 3 px (a 550 de lado) lo empareja con la tipografia
-    # sin cambiarle el dibujo.
+    # el line-art es fino: al lado de un Oswald 700 enorme se ve anemico
     tinta = tinta.filter(ImageFilter.MaxFilter(7))
     im = Image.new("RGBA", src.size, color + (0,))
     im.putalpha(tinta)
     return im.resize((size, size), Image.LANCZOS)
+
+
+def _sacar_croma(src, size, tol=(52, 128)):
+    """Recorta el fondo plano del PNG que devuelve Gemini. La clave se toma del
+    borde de la imagen (no se hardcodea el magenta: el modelo no clava el hex).
+    Despues se ERODA el alfa un pixel, que es lo que mata el fleco de color que
+    queda en el antialias del contorno."""
+    import collections
+    a = src.load()
+    W, H = src.size
+    borde = [a[x, 0] for x in range(0, W, 4)] + [a[x, H - 1] for x in range(0, W, 4)]           + [a[0, y] for y in range(0, H, 4)] + [a[W - 1, y] for y in range(0, H, 4)]
+    clave = collections.Counter(borde).most_common(1)[0][0]
+
+    dist = Image.new("L", src.size)
+    dp = dist.load()
+    t0, t1 = tol
+    for y in range(H):
+        for x in range(W):
+            r, g, b = a[x, y]
+            d = ((r - clave[0]) ** 2 + (g - clave[1]) ** 2 + (b - clave[2]) ** 2) ** 0.5
+            dp[x, y] = 0 if d <= t0 else (255 if d >= t1 else int(255 * (d - t0) / (t1 - t0)))
+    dist = dist.filter(ImageFilter.MinFilter(3))
+
+    im = src.convert("RGBA")
+    im.putalpha(dist)
+    caja = dist.point(lambda v: 255 if v > 24 else 0).getbbox()
+    if caja:
+        im = im.crop(caja)
+    lado = max(im.size)
+    lienzo = Image.new("RGBA", (lado, lado), (0, 0, 0, 0))
+    lienzo.alpha_composite(im, ((lado - im.width) // 2, (lado - im.height) // 2))
+    return lienzo.resize((size, size), Image.LANCZOS)
 
 
 def icon_tile(size, radio=0.22, ss=4):
@@ -184,7 +223,7 @@ def build_brand():
     from io import BytesIO
 
     m = mark(512)
-    m.save(out("assets", "brand", "teamgeist.webp"), "WEBP", quality=90, method=6, lossless=False)
+    m.save(out("assets", "brand", "pelota.webp"), "WEBP", quality=90, method=6, lossless=False)
 
     # favicon SVG: el mark embebido en PNG dentro del SVG. Es un archivo solo,
     # sin dependencias, y el navegador lo escala sin perder nitidez en la baldosa.
@@ -198,7 +237,7 @@ def build_brand():
     icon_tile(256).save(out("assets", "brand", "fulbito.ico"),
                         sizes=[(16, 16), (32, 32), (48, 48), (256, 256)])
     build_og()
-    print("brand: teamgeist.webp, favicon.svg, favicon-32, apple-touch-180, fulbito.ico, og-image")
+    print("brand: pelota.webp, favicon.svg, favicon-32, apple-touch-180, fulbito.ico, og-image")
 
 
 def build_og():

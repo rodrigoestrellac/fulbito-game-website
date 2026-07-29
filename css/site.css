@@ -558,3 +558,11 @@ code {
   background: rgba(201, 169, 78, .09); padding: 1px 5px; border-radius: var(--r-sm);
   color: var(--oro-claro);
 }
+
+.pie__corazon { color: var(--oro); }
+/* el emoji ⚽ entra como glifo de color (azul y blanco) y rompe la paleta:
+   va el mark propio, dorado, alineado a la altura de la x */
+.pie__pelotita {
+  display: inline-block; width: 1.05em; height: auto;
+  vertical-align: -.16em; margin-inline: .06em;
+}
