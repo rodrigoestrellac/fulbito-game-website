@@ -1,0 +1,53 @@
+/* variables.css — tokens heredados del design system de Fulbito (app + juego).
+   Los valores de color y las tipografías son los MISMOS que web.fulbito.futbol
+   (website/css/variables.css): esto es la misma marca, no un sitio aparte. */
+:root {
+  /* ── Colores ── */
+  --cesped: #2D5016;
+  --cesped-claro: #4A7A2E;
+  --noche: #0D1B0F;
+  --noche-hondo: #070E08;   /* propio del sitio del juego: el fondo del estadio */
+  --oro: #C9A94E;
+  --oro-claro: #E8D48B;
+  --cal: #F0EDE4;
+  --cal-tenue: #A8B2A5;     /* texto secundario sobre noche */
+
+  /* anillos de selección del juego: P1 azul, rival rojo. Se usan SOLO como
+     marca de equipo en las figuritas — no son colores de UI. */
+  --anillo-azul: #3E8BD8;
+  --anillo-rojo: #E0533A;
+
+  /* ── Glass ── */
+  --glass-bg: rgba(13, 27, 15, 0.72);
+  --glass-borde: rgba(201, 169, 78, 0.18);
+  --glass-blur: blur(16px);
+
+  /* ── Tipografía ── */
+  --display: 'Oswald', 'Arial Narrow', sans-serif;
+  --body: 'DM Sans', system-ui, sans-serif;
+  --tiza: 'Caveat', cursive;
+
+  /* escala fluida */
+  --t-wordmark: clamp(3.6rem, 15vw, 10.5rem);
+  --t-titulo: clamp(2rem, 5.2vw, 3.6rem);
+  --t-sub: clamp(1.15rem, 2.2vw, 1.5rem);
+  --t-body: clamp(1rem, 1.05vw, 1.0625rem);
+  --t-micro: 0.75rem;
+
+  /* ── Espaciado ── */
+  --s1: 4px;  --s2: 8px;  --s3: 16px; --s4: 24px;
+  --s5: 32px; --s6: 48px; --s7: 64px; --s8: 96px;
+  --seccion: clamp(64px, 9vw, 128px);
+
+  --r-sm: 4px; --r-md: 8px; --r-lg: 14px;
+
+  --sombra-card: 0 8px 32px rgba(0, 0, 0, .38);
+  --brillo-oro: 0 0 24px rgba(201, 169, 78, .28);
+
+  --ease: cubic-bezier(.22, 1, .36, 1);
+  --ease-back: cubic-bezier(.34, 1.56, .64, 1);
+
+  --ancho: 1160px;
+  --ancho-angosto: 720px;
+  --marcador-h: 56px;
+}

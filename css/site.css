@@ -1,0 +1,560 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   site.css — Fulbito: The Game
+   Idea rectora: la página es un partido. El scroll es el reloj, la barra fija
+   es el marcador de la transmisión y cada sección entra con su minuto.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body {
+  margin: 0;
+  background: var(--noche-hondo);
+  color: var(--cal);
+  font-family: var(--body);
+  font-size: var(--t-body);
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* `height: auto` NO es opcional: todas las <img> llevan width/height como
+   atributo (para que el navegador reserve el lugar y no salte el layout), y ese
+   height es un valor USADO que le gana a cualquier `aspect-ratio` del CSS. Sin
+   esto, las tarjetas del roster y de las firmas se dibujaban con la altura
+   intrinseca del archivo (720 px) en vez de la del diseno. */
+img { max-width: 100%; height: auto; display: block; }
+a { color: var(--oro-claro); text-decoration-color: rgba(201, 169, 78, .4); text-underline-offset: 3px; }
+a:hover { text-decoration-color: var(--oro); }
+
+:focus-visible {
+  outline: 2px solid var(--oro-claro);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.saltar {
+  position: absolute; left: -9999px; top: 0; z-index: 999;
+  background: var(--oro); color: var(--noche); padding: 10px 18px;
+  font-family: var(--display); font-weight: 700; letter-spacing: .08em;
+}
+.saltar:focus { left: 8px; top: 8px; }
+
+.env { width: min(100% - 40px, var(--ancho)); margin-inline: auto; }
+.angosto { max-width: var(--ancho-angosto); }
+
+/* ── Tipografía base ───────────────────────────────────────────────────── */
+h1, h2, h3 { font-family: var(--display); font-weight: 700; margin: 0; line-height: 1.04; }
+h2 { font-size: var(--t-titulo); text-transform: uppercase; letter-spacing: .015em; }
+h3 { font-size: 1.2rem; text-transform: uppercase; letter-spacing: .08em; }
+p { margin: 0 0 1em; }
+p:last-child { margin-bottom: 0; }
+
+.bajada { font-size: var(--t-sub); color: var(--cal-tenue); line-height: 1.5; }
+.tiza {
+  font-family: var(--tiza); font-size: 1.5rem; color: var(--oro-claro);
+  line-height: 1.35; transform: rotate(-1.2deg); transform-origin: left;
+}
+
+/* ── El minuto: el marcador estructural de la página ───────────────────── */
+.minuto {
+  display: flex; align-items: center; gap: 14px;
+  font-family: var(--display); font-weight: 500;
+  font-size: var(--t-micro); letter-spacing: .22em; text-transform: uppercase;
+  color: var(--oro); margin-bottom: var(--s3);
+}
+.minuto::before {
+  content: attr(data-min);
+  font-weight: 700; font-size: 1.05rem; letter-spacing: .02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--noche); background: var(--oro);
+  padding: 1px 9px 2px; border-radius: 2px;
+}
+.minuto::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(201,169,78,.35), transparent); }
+
+/* ── Marcador fijo (aparece pasado el hero) ────────────────────────────── */
+.marcador {
+  position: fixed; inset: 0 0 auto; z-index: 60;
+  height: var(--marcador-h);
+  display: flex; align-items: center; gap: var(--s4);
+  padding-inline: clamp(16px, 3vw, 28px);
+  background: rgba(7, 14, 8, .86);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-bottom: 1px solid var(--glass-borde);
+  transform: translateY(-100%);
+  transition: transform .45s var(--ease);
+}
+.marcador.visible { transform: none; }
+.marcador__marca {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--display); font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase; font-size: .95rem;
+  color: var(--cal); text-decoration: none;
+}
+.marcador__marca img { width: 21px; height: 21px; }
+.marcador__reloj {
+  font-family: var(--display); font-weight: 500; font-size: .8rem;
+  letter-spacing: .16em; color: var(--oro);
+  font-variant-numeric: tabular-nums;
+  padding-left: var(--s4);
+  border-left: 1px solid rgba(201, 169, 78, .22);
+}
+.marcador__cta { margin-left: auto; }
+@media (max-width: 620px) {
+  .marcador__reloj { display: none; }
+  .marcador { gap: var(--s3); }
+}
+
+/* ── Botones ───────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--display); font-weight: 700;
+  font-size: .95rem; letter-spacing: .1em; text-transform: uppercase;
+  padding: 14px 26px; border: 0; border-radius: var(--r-sm);
+  background: var(--oro); color: var(--noche);
+  text-decoration: none; cursor: pointer;
+  transition: background .2s var(--ease), transform .2s var(--ease-back), box-shadow .2s var(--ease);
+}
+.btn:hover { background: var(--oro-claro); transform: translateY(-2px); box-shadow: var(--brillo-oro); }
+.btn:active { transform: none; }
+.btn--chico { padding: 9px 16px; font-size: .78rem; letter-spacing: .09em; }
+.btn--grande { padding: 18px 34px; font-size: 1.1rem; }
+.btn--fantasma {
+  background: transparent; color: var(--oro-claro);
+  box-shadow: inset 0 0 0 1px rgba(201, 169, 78, .38);
+}
+.btn--fantasma:hover { background: rgba(201, 169, 78, .1); color: var(--oro-claro); box-shadow: inset 0 0 0 1px var(--oro); }
+.btn[aria-disabled="true"] { opacity: .5; pointer-events: none; }
+
+/* ── HERO ──────────────────────────────────────────────────────────────── */
+.hero {
+  position: relative; min-height: 100svh;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding-bottom: clamp(28px, 6vh, 64px);
+  overflow: hidden;
+}
+.hero__fondo { position: absolute; inset: 0; z-index: 0; }
+.hero__fondo img, .hero__fondo video {
+  width: 100%; height: 100%; object-fit: cover;
+  /* la captura está tomada de frente: el encuadre útil es el tercio superior */
+  object-position: 50% 32%;
+}
+/* viñeta + gradiente: el texto tiene que leerse sin depender de la imagen */
+.hero__fondo::after {
+  content: ''; position: absolute; inset: 0;
+  background:
+    radial-gradient(120% 85% at 50% 18%, transparent 20%, rgba(7,14,8,.72) 78%),
+    linear-gradient(to bottom, rgba(7,14,8,.55) 0%, rgba(7,14,8,.2) 32%, rgba(7,14,8,.94) 88%, var(--noche-hondo) 100%);
+}
+.hero__cuerpo { position: relative; z-index: 1; }
+
+.wordmark { display: flex; align-items: baseline; gap: clamp(10px, 2vw, 22px); }
+/* El wordmark es lo único que se permite gritar. El relieve dorado duro (sin
+   blur) es lo que le da la onda de fichín: la letra crema se despega del fondo
+   con su propia sombra sólida, como los títulos de los arcades. En em para que
+   escale sola con el clamp del tamaño. */
+.wordmark__texto {
+  font-family: var(--display); font-weight: 700;
+  font-size: var(--t-wordmark); line-height: .84;
+  letter-spacing: .04em; text-transform: uppercase;
+  margin: 0; color: var(--cal);
+  text-shadow:
+    .022em .03em 0 var(--oro),
+    .044em .06em 0 rgba(160, 130, 52, .85),
+    .058em .08em 0 rgba(13, 27, 15, .9),
+    0 .1em .32em rgba(0, 0, 0, .55);
+}
+.wordmark__pelota {
+  width: clamp(34px, 10vw, 108px); height: auto; flex: none;
+  align-self: center; margin-bottom: clamp(4px, 1.4vw, 16px);
+  /* la misma sombra dura del wordmark, para que la pelota viva en su capa */
+  filter: drop-shadow(.04em .055em 0 rgba(13, 27, 15, .9));
+}
+.wordmark__sub {
+  display: flex; align-items: center; gap: 14px;
+  margin-top: clamp(8px, 1.6vw, 18px);
+  font-family: var(--display); font-weight: 500;
+  font-size: clamp(.9rem, 2.4vw, 1.5rem);
+  letter-spacing: .42em; text-transform: uppercase; color: var(--oro);
+}
+.wordmark__sub::before { content: ''; width: clamp(28px, 5vw, 64px); height: 2px; background: var(--oro); }
+
+.hero__tagline {
+  margin: clamp(20px, 3vh, 34px) 0 clamp(22px, 3.4vh, 36px);
+  font-size: clamp(1.05rem, 2.4vw, 1.55rem);
+  color: var(--cal); max-width: 21ch; line-height: 1.35;
+}
+.hero__tagline b { color: var(--oro-claro); font-weight: 500; }
+
+.hero__acciones { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s3); }
+.hero__nota { font-size: .875rem; color: var(--cal-tenue); }
+
+/* lower third: la ficha del partido, como el zócalo de una transmisión */
+.zocalo {
+  margin-top: clamp(26px, 4.5vh, 52px);
+  padding-top: var(--s3);
+  border-top: 1px solid rgba(201, 169, 78, .22);
+  display: flex; flex-wrap: wrap; gap: 6px 26px;
+  font-family: var(--display); font-weight: 500;
+  font-size: .8rem; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--cal-tenue);
+}
+.zocalo b { color: var(--oro); font-weight: 700; }
+
+/* ── Ticker dorado (el separador con las jugadas firma) ────────────────── */
+.ticker {
+  background: var(--oro); color: var(--noche);
+  padding: 11px 0; overflow: hidden;
+  border-block: 1px solid rgba(13, 27, 15, .18);
+  --ticker-dur: 46s;
+}
+.ticker__pista { display: flex; width: max-content; animation: correr var(--ticker-dur) linear infinite; }
+.ticker__grupo {
+  display: flex; gap: 34px; padding-right: 34px; flex: none;
+  font-family: var(--display); font-weight: 700;
+  font-size: .82rem; letter-spacing: .2em; text-transform: uppercase;
+  white-space: nowrap;
+}
+.ticker__grupo span::after { content: ' ·'; opacity: .45; margin-left: 34px; }
+@keyframes correr { to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) {
+  .ticker__pista { animation: none; }
+  .ticker { overflow-x: auto; }
+}
+
+/* ── Secciones ─────────────────────────────────────────────────────────── */
+.seccion { padding-block: var(--seccion); position: relative; }
+.seccion--suave { background: linear-gradient(180deg, var(--noche-hondo), var(--noche) 40%, var(--noche-hondo)); }
+.seccion__intro { max-width: 56ch; }
+.seccion__intro h2 + p { margin-top: var(--s3); }
+
+/* ── Banda cinematográfica (el gol) ────────────────────────────────────── */
+/* Panel contenido, no full-bleed: la captura es de 1280 de ancho y estirada a
+   todo el viewport se veía blanda. Acá nunca pasa del ancho del contenedor. */
+.banda {
+  position: relative; isolation: isolate;
+  width: min(100% - 40px, var(--ancho)); margin-inline: auto;
+  border-radius: var(--r-lg); overflow: hidden;
+  border: 1px solid var(--glass-borde);
+}
+.banda__img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+.banda::after {
+  content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(90deg, rgba(7,14,8,.94) 0%, rgba(7,14,8,.7) 42%, transparent 78%),
+              linear-gradient(to top, rgba(7,14,8,.9), transparent 45%);
+}
+.banda__texto {
+  position: absolute; z-index: 2; inset: auto auto 0 0;
+  padding: clamp(24px, 5vw, 64px);
+  max-width: min(100%, 46ch);
+}
+@media (max-width: 760px) {
+  .banda__img { aspect-ratio: 4 / 3; }
+  .banda::after { background: linear-gradient(to top, rgba(7,14,8,.96) 24%, rgba(7,14,8,.45) 70%, rgba(7,14,8,.2)); }
+}
+
+/* ── Jugadas firma ─────────────────────────────────────────────────────── */
+.firmas { display: grid; gap: var(--s4); grid-template-columns: repeat(3, 1fr); margin-top: var(--s6); }
+@media (max-width: 900px) { .firmas { grid-template-columns: 1fr; } }
+
+.firma {
+  background: var(--glass-bg); border: 1px solid var(--glass-borde);
+  border-radius: var(--r-lg); overflow: hidden;
+  display: flex; flex-direction: column;
+}
+/* El retrato es un render limpio a 720²: se muestra cuadrado y sin recorte
+   fuerte. (Las capturas del sim de firmas salen a 720p sin antialias y se veían
+   pixeladas acá — por eso la tarjeta usa el retrato y no la jugada en acción.) */
+.firma img {
+  aspect-ratio: 1; object-fit: cover; object-position: 50% 42%;
+  background: radial-gradient(70% 70% at 50% 35%, #2b322b, #151a15);
+  border-bottom: 1px solid var(--glass-borde);
+}
+.firma__cuerpo { padding: var(--s4); }
+.firma__nombre { color: var(--oro); font-size: 1.35rem; letter-spacing: .06em; }
+.firma__duenio {
+  display: block; margin-top: 4px; margin-bottom: 10px;
+  font-family: var(--display); font-weight: 500;
+  font-size: .72rem; letter-spacing: .2em; text-transform: uppercase; color: var(--cal-tenue);
+}
+.firma p { font-size: .95rem; color: var(--cal-tenue); }
+
+/* el resto de las firmas: una lista, porque es una lista */
+.firmas-resto {
+  margin-top: var(--s6); padding-top: var(--s5);
+  border-top: 1px solid rgba(201, 169, 78, .16);
+  display: flex; flex-wrap: wrap; gap: 10px;
+  list-style: none; padding-inline: 0;
+}
+.firmas-resto li {
+  font-family: var(--display); font-weight: 500;
+  font-size: .82rem; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--cal); padding: 7px 14px;
+  border: 1px solid rgba(201, 169, 78, .22); border-radius: 100px;
+}
+.firmas-resto li em { font-style: normal; color: var(--oro); }
+
+/* ── El plantel: álbum de figuritas ────────────────────────────────────── */
+.album__encabezado {
+  display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
+  gap: var(--s4); margin-bottom: var(--s6);
+}
+.album__contador {
+  font-family: var(--display); font-weight: 500;
+  font-size: .8rem; letter-spacing: .18em; text-transform: uppercase; color: var(--cal-tenue);
+}
+.album__contador b { color: var(--oro); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+.album {
+  display: grid; gap: clamp(12px, 1.6vw, 20px);
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  list-style: none; margin: 0; padding: 0;
+}
+.figu {
+  position: relative; border-radius: var(--r-md); overflow: hidden;
+  background: linear-gradient(170deg, #232a23, #141914);
+  box-shadow: var(--sombra-card);
+  border: 1px solid rgba(201, 169, 78, .2);
+  transition: transform .28s var(--ease-back), border-color .28s var(--ease), box-shadow .28s var(--ease);
+}
+.figu:hover, .figu:focus-within {
+  transform: translateY(-5px) rotate(-.6deg);
+  border-color: var(--oro);
+  box-shadow: var(--sombra-card), var(--brillo-oro);
+}
+.figu img { width: 100%; aspect-ratio: 1; object-fit: cover; }
+.figu__pie {
+  padding: 9px 11px 11px;
+  border-top: 1px solid rgba(201, 169, 78, .18);
+  background: rgba(7, 14, 8, .62);
+}
+.figu__nombre {
+  display: block; font-family: var(--display); font-weight: 700;
+  font-size: .82rem; letter-spacing: .07em; text-transform: uppercase;
+  color: var(--cal); line-height: 1.2;
+}
+.figu__firma {
+  display: block; margin-top: 3px;
+  font-family: var(--display); font-weight: 500;
+  font-size: .62rem; letter-spacing: .14em; text-transform: uppercase; color: var(--oro);
+}
+.figu__pos {
+  position: absolute; top: 8px; left: 8px; z-index: 2;
+  width: 22px; height: 22px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-family: var(--display); font-weight: 700; font-size: .58rem; letter-spacing: .02em;
+  background: rgba(7, 14, 8, .8); color: var(--cal);
+  border: 1.5px solid var(--anillo-azul);
+}
+.figu__pos[data-pos="ARQ"] { border-color: var(--oro); color: var(--oro); }
+
+/* el hueco del álbum: honesto, faltan 6 */
+.figu--falta { background: repeating-linear-gradient(135deg, #131813 0 9px, #171d17 9px 18px); border-style: dashed; }
+.figu--falta:hover { transform: none; border-color: rgba(201, 169, 78, .3); box-shadow: var(--sombra-card); }
+.figu--falta .figu__hueco {
+  aspect-ratio: 1; display: grid; place-items: center;
+  font-family: var(--display); font-weight: 700; font-size: 2.4rem;
+  color: rgba(240, 237, 228, .12);
+}
+.figu--falta .figu__nombre { color: var(--cal-tenue); }
+
+/* ── Modos: la pantalla del menú, tal cual ─────────────────────────────── */
+.menu {
+  margin-top: var(--s6); list-style: none; padding: 0;
+  border-top: 1px solid rgba(201, 169, 78, .16);
+}
+.menu li {
+  display: grid; grid-template-columns: auto 1fr auto; align-items: baseline;
+  gap: var(--s3) var(--s4);
+  padding: var(--s4) var(--s3) var(--s4) 0;
+  border-bottom: 1px solid rgba(201, 169, 78, .16);
+  transition: background .2s var(--ease), padding-left .2s var(--ease);
+}
+.menu li:hover { background: rgba(201, 169, 78, .05); padding-left: var(--s3); }
+.menu__flecha { color: var(--oro); font-family: var(--display); opacity: 0; transition: opacity .2s; }
+.menu li:hover .menu__flecha { opacity: 1; }
+.menu__label {
+  font-family: var(--display); font-weight: 700; font-size: clamp(1rem, 2.1vw, 1.35rem);
+  letter-spacing: .09em; text-transform: uppercase; color: var(--cal);
+}
+.menu__que { grid-column: 2; color: var(--cal-tenue); font-size: .95rem; }
+.menu__mando {
+  font-family: var(--display); font-weight: 500; font-size: .68rem;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--oro);
+  white-space: nowrap; align-self: center;
+}
+@media (max-width: 660px) {
+  .menu li { grid-template-columns: auto 1fr; }
+  .menu__mando { grid-column: 2; align-self: start; }
+}
+
+/* ── Requisitos ────────────────────────────────────────────────────────── */
+.claim {
+  font-family: var(--display); font-weight: 700;
+  font-size: clamp(1.6rem, 4.4vw, 2.9rem); line-height: 1.1;
+  text-transform: uppercase; letter-spacing: .01em;
+  color: var(--cal); max-width: 18ch;
+}
+.claim b { color: var(--oro); font-weight: 700; }
+
+.tabla-envoltura { overflow-x: auto; margin-top: var(--s6); -webkit-overflow-scrolling: touch; }
+table.specs { width: 100%; min-width: 520px; border-collapse: collapse; font-size: .95rem; }
+table.specs th, table.specs td { padding: 14px 16px; text-align: left; border-bottom: 1px solid rgba(201, 169, 78, .14); vertical-align: top; }
+table.specs thead th {
+  font-family: var(--display); font-weight: 700; font-size: .72rem;
+  letter-spacing: .18em; text-transform: uppercase; color: var(--oro);
+  border-bottom-color: rgba(201, 169, 78, .3);
+}
+table.specs tbody th {
+  font-family: var(--display); font-weight: 500; font-size: .78rem;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--cal); width: 1%; white-space: nowrap;
+}
+table.specs td { color: var(--cal-tenue); }
+table.specs td:first-of-type { color: var(--cal); }
+
+.medido {
+  margin-top: var(--s5); padding: var(--s4);
+  border-left: 2px solid var(--oro);
+  background: rgba(201, 169, 78, .05);
+  font-size: .92rem; color: var(--cal-tenue);
+}
+
+/* ── El relator ────────────────────────────────────────────────────────── */
+.relator { display: flex; flex-wrap: wrap; gap: var(--s3); margin-top: var(--s5); }
+.voz {
+  display: inline-flex; align-items: center; gap: 11px;
+  padding: 12px 20px 12px 14px; border-radius: 100px;
+  background: rgba(13, 27, 15, .7); color: var(--cal);
+  border: 1px solid rgba(201, 169, 78, .25);
+  font-family: var(--display); font-weight: 500;
+  font-size: .82rem; letter-spacing: .13em; text-transform: uppercase;
+  cursor: pointer; transition: border-color .2s, background .2s, color .2s;
+}
+.voz:hover { border-color: var(--oro); background: rgba(201, 169, 78, .08); }
+.voz__icono {
+  width: 26px; height: 26px; border-radius: 50%; flex: none;
+  display: grid; place-items: center;
+  background: var(--oro); color: var(--noche); font-size: .7rem;
+}
+.voz[aria-pressed="true"] { border-color: var(--oro); color: var(--oro-claro); }
+.voz[aria-pressed="true"] .voz__icono { animation: latir 1s var(--ease) infinite; }
+@keyframes latir { 50% { transform: scale(1.14); } }
+@media (prefers-reduced-motion: reduce) { .voz[aria-pressed="true"] .voz__icono { animation: none; } }
+
+/* ── Descarga ──────────────────────────────────────────────────────────── */
+.descargas { display: grid; gap: var(--s3); margin-top: var(--s5); }
+.bajada-item {
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--s3) var(--s4);
+  padding: var(--s4);
+  border: 1px solid var(--glass-borde); border-radius: var(--r-lg);
+  background: var(--glass-bg);
+}
+.bajada-item__so {
+  font-family: var(--display); font-weight: 700; font-size: 1.05rem;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--cal);
+  min-width: 8ch;
+}
+.bajada-item__meta { color: var(--cal-tenue); font-size: .9rem; flex: 1 1 14ch; }
+.bajada-item__meta em { font-style: normal; color: var(--oro); }
+.bajada-item .btn { margin-left: auto; }
+
+/* ── Pasos de instalación ──────────────────────────────────────────────── */
+.pasos { counter-reset: paso; list-style: none; padding: 0; margin: var(--s5) 0 0; }
+.pasos > li {
+  counter-increment: paso; position: relative;
+  padding: 0 0 var(--s5) var(--s6);
+  border-left: 1px solid rgba(201, 169, 78, .2);
+}
+.pasos > li:last-child { border-left-color: transparent; padding-bottom: 0; }
+.pasos > li::before {
+  content: counter(paso); position: absolute; left: 0; top: -2px;
+  transform: translateX(-50%);
+  width: 30px; height: 30px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--noche-hondo); border: 1px solid var(--oro);
+  font-family: var(--display); font-weight: 700; font-size: .85rem; color: var(--oro);
+}
+.pasos h3 { margin-bottom: 6px; color: var(--cal); }
+.pasos p { color: var(--cal-tenue); font-size: .95rem; }
+.tecla {
+  display: inline-block; padding: 1px 7px; margin: 0 1px;
+  border-radius: var(--r-sm); background: rgba(201, 169, 78, .13);
+  border: 1px solid rgba(201, 169, 78, .3);
+  font-family: var(--display); font-weight: 500; font-size: .82em;
+  letter-spacing: .06em; color: var(--oro-claro); white-space: nowrap;
+}
+
+/* ── Controles ─────────────────────────────────────────────────────────── */
+.controles { list-style: none; padding: 0; margin: var(--s5) 0 0; display: grid; gap: 2px; }
+.controles li {
+  display: grid; grid-template-columns: 1fr auto auto; gap: var(--s3);
+  align-items: baseline; padding: 11px 14px;
+  background: rgba(13, 27, 15, .5);
+  font-size: .92rem;
+}
+.controles li:nth-child(odd) { background: rgba(13, 27, 15, .78); }
+.controles__que {
+  font-family: var(--display); font-weight: 500; font-size: .8rem;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--cal);
+}
+
+/* ── Footer ────────────────────────────────────────────────────────────── */
+.pie {
+  padding-block: var(--s7) var(--s6);
+  border-top: 1px solid rgba(201, 169, 78, .16);
+  background: var(--noche-hondo);
+  font-size: .875rem; color: var(--cal-tenue);
+}
+.pie__grilla { display: grid; gap: var(--s5); grid-template-columns: 1.4fr 1fr; align-items: start; }
+@media (max-width: 720px) { .pie__grilla { grid-template-columns: 1fr; } }
+.pie__legal { max-width: 52ch; }
+.pie__links { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.pie__firma { margin-top: var(--s5); font-family: var(--tiza); font-size: 1.35rem; color: var(--oro-claro); }
+
+/* ── Reveal al entrar en viewport ──────────────────────────────────────── */
+.rev { opacity: 0; transform: translateY(24px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
+.rev.dentro { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .rev { opacity: 1; transform: none; transition: none; }
+  .figu, .btn, .menu li { transition: none; }
+  .figu:hover { transform: none; }
+  .btn:hover { transform: none; }
+}
+/* sin JS la página se ve entera igual */
+.no-js .rev { opacity: 1; transform: none; }
+
+/* ── Ajustes finales ───────────────────────────────────────────────────── */
+/* svh es lo correcto en móvil (la barra del browser no empuja el hero), pero
+   hay que dejar el vh de antes para los navegadores que no lo conocen. */
+.hero { min-height: 100vh; min-height: 100svh; }
+
+/* el <video> que inyecta main.js cuando hay un clip: va ENCIMA de la captura,
+   en la misma caja, para que no haya salto de layout al cambiar */
+.banda > video {
+  position: absolute; inset: 0; z-index: 0;
+  width: 100%; height: 100%; object-fit: cover;
+}
+
+.controles-leyenda {
+  display: grid; grid-template-columns: 1fr auto auto; gap: var(--s3);
+  margin: var(--s4) 0 0; padding: 0 14px 8px;
+  font-family: var(--display); font-weight: 500;
+  font-size: .68rem; letter-spacing: .18em; text-transform: uppercase; color: var(--oro);
+}
+.controles-leyenda + .controles { margin-top: 0; }
+
+.pie__credito { color: var(--cal-tenue); font-size: .8rem; opacity: .8; }
+
+/* ── Utilidades ────────────────────────────────────────────────────────── */
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; margin: -1px;
+  padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+code {
+  font-size: .88em; word-break: break-all;
+  background: rgba(201, 169, 78, .09); padding: 1px 5px; border-radius: var(--r-sm);
+  color: var(--oro-claro);
+}

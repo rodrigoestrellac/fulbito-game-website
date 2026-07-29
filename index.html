@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="es" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fulbito: The Game — fútbol arcade 7v7, gratis, para Windows y Mac</title>
+<meta name="description" content="Fútbol arcade 7v7: 28 jugadores con jugada firma propia, relator propio, seis modos y dos jugadores en la misma PC. Gratis, sin cuenta. Corre a 1080p y 60 fps en una placa integrada.">
+<link rel="canonical" href="https://game.fulbito.futbol/">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://game.fulbito.futbol/">
+<meta property="og:site_name" content="Fulbito: The Game">
+<meta property="og:locale" content="es_AR">
+<meta property="og:title" content="Fulbito: The Game — fútbol arcade 7v7, gratis">
+<meta property="og:description" content="28 jugadores, 20 jugadas firma y un relator propio. Gratis, para jugar entre amigos. Windows y Mac.">
+<meta property="og:image" content="https://game.fulbito.futbol/assets/brand/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" href="assets/brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/brand/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="assets/brand/apple-touch-180.png">
+<meta name="theme-color" content="#0D1B0F">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="image" href="assets/img/cancha-noche.webp" fetchpriority="high">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=DM+Sans:wght@400;500&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/variables.css">
+<link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+
+<a class="saltar" href="#contenido">Saltar al contenido</a>
+
+<!-- ── Marcador: aparece pasado el hero. El reloj sigue el scroll ────────── -->
+<header class="marcador">
+  <a class="marcador__marca" href="#inicio">
+    <img src="assets/brand/teamgeist.webp" alt="" width="21" height="21">
+    Fulbito
+  </a>
+  <span class="marcador__reloj" data-reloj aria-hidden="true">0'</span>
+  <a class="btn btn--chico marcador__cta" href="https://github.com/rodrigoestrellac/fulbito-game-website/releases/latest" data-rel="cta" data-corto="1">
+    <span data-rel="cta-texto">Descargar</span>
+  </a>
+</header>
+
+<!-- ══ HERO ══════════════════════════════════════════════════════════════ -->
+<section class="hero" id="inicio">
+  <div class="hero__fondo" data-video="assets/video/hero.mp4">
+    <img src="assets/img/cancha-noche.webp" alt="Cancha de Fulbito de noche, vista de cámara de TV, con los catorce jugadores en el saque del medio" width="1280" height="720" fetchpriority="high">
+  </div>
+
+  <div class="hero__cuerpo env">
+    <div class="wordmark">
+      <h1 class="wordmark__texto">Fulbito</h1>
+      <img class="wordmark__pelota" src="assets/brand/teamgeist.webp" alt="" width="92" height="92">
+    </div>
+    <p class="wordmark__sub">The Game</p>
+
+    <p class="hero__tagline">Fútbol arcade 7v7.<br><b>Gratis.</b></p>
+
+    <div class="hero__acciones">
+      <a class="btn btn--grande" href="https://github.com/rodrigoestrellac/fulbito-game-website/releases/latest" data-rel="cta">
+        <span data-rel="cta-texto">Descargar</span>
+        <span aria-hidden="true">·</span>
+        <span data-rel="cta-peso">88 MB</span>
+      </a>
+      <p class="hero__nota" data-rel="cta-nota"></p>
+    </div>
+
+    <p class="zocalo">
+      <span>Versión <b data-rel="version">M78</b></span>
+      <span>Windows <b>+</b> macOS</span>
+      <span><b>28</b> jugadores</span>
+      <span><b>20</b> jugadas firma</span>
+      <span><b>6</b> modos</span>
+      <span>Sin cuenta, sin publicidad</span>
+    </p>
+  </div>
+</section>
+
+<!-- ══ TICKER: las jugadas firma pasando como en el estadio ══════════════ -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker__pista">
+    <div class="ticker__grupo">
+      <span>El Martillazo</span><span>La Pausa</span><span>El Gigante</span><span>La Telaraña</span>
+      <span>El Cañonazo</span><span>La Muralla</span><span>El Hechizo</span><span>La Roulette</span>
+      <span>El Tractor</span><span>La Embestida</span><span>Los Flashes</span><span>La Pulguita</span>
+      <span>El Mareo</span><span>La Liana</span><span>El Pitbull</span><span>La Mordida</span>
+      <span>El Hacha</span><span>La Bomba</span><span>El Fenómeno</span><span>Velocidad</span>
+    </div>
+    <div class="ticker__grupo">
+      <span>El Martillazo</span><span>La Pausa</span><span>El Gigante</span><span>La Telaraña</span>
+      <span>El Cañonazo</span><span>La Muralla</span><span>El Hechizo</span><span>La Roulette</span>
+      <span>El Tractor</span><span>La Embestida</span><span>Los Flashes</span><span>La Pulguita</span>
+      <span>El Mareo</span><span>La Liana</span><span>El Pitbull</span><span>La Mordida</span>
+      <span>El Hacha</span><span>La Bomba</span><span>El Fenómeno</span><span>Velocidad</span>
+    </div>
+  </div>
+</div>
+
+<main id="contenido">
+
+  <!-- ══ 09' EL GOL ══════════════════════════════════════════════════════ -->
+  <section class="seccion" aria-labelledby="t-gol">
+    <div class="env rev">
+      <p class="minuto" data-min="09'">Lo que estás buscando</p>
+    </div>
+    <div class="banda rev" data-video="assets/video/gol.mp4">
+      <img class="banda__img" src="assets/img/gol.webp" alt="La pelota entra al arco de noche y el arquero queda tirado en el suelo" width="1280" height="720" loading="lazy">
+      <div class="banda__texto">
+        <h2 id="t-gol">El gol</h2>
+        <p class="tiza">«¡Gooool! ¡Golazo!»</p>
+        <p>Entra la pelota, la red se hincha, el relator grita, salta el confeti y arranca el replay
+          desde otra cámara. Después la sacan del medio y seguís jugando, porque son quince minutos
+          por tiempo y no hay tiempo que perder.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 23' JUGADAS FIRMA ═══════════════════════════════════════════════ -->
+  <section class="seccion seccion--suave" aria-labelledby="t-firmas">
+    <div class="env">
+      <div class="seccion__intro rev">
+        <p class="minuto" data-min="23'">Veinte jugadas firma</p>
+        <h2 id="t-firmas">Cada uno tiene la suya</h2>
+        <p class="bajada">Mientras jugás se te va cargando un medidor. Cuando se llena, el jugador que
+          estás manejando puede hacer la única cosa que sabe hacer él. No es un power-up genérico:
+          son veinte jugadas distintas y cada una la tiene quien la tiene.</p>
+      </div>
+
+      <div class="firmas">
+        <article class="firma rev">
+          <img src="assets/firmas/el-vikingo.webp" alt="Retrato de El Vikingo con el martillo en la mano" width="720" height="720" loading="lazy">
+          <div class="firma__cuerpo">
+            <h3 class="firma__nombre">El Martillazo</h3>
+            <span class="firma__duenio">El Vikingo</span>
+            <p>Saca un martillo de la nada, lo levanta, lo baja — y todo el que esté a tres metros y
+              medio sale por el aire. Tarda tres cuartos de segundo en caer: en ese rato no te podés
+              mover, así que hay que apuntarlo.</p>
+          </div>
+        </article>
+
+        <article class="firma rev">
+          <img src="assets/firmas/el-toro.webp" alt="Retrato de El Toro, con cuernos" width="720" height="720" loading="lazy">
+          <div class="firma__cuerpo">
+            <h3 class="firma__nombre">La Embestida</h3>
+            <span class="firma__duenio">El Toro</span>
+            <p>Arranca a correr al doble de velocidad durante tres segundos y medio y hace panqueque
+              a todo el que se le cruza. No frena: lo difícil es no pasarse de largo.</p>
+          </div>
+        </article>
+
+        <article class="firma rev">
+          <img src="assets/firmas/il-capitano.webp" alt="Retrato de Il Capitano" width="720" height="720" loading="lazy">
+          <div class="firma__cuerpo">
+            <h3 class="firma__nombre">La Muralla</h3>
+            <span class="firma__duenio">Il Capitano · Samu</span>
+            <p>Levanta una pared de cinco metros y la deja seis segundos. Es la única firma defensiva
+              de verdad: no te da la pelota, te da tiempo.</p>
+          </div>
+        </article>
+      </div>
+
+      <ul class="firmas-resto rev">
+        <li>El Gigante <em>·</em> Zlatan</li>
+        <li>La Pausa <em>·</em> Lucky, El Cerebro, El Torero</li>
+        <li>El Cañonazo <em>·</em> Batigol, Rober</li>
+        <li>El Tractor <em>·</em> El Motorcito, El Pupi</li>
+        <li>La Embestida <em>·</em> El Toro</li>
+        <li>La Telaraña <em>·</em> La Araña</li>
+        <li>El Hechizo <em>·</em> La Bruja</li>
+        <li>El Mareo <em>·</em> Dinho, Ney</li>
+        <li>La Pulguita <em>·</em> La Pulga</li>
+        <li>La Roulette <em>·</em> Zizou</li>
+        <li>Los Flashes <em>·</em> David</li>
+        <li>El Fenómeno <em>·</em> Fenómeno</li>
+        <li>La Liana <em>·</em> Tarzán</li>
+        <li>El Pitbull <em>·</em> El Holandés</li>
+        <li>Velocidad <em>·</em> Diegote</li>
+        <li>La Mordida <em>·</em> Dientón</li>
+        <li>El Hacha <em>·</em> The Butcher</li>
+        <li>La Bomba <em>·</em> Cuti</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══ 38' EL PLANTEL ══════════════════════════════════════════════════ -->
+  <section class="seccion" aria-labelledby="t-plantel">
+    <div class="env">
+      <div class="album__encabezado">
+        <div class="seccion__intro rev">
+          <p class="minuto" data-min="38'">El plantel</p>
+          <h2 id="t-plantel">Veintiocho</h2>
+          <p class="bajada">Veintiséis de campo y dos arqueros. Los elegís uno por uno en ARMAR EQUIPO
+            antes de cada partido, y en el potrero podés ir cambiando para probarlos a todos.</p>
+        </div>
+        <p class="album__contador rev"><b>22</b> retratados <span aria-hidden="true">·</span> te faltan <b>6</b></p>
+      </div>
+
+      <ul class="album rev">
+        <li class="figu"><img src="assets/roster/la-pulga.webp" alt="Retrato de La Pulga" width="360" height="360" loading="lazy"><div class="figu__pie"><span class="figu__nombre">La Pulga</span><span class="figu__firma">La Pulguita</span></div></li>
+        <li class="figu"><img src="assets/roster/el-vikingo.webp" alt="Retrato de El Vikingo" width="360" height="360" loading="lazy"><div class="figu__pie"><span class="figu__nombre">El Vikingo</span><span class="figu__firma">El Martillazo</span></div></li>
+        <li class="figu"><img src="assets/roster/il-capitano.webp" alt="Retrato de Il Capitano" width="360" height="360" loading="lazy"><div class="figu__pie"><span class="figu__nombre">Il Capitano</span><span class="figu__firma">La Muralla</span></div></li>
+        <li class="figu"><span class="figu__pos" data-pos="ARQ" aria-hidden="true">ARQ</span><img src="assets/roster/dibu.webp" alt="Retrato de Dibu, arquero" width="360" height="360" loading="lazy"><div class="figu__pie"><span class="figu__nombre">Dibu</span><span class="figu__firma">Arquero</span></div></li>
+        <li class="figu"><span class="figu__pos" data-pos="ARQ" aria-hidden="true">ARQ</span><img src="assets/roster/manuelito.webp" alt="Retrato de Manuelito, arquero" width="360" height="360" loading="lazy"><div class="figu__pie"><span class="figu__nombre">Manuelito</span><span class="figu__firma">Arquero</span></div></li>
+        <li class="figu"><img src="assets/roster/zizou.webp" alt="Retrato de Zizou" width="360" height="360" loading="lazy"><div class="figu__pie"><span class="figu__nombre">Zizou</span><span class="figu__firma">La Roulette</span></div></li>
+        <li class="figu"><img src="assets/roster/david.webp" alt="Retrato de David" width="360" height="360" loading="lazy"><div class="figu__pie"><span class="figu__nombre">David</span><span class="figu__firma">Los Flashes</span></div></li>
+        <li class="figu"><img src="assets/roster/ney.webp" alt="Retrato de Ney" width="360" height="360" loading="lazy"><div class="figu__pie"><span class="figu__nombre">Ney</span><span class="figu__firma">El Mareo</span></div></li>
+        <li class="figu"><img src="assets/roster/el-torero.webp" alt="Retrato de El Torero" width="360" height="360" loading="lazy"><div class="figu__pie"><span class="figu__nombre">El Torero</span><span class="figu__firma">La Pausa</span></div></li>
+        <li class="figu"><img src="assets/roster/diegote.webp" alt="Retrato de Diegote" width="360" height="360" loading="lazy"><div class="figu__pie"><span class="figu__nombre">Diegote</span><span class="figu__firma">Velocidad</span></div></li>
+        <li class="figu"><img src="assets/roster/dienton.webp" alt="Retrato de Dientón" width="360" height="360" loading="lazy"><div class="figu__pie"><span class="figu__nombre">Dientón</span><span class="figu__firma">La Mordida</span></div></li>
+        <li class="figu"><img src="assets/roster/cuti.webp" alt="Retrato de Cuti" width="360" height="360" loading="lazy"><div class="figu__pie"><span class="figu__nombre">Cuti</span><span class="figu__firma">La Bomba</span></div></li>
+        <li class="figu"><img src="assets/roster/the-butcher.webp" alt="Retrato de The Butcher" width="360" height="360" loading="lazy"><div class="figu__pie"><span class="figu__nombre">The Butcher</span><span class="figu__firma">El Hacha</span></div></li>
+        <li class="figu"><img src="assets/roster/el-toro.webp" alt="Retrato de El Toro" width="360" height="360" loading="lazy"><div class="figu__pie"><span class="figu__nombre">El Toro</span><span class="figu__firma">La Embestida</span></div></li>
+        <li class="figu"><img src="assets/roster/el-cerebro.webp" alt="Retrato de El Cerebro" width="360" height="360" loading="lazy"><div class="figu__pie"><span class="figu__nombre">El Cerebro</span><span class="figu__firma">La Pausa</span></div></li>
+        <li class="figu"><img src="assets/roster/tarzan.webp" alt="Retrato de Tarzán" width="360" height="360" loading="lazy"><div class="figu__pie"><span class="figu__nombre">Tarzán</span><span class="figu__firma">La Liana</span></div></li>
+        <li class="figu"><img src="assets/roster/fenomeno.webp" alt="Retrato de Fenómeno" width="360" height="360" loading="lazy"><div class="figu__pie"><span class="figu__nombre">Fenómeno</span><span class="figu__firma">El Fenómeno</span></div></li>
+        <li class="figu"><img src="assets/roster/el-holandes.webp" alt="Retrato de El Holandés" width="360" height="360" loading="lazy"><div class="figu__pie"><span class="figu__nombre">El Holandés</span><span class="figu__firma">El Pitbull</span></div></li>
+        <li class="figu"><img src="assets/roster/batigol.webp" alt="Retrato de Batigol" width="360" height="360" loading="lazy"><div class="figu__pie"><span class="figu__nombre">Batigol</span><span class="figu__firma">El Cañonazo</span></div></li>
+        <li class="figu"><img src="assets/roster/la-bruja.webp" alt="Retrato de La Bruja" width="360" height="360" loading="lazy"><div class="figu__pie"><span class="figu__nombre">La Bruja</span><span class="figu__firma">El Hechizo</span></div></li>
+        <li class="figu"><img src="assets/roster/lucky.webp" alt="Retrato de Lucky" width="360" height="360" loading="lazy"><div class="figu__pie"><span class="figu__nombre">Lucky</span><span class="figu__firma">La Pausa</span></div></li>
+        <li class="figu"><img src="assets/roster/la-arana.webp" alt="Retrato de La Araña" width="360" height="360" loading="lazy"><div class="figu__pie"><span class="figu__nombre">La Araña</span><span class="figu__firma">La Telaraña</span></div></li>
+
+        <li class="figu figu--falta"><div class="figu__hueco" aria-hidden="true">?</div><div class="figu__pie"><span class="figu__nombre">Dinho</span><span class="figu__firma">El Mareo</span></div></li>
+        <li class="figu figu--falta"><div class="figu__hueco" aria-hidden="true">?</div><div class="figu__pie"><span class="figu__nombre">El Motorcito</span><span class="figu__firma">El Tractor</span></div></li>
+        <li class="figu figu--falta"><div class="figu__hueco" aria-hidden="true">?</div><div class="figu__pie"><span class="figu__nombre">Samu</span><span class="figu__firma">La Muralla</span></div></li>
+        <li class="figu figu--falta"><div class="figu__hueco" aria-hidden="true">?</div><div class="figu__pie"><span class="figu__nombre">Zlatan</span><span class="figu__firma">El Gigante</span></div></li>
+        <li class="figu figu--falta"><div class="figu__hueco" aria-hidden="true">?</div><div class="figu__pie"><span class="figu__nombre">El Pupi</span><span class="figu__firma">El Tractor</span></div></li>
+        <li class="figu figu--falta"><div class="figu__hueco" aria-hidden="true">?</div><div class="figu__pie"><span class="figu__nombre">Rober</span><span class="figu__firma">El Cañonazo</span></div></li>
+      </ul>
+
+      <p class="tiza rev" style="margin-top:32px">Los seis del final todavía no tienen foto de carnet. Están en el juego igual.</p>
+    </div>
+  </section>
+
+  <!-- ══ 52' EL RELATOR ══════════════════════════════════════════════════ -->
+  <section class="seccion seccion--suave" aria-labelledby="t-relator">
+    <div class="env">
+      <div class="seccion__intro rev">
+        <p class="minuto" data-min="52'">El relator</p>
+        <h2 id="t-relator">Paco «Pichichi» Carrasco</h2>
+        <p class="bajada">El relator exclusivo de Fulbito. Grita los goles, se lamenta las atajadas
+          y nombra a los veintiocho por su nombre cuando la tocan. Tocá para escucharlo — es el
+          audio del juego, tal cual sale.</p>
+      </div>
+      <div class="relator rev">
+        <button class="voz" type="button" data-voz="assets/audio/relator-gol.mp3" aria-pressed="false">
+          <span class="voz__icono" aria-hidden="true">▶</span> El gol
+        </button>
+        <button class="voz" type="button" data-voz="assets/audio/relator-atajada.mp3" aria-pressed="false">
+          <span class="voz__icono" aria-hidden="true">▶</span> La atajada
+        </button>
+        <button class="voz" type="button" data-voz="assets/audio/relator-arranca.mp3" aria-pressed="false">
+          <span class="voz__icono" aria-hidden="true">▶</span> Arranca el partido
+        </button>
+        <button class="voz" type="button" data-voz="assets/audio/relator-nombre.mp3" aria-pressed="false">
+          <span class="voz__icono" aria-hidden="true">▶</span> Un nombre
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 61' MODOS ═══════════════════════════════════════════════════════ -->
+  <section class="seccion" aria-labelledby="t-modos">
+    <div class="env">
+      <div class="seccion__intro rev">
+        <p class="minuto" data-min="61'">Seis modos</p>
+        <h2 id="t-modos">Lo que hay en el menú</h2>
+        <p class="bajada">Tal cual aparece cuando abrís el juego. Se juega con teclado o con joystick
+          (Xbox o PlayStation, por USB o Bluetooth); con dos joysticks, de a dos en la misma PC.</p>
+      </div>
+
+      <ul class="menu rev">
+        <li>
+          <span class="menu__flecha" aria-hidden="true">▸</span>
+          <span class="menu__label">Partido 7v7</span>
+          <span class="menu__mando">1 mando o teclado</span>
+          <span class="menu__que">Vos y seis compañeros contra la máquina. Antes elegís formación,
+            dificultad y los seis que salen a la cancha.</span>
+        </li>
+        <li>
+          <span class="menu__flecha" aria-hidden="true">▸</span>
+          <span class="menu__label">2 jugadores · juntos vs CPU</span>
+          <span class="menu__mando">2 mandos</span>
+          <span class="menu__que">Los dos manejan el mismo equipo, cada uno con su cursor, contra la CPU.</span>
+        </li>
+        <li>
+          <span class="menu__flecha" aria-hidden="true">▸</span>
+          <span class="menu__label">2 jugadores · uno contra otro</span>
+          <span class="menu__mando">2 mandos</span>
+          <span class="menu__que">La pantalla se parte en dos: cada uno arma su equipo con su propio
+            mando, y el partido arranca cuando los dos dicen LISTO.</span>
+        </li>
+        <li>
+          <span class="menu__flecha" aria-hidden="true">▸</span>
+          <span class="menu__label">Entrenamiento</span>
+          <span class="menu__mando">1 mando o teclado</span>
+          <span class="menu__que">Penales, tiros libres, córners y mano a mano, sin reloj. La primera
+            vez, entrá por acá.</span>
+        </li>
+        <li>
+          <span class="menu__flecha" aria-hidden="true">▸</span>
+          <span class="menu__label">Penales · potrero</span>
+          <span class="menu__mando">1 mando o teclado</span>
+          <span class="menu__que">El potrero de noche: pateás, atajás y vas cambiando de jugador para
+            probarlos a todos.</span>
+        </li>
+        <li>
+          <span class="menu__flecha" aria-hidden="true">▸</span>
+          <span class="menu__label">Penales · 1v1</span>
+          <span class="menu__mando">2 mandos</span>
+          <span class="menu__que">La tanda, uno contra otro, hasta que uno falle.</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ══ 74' REQUISITOS ══════════════════════════════════════════════════ -->
+  <section class="seccion seccion--suave" aria-labelledby="t-req">
+    <div class="env">
+      <div class="rev">
+        <p class="minuto" data-min="74'">Corre en cualquier PC</p>
+        <h2 id="t-req" class="claim">1080p a <b>60 fps</b> en una placa integrada</h2>
+      </div>
+
+      <div class="tabla-envoltura rev">
+        <table class="specs">
+          <caption class="visually-hidden">Requisitos mínimos y recomendados</caption>
+          <thead>
+            <tr><th scope="col">Pieza</th><th scope="col">Mínimo</th><th scope="col">Recomendado</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">Video</th>
+              <td>Integrada Intel UHD 730/770 o AMD Vega. Dedicada, de una GTX 750 Ti en adelante. DirectX 11.</td>
+              <td>GTX 1650 / RX 6400 o mejor, si querés 1440p o aprovechar un monitor de 144 Hz.</td>
+            </tr>
+            <tr><th scope="row">Procesador</th><td>4 núcleos de la última década. El juego usa poco más de uno.</td><td>Cualquiera moderno.</td></tr>
+            <tr><th scope="row">Memoria</th><td>4 GB</td><td>8 GB</td></tr>
+            <tr><th scope="row">Disco</th><td>354 MB</td><td>—</td></tr>
+            <tr><th scope="row">Sistema</th><td>Windows 10 u 11 de 64 bits, o macOS</td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="medido rev">
+        <p><strong>Esto está medido, no estimado.</strong> El juego escribe los fps al log cada cinco
+          segundos y con <span class="tecla">F3</span> los muestra en pantalla. Forzado a la placa
+          integrada de una laptop, dio 109 fps en 720p y 60 en 1080p.</p>
+        <p>Si igual te va lento: en el menú, <strong>Opciones → Calidad → Baja</strong>. Baja la nitidez y
+          deja una sola sombra en lugar de cuatro.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ 86' DESCARGAR ═══════════════════════════════════════════════════ -->
+  <section class="seccion" id="descargar" aria-labelledby="t-bajar">
+    <div class="env">
+      <div class="seccion__intro rev">
+        <p class="minuto" data-min="86'">Bajalo</p>
+        <h2 id="t-bajar">Descargar e instalar</h2>
+        <p class="bajada">Versión <strong data-rel="version">M78</strong>. Es gratis, no pide cuenta, no
+          tiene publicidad y no manda nada a ningún lado.</p>
+      </div>
+
+      <div class="descargas rev" data-rel="lista">
+        <!-- releases.js reemplaza esto con los assets del último release (links
+             directos + tamaños). Lo de acá abajo es el camino sin JS. -->
+        <div class="bajada-item">
+          <span class="bajada-item__so">Windows</span>
+          <span class="bajada-item__meta">Instalador. Se instala solo, sin permisos de administrador.</span>
+          <a class="btn btn--chico" href="https://github.com/rodrigoestrellac/fulbito-game-website/releases/latest">Descargar</a>
+        </div>
+        <div class="bajada-item">
+          <span class="bajada-item__so">Windows</span>
+          <span class="bajada-item__meta">Portable. Lo descomprimís y ejecutás <em>Fulbito.exe</em>. Sirve si la PC no te deja instalar nada.</span>
+          <a class="btn btn--chico" href="https://github.com/rodrigoestrellac/fulbito-game-website/releases/latest">Descargar</a>
+        </div>
+        <div class="bajada-item">
+          <span class="bajada-item__so">macOS</span>
+          <span class="bajada-item__meta"><em>Beta</em> — se empaquetó desde Windows y no lo probó nadie en un Mac de verdad. Si no te abre, contame.</span>
+          <a class="btn btn--chico" href="https://github.com/rodrigoestrellac/fulbito-game-website/releases/latest">Descargar</a>
+        </div>
+      </div>
+
+      <p class="rev" style="margin-top:24px">
+        <a data-rel="checksums" href="https://github.com/rodrigoestrellac/fulbito-game-website/releases/latest">Ver los SHA256 (CHECKSUMS.txt)</a>
+      </p>
+
+      <ol class="pasos rev">
+        <li>
+          <h3>Windows te va a decir que te protegió</h3>
+          <p>Al abrir el instalador puede aparecer una pantalla azul que dice «Windows protegió tu PC».
+            Es normal: pasa con todo programa que no está firmado con un certificado digital, que
+            cuesta unos cuantos dólares por año. Tocá <span class="tecla">Más información</span> y
+            después <span class="tecla">Ejecutar de todas formas</span>. Si querés verificar que el
+            archivo es el original, compará su SHA256 con el de CHECKSUMS.txt.</p>
+        </li>
+        <li>
+          <h3>En Mac, descomprimilo antes de abrirlo</h3>
+          <p>Descomprimí el zip y mové Fulbito a la carpeta Aplicaciones — desde adentro del zip no
+            arranca. La primera vez macOS va a decir que no puede verificar al desarrollador: entrá a
+            <span class="tecla">Ajustes del Sistema</span> → <span class="tecla">Privacidad y seguridad</span>,
+            bajá hasta el final y tocá <span class="tecla">Abrir de todas formas</span>.</p>
+        </li>
+        <li>
+          <h3>Entrá por Entrenamiento</h3>
+          <p>Y si te resulta difícil, en ARMAR EQUIPO poné la dificultad en FÁCIL. Arranca en LEYENDA,
+            que es la brava.</p>
+        </li>
+        <li>
+          <h3>Si algo falla, contame</h3>
+          <p>El juego anota todo lo que le pasa por dentro en un archivo. En Windows está en
+            <code>%USERPROFILE%\AppData\LocalLow\Fulbito\Fulbito\Player.log</code>; en Mac, en
+            <code>~/Library/Logs/Fulbito/Fulbito/Player.log</code>. Mandámelo junto con qué estabas
+            haciendo cuando pasó.</p>
+        </li>
+      </ol>
+
+      <h3 class="rev" style="margin-top:56px">Lo mínimo para arrancar</h3>
+      <p class="controles-leyenda rev" aria-hidden="true"><span>Acción</span><span>Teclado</span><span>Joystick</span></p>
+      <ul class="controles rev">
+        <li><span class="controles__que">Moverse</span><span>WASD</span><span>Stick</span></li>
+        <li><span class="controles__que">Correr</span><span>Shift</span><span>RB</span></li>
+        <li><span class="controles__que">Pasar</span><span>X</span><span>A</span></li>
+        <li><span class="controles__que">Patear</span><span>Espacio</span><span>Cuadrado</span></li>
+        <li><span class="controles__que">Centro o barrida</span><span>C</span><span>B</span></li>
+        <li><span class="controles__que">Pausa</span><span>Esc</span><span>Start</span></li>
+      </ul>
+      <p class="rev" style="margin-top:20px;color:var(--cal-tenue);font-size:.92rem">
+        Hay mucho más — vaselina, rosca, pared, chilena, las jugadas firma de cada uno. Está todo en
+        <strong>Cómo jugar</strong>, adentro del juego: en el menú principal y también en la pausa.
+        Ahí la lista siempre está al día.
+      </p>
+    </div>
+  </section>
+</main>
+
+<!-- ══ 90'+ ════════════════════════════════════════════════════════════ -->
+<footer class="pie">
+  <div class="env pie__grilla">
+    <div>
+      <p class="minuto" data-min="90+">Final del partido</p>
+      <p class="pie__legal">Fulbito es un proyecto personal, sin fines comerciales, hecho para jugar
+        entre amigos. No está afiliado ni autorizado por ningún club, jugador, marca ni liga.</p>
+      <p class="pie__firma">Hecho con ♥ y ⚽ por Rodrigo.</p>
+    </div>
+    <ul class="pie__links">
+      <li><a href="#descargar">Descargar Fulbito</a></li>
+      <li><a href="https://github.com/rodrigoestrellac/fulbito-game-website/releases">Todas las versiones</a></li>
+      <li><a href="https://fulbito.futbol">Fulbito, la app para tu grupo</a></li>
+      <li class="pie__credito">Ícono de la pelota Teamgeist: Javier Flowers, Noun Project.</li>
+    </ul>
+  </div>
+</footer>
+
+<script src="js/releases.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
