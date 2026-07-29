@@ -172,7 +172,10 @@ p:last-child { margin-bottom: 0; }
 .wordmark__caja {
   position: relative; display: block; flex: none;
   width: clamp(34px, 10vw, 108px); aspect-ratio: 1;
-  align-self: center; margin-bottom: clamp(4px, 1.4vw, 16px);
+  /* SIN align-self ni margin-bottom: el contenedor ya alinea por baseline
+     (.wordmark { align-items: baseline }), y un bloque sin texto adentro toma
+     como baseline su borde inferior. O sea que el piso de esta caja ES el
+     baseline de FULBITO, que es justo donde tiene que picar la pelota. */
 }
 .wordmark__caja > canvas { z-index: 1; }
 .wordmark__pelota {

@@ -131,7 +131,8 @@ function cargarPelota3D() {
   const caja = document.getElementById('pelota3d');
   if (!caja || !pelota3DConviene()) return;
   import('./pelota3d.js')
-    .then((m) => m.montarPelota3D(caja, caja.querySelector('img')))
+    .then((m) => m.montarPelota3D(caja, caja.querySelector('img'),
+                                  document.querySelector('.wordmark__texto')))
     .catch((e) => console.info('[pelota3d] queda la imagen:', e.message));
 }
 

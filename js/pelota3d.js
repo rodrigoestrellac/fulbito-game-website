@@ -18,19 +18,34 @@ import { GLTFLoader } from '../vendor/jsm/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from '../vendor/jsm/libs/meshopt_decoder.module.js';
 import { RoomEnvironment } from '../vendor/jsm/environments/RoomEnvironment.js';
 
-/* Encuadre. El lienzo es más alto que la pelota para que el rebote tenga aire:
-   ALTO_REL es cuántas veces la caja de la pelota mide el lienzo. La cámara se
-   calcula a partir de eso, no a ojo, así el tamaño en pantalla coincide con el
-   de la imagen que reemplaza. */
-const ALTO_REL = 2.6;
-const ANCHO_REL = 1.34;
-const FOV = 30;
-const PERIODO = 1.25;      // segundos por rebote
-const ALTURA = 1.45;       // unidades de mundo que sube (radio de la pelota = 1)
-const GIRO = 0.42;         // radianes por segundo — "levemente"
+/* El rebote va ENTRE EL BASELINE Y EL ALTO DE LAS LETRAS de FULBITO: apoya en el
+   baseline y en el punto más alto su tope llega a la altura de las mayúsculas,
+   sin pasarse. Nada de esto se estima: la altura de mayúscula se MIDE de la
+   tipografía ya cargada (`actualBoundingBoxAscent` de una F), porque depende del
+   font-size —que es fluido, con clamp— y de que Oswald haya llegado. Con la
+   tipografía de respaldo la métrica es otra y el rebote saldría mal.
 
-export async function montarPelota3D(caja, imagen) {
+   El recorrido es corto a propósito: la pelota mide ~80 % del alto de las letras,
+   así que entre las dos líneas quedan ~30 px en desktop y ~10 en mobile. Si se
+   quisiera un pique más grande, la palanca es el `width` de `.wordmark__caja`:
+   una pelota más chica deja más recorrido. */
+const FOV = 30;
+const PERIODO = 1.25;      // segundos por pique
+const GIRO = 0.42;         // radianes por segundo — "levemente"
+const RECORRIDO_MIN = 0.10;  // fracción del diámetro: piso, para que siempre se note algo
+
+/** Altura de mayúscula en px de la tipografía REAL del elemento. */
+function altoDeMayuscula(el) {
+  const cs = getComputedStyle(el);
+  const ctx = document.createElement('canvas').getContext('2d');
+  ctx.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+  return ctx.measureText('F').actualBoundingBoxAscent || parseFloat(cs.fontSize) * 0.72;
+}
+
+export async function montarPelota3D(caja, imagen, titulo) {
   if (!caja.clientWidth) return;
+  // sin esto se mide la tipografía de respaldo y el rebote queda con otra altura
+  if (document.fonts && document.fonts.ready) await document.fonts.ready;
 
   const renderer = new WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'low-power' });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
@@ -49,28 +64,37 @@ export async function montarPelota3D(caja, imagen) {
      teléfono o al arrastrar la ventana. Sin esto el lienzo se queda con la
      medida que tenía cuando cargó — que es tarde, después del load, y puede no
      ser la definitiva. */
+  let yReposo = 0, recorrido = 0;   // en unidades de mundo (radio de la pelota = 1)
+
   function medir() {
-    const a = caja.clientWidth;
-    if (!a) return;
-    const W = Math.round(a * ANCHO_REL);
-    const H = Math.round(a * ALTO_REL);
+    const d = caja.clientWidth;                       // diámetro de la pelota, en px
+    if (!d) return;
+    const mayuscula = titulo ? altoDeMayuscula(titulo) : d * 1.25;
+    // lo que hay entre el baseline y el tope de las letras, descontando la pelota
+    const subePx = Math.max(mayuscula - d, d * RECORRIDO_MIN);
+
+    const W = Math.ceil(d) + 2;                       // 1 px de aire a cada lado
+    const H = Math.ceil(d + subePx);
     renderer.setSize(W, H, false);
     lienzo.style.width = W + 'px';
     lienzo.style.height = H + 'px';
-    lienzo.style.left = (a - W) / 2 + 'px';
+    lienzo.style.left = (d - W) / 2 + 'px';
+
+    /* Un radio de pelota = d/2 px, así que el alto visible en unidades de mundo
+       es 2H/d y la cámara va a (H/d)/tan(fov/2). El borde de abajo del lienzo cae
+       en y = -H/d, y ahí apoya la pelota: su centro queda a un radio de eso. */
     camara.aspect = W / H;
+    camara.position.z = (H / d) / Math.tan((FOV / 2) * Math.PI / 180);
     camara.updateProjectionMatrix();
+
+    yReposo = -H / d + 1;
+    recorrido = 2 * subePx / d;
+    pelota.position.y = yReposo;
   }
 
   const escena = new Scene();
-  /* Distancia derivada del encuadre: si la pelota (diámetro 2) tiene que ocupar
-     1/ALTO_REL del alto visible, entonces alto visible = 2·ALTO_REL y
-     d = ALTO_REL / tan(fov/2). Sin esto habría que ajustar la cámara a mano cada
-     vez que cambia el tamaño del wordmark. */
+  // el encuadre lo fija medir(), que es el que conoce el diámetro real
   const camara = new PerspectiveCamera(FOV, 1, 0.1, 100);
-  camara.position.z = ALTO_REL / Math.tan((FOV / 2) * Math.PI / 180);
-  medir();
-  new ResizeObserver(medir).observe(caja);
 
   const pmrem = new PMREMGenerator(renderer);
   escena.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
@@ -86,8 +110,9 @@ export async function montarPelota3D(caja, imagen) {
 
   const pelota = new Group();
   escena.add(pelota);
-  // reposo: apoyada abajo del lienzo, donde estaba la imagen
-  const yReposo = -ALTO_REL + 1;
+  medir();
+  // el wordmark es fluido: al cambiar de tamaño hay que volver a medir todo
+  new ResizeObserver(medir).observe(caja);
 
   const gltf = await new Promise((ok, mal) => {
     const cargador = new GLTFLoader();
@@ -125,9 +150,9 @@ export async function montarPelota3D(caja, imagen) {
     if (!t0) t0 = ahora;
     const t = (ahora - t0) / 1000;
 
-    // parábola de rebote: sube y baja sin quedarse quieta arriba
+    // parábola de pique: sube y baja sin quedarse quieta arriba
     const f = (t % PERIODO) / PERIODO;
-    pelota.position.y = yReposo + ALTURA * (1 - Math.pow(2 * f - 1, 2));
+    pelota.position.y = yReposo + recorrido * (1 - Math.pow(2 * f - 1, 2));
     pelota.rotation.y = -0.62 + t * GIRO;
     pelota.rotation.x = 0.34 + Math.sin(t * 0.8) * 0.06;
 

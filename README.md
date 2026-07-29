@@ -124,10 +124,26 @@ no estar lista) y sin ahorro de datos ni conexión 2G. Si cualquiera de esas fal
 three.js + el modelo son ~1,4 MB: **eso no puede pesar en el primer paint**, y por eso no
 está en el HTML.
 
-El lienzo va absoluto adentro de `.wordmark__caja`, más alto que la pelota para que el
-rebote tenga aire sin mover el layout, y se redimensiona con un `ResizeObserver` porque el
-wordmark es fluido. La animación se detiene cuando el hero sale de pantalla o la pestaña
-pasa a segundo plano.
+**El pique va entre el baseline de FULBITO y el alto de las letras**: apoya en el baseline y
+en el punto más alto su tope llega a la altura de las mayúsculas, sin pasarse. Eso no está
+estimado —
+
+- el piso: `.wordmark__caja` no lleva `align-self` ni `margin-bottom`, así que el contenedor
+  la alinea por baseline y, siendo un bloque sin texto adentro, su borde inferior **es** el
+  baseline del título;
+- el techo: la altura de mayúscula se **mide** con `actualBoundingBoxAscent` de una «F» en la
+  tipografía real, después de `document.fonts.ready`. Hace falta medirla porque el
+  `font-size` es fluido (clamp) y porque con la tipografía de respaldo la métrica es otra.
+
+De ahí sale todo el encuadre: el lienzo mide exactamente , la cámara se
+ubica en  y la pelota reposa a un radio del borde de abajo. Un
+`ResizeObserver` lo recalcula cuando cambia el tamaño, y la animación se detiene cuando el
+hero sale de pantalla o la pestaña pasa a segundo plano.
+
+⚠️ El recorrido es **corto**: la pelota mide ~80 % del alto de las letras, así que entre las
+dos líneas quedan unos **30 px en desktop y 10 en mobile**. Si se quisiera un pique más
+grande, la palanca es el `width` de `.wordmark__caja` — una pelota más chica deja más
+recorrido.
 
 Para regenerar el PNG estático: servir el repo, abrir `http://localhost:8899/tools/render3d/`
 y guardar `window.PELOTA_PNG` como `tools/pelota-fuente.png`; después `build_assets.py` lo
