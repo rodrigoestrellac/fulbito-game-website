@@ -23,6 +23,7 @@ import os
 import sys
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  # p/ importar build_icono
 HERE = os.path.dirname(os.path.abspath(__file__))
 WEB = os.path.dirname(HERE)
 RAIZ = os.path.abspath(os.path.join(WEB, ".."))
@@ -157,50 +158,16 @@ def mark(size):
     return lienzo.resize((size, size), Image.LANCZOS)
 
 
-def icon_tile(size, radio=0.22, ss=4):
-    """Ícono de app: baldosa verde noche + borde dorado + el mark."""
-    S = size * ss
-    im = Image.new("RGBA", (S, S), (0, 0, 0, 0))
-    d = ImageDraw.Draw(im)
-    d.rounded_rectangle([0, 0, S - 1, S - 1], radius=int(S * radio), fill=NOCHE)
-    if radio:
-        b = int(S * .02)
-        d.rounded_rectangle([b, b, S - 1 - b, S - 1 - b], radius=int(S * radio * .92),
-                            outline=ORO, width=max(1, int(S * .022)))
-    m = mark(int(S * 0.74))
-    im.alpha_composite(m, ((S - m.width) // 2, (S - m.height) // 2))
-    return im.resize((size, size), Image.LANCZOS)
-
-
-FAVICON_SVG_TPL = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="14" fill="#0D1B0F"/>
-  <rect x="1.5" y="1.5" width="61" height="61" rx="12.5" fill="none" stroke="#C9A94E" stroke-width="2"/>
-  <image x="10" y="10" width="44" height="44" href="data:image/png;base64,%s"/>
-</svg>
-"""
-
-
 def build_brand():
-    import base64
-    from io import BytesIO
-
-    m = mark(512)
-    m.save(out("assets", "brand", "pelota.webp"), "WEBP", quality=90, method=6, lossless=False)
-
-    # favicon SVG: el mark embebido en PNG dentro del SVG. Es un archivo solo,
-    # sin dependencias, y el navegador lo escala sin perder nitidez en la baldosa.
-    buf = BytesIO()
-    mark(128).save(buf, "PNG", optimize=True)
-    open(out("assets", "brand", "favicon.svg"), "w", encoding="utf-8").write(
-        FAVICON_SVG_TPL % base64.b64encode(buf.getvalue()).decode())
-
-    icon_tile(32).save(out("assets", "brand", "favicon-32.png"))
-    icon_tile(180, radio=0.0).save(out("assets", "brand", "apple-touch-180.png"))
-    icon_tile(256).save(out("assets", "brand", "fulbito.ico"),
-                        sizes=[(16, 16), (32, 32), (48, 48), (256, 256)])
+    # el mark suelto: lo usa el wordmark del hero como fallback de la pelota 3D,
+    # y la pelotita de la firma del footer
+    mark(512).save(out("assets", "brand", "pelota.webp"), "WEBP",
+                   quality=90, method=6, lossless=False)
+    # los iconos son otra cosa: el logo de la app + «The Game» manuscrito
+    from build_icono import construir as construir_icono
+    construir_icono(out)
     build_og()
-    print("brand: pelota.webp, favicon.svg, favicon-32, apple-touch-180, fulbito.ico, og-image")
-
+    print("brand: pelota.webp + iconos (build_icono.py) + og-image")
 
 def build_og():
     """1200x630 — el wordmark sobre la cancha de noche, oscurecida."""

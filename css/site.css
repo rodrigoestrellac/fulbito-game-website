@@ -167,9 +167,16 @@ p:last-child { margin-bottom: 0; }
     .058em .08em 0 rgba(13, 27, 15, .9),
     0 .1em .32em rgba(0, 0, 0, .55);
 }
-.wordmark__pelota {
-  width: clamp(34px, 10vw, 108px); height: auto; flex: none;
+/* La caja fija el tamano y la posicion; el <canvas> de la pelota 3D se cuelga
+   adentro, absoluto y MAS ALTO, asi el rebote sube sin empujar nada. */
+.wordmark__caja {
+  position: relative; display: block; flex: none;
+  width: clamp(34px, 10vw, 108px); aspect-ratio: 1;
   align-self: center; margin-bottom: clamp(4px, 1.4vw, 16px);
+}
+.wordmark__caja > canvas { z-index: 1; }
+.wordmark__pelota {
+  width: 100%; height: auto;
   /* La pelota es un render 3D, no un vector: le va una sombra BLANDA. La sombra
      dura del wordmark (offset plano, sin blur) sobre un objeto con volumen se
      ve como una calcomania mal pegada. */
@@ -576,4 +583,13 @@ code {
   position: absolute; z-index: 2; inset: auto 0 0 0;
   margin: 0; padding: var(--s4);
   font-family: var(--tiza); font-size: 1.35rem; color: var(--oro-claro);
+}
+
+/* En pantallas angostas "DESCARGAR PARA WINDOWS · 84 MB" parte en dos renglones
+   y el "· 84 MB" queda descolgado. El peso es informativo, no la acción: se
+   esconde acá y sigue estando en el zócalo y en la sección de descargas. */
+@media (max-width: 560px) {
+  .hero__acciones .btn--grande { font-size: 1rem; padding: 16px 24px; }
+  .hero__acciones .btn--grande [data-rel="cta-peso"],
+  .hero__acciones .btn--grande [aria-hidden="true"] { display: none; }
 }

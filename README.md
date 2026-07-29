@@ -8,7 +8,9 @@ Sitio estático, sin build step. Se sirve tal cual desde GitHub Pages (branch `m
 ```
 index.html      la one-page entera
 css/            variables.css (tokens) + site.css
-js/             releases.js (descargas dinámicas) + main.js (motion)
+js/             releases.js (descargas) + main.js (motion) + pelota3d.js (la pelota)
+vendor/         three.js (sólo lo usa la pelota 3D, se carga diferido)
+assets/ball/    teamgeist.glb
 assets/img/     capturas del juego (WebP)
 assets/roster/  retratos del plantel, 480x480 (WebP)
 assets/firmas/  los tres retratos grandes de las jugadas firma, 720x720
@@ -90,12 +92,6 @@ Pendiente del lado del juego (no bloquea la web): limpiar la textura de `rc3b`.
 Push a `main` → GitHub Pages deploya solo. Custom domain `game.fulbito.futbol` (CNAME en
 el repo) + Enforce HTTPS. DNS: `CNAME game → rodrigoestrellac.github.io` en `fulbito.futbol`.
 
-## El ícono del instalador
-
-`assets/brand/fulbito.ico` lo genera el mismo script y es el que usa el instalador
-del juego (`game-unity/installer/fulbito.iss`, `SetupIconFile`). Si se cambia el mark,
-hay que volver a copiarlo: `cp assets/brand/fulbito.ico ../game-unity/installer/`.
-
 ## Por qué las capturas se veían pixeladas
 
 `PocSetup.ShotWithCam` (repo del juego) renderizaba a **1280x720 sin antialias**. En una
@@ -110,30 +106,58 @@ tiene, las tarjetas de jugadas firma usan los **retratos** (renders limpios) en 
 jugada en acción, y el hero le aplica un desenfoque graduado a la tribuna — que es una
 textura de sprites de baja resolución — para que lea como profundidad de campo.
 
-## El mark de la pelota
+## La pelota y el ícono
 
-Es un **render 3D de la pelota Teamgeist que ya está en el repo de la app**
-(`website/assets/ball/teamgeist.glb`), el mismo modelo que rebota en el hero de
-`fulbito.futbol`. No es una imitación ni un dibujo: es el modelo, renderizado.
+Son dos cosas distintas y salen de fuentes distintas.
 
-`assets/brand/pelota.webp` sale de `tools/pelota-fuente.png`, y ese PNG se rinde así:
+### La pelota del hero — 3D, viva
 
-1. Servir el repo: `python -m http.server 8899`
-2. Abrir `http://127.0.0.1:8899/tools/render3d/` — carga el GLB con three.js, lo
-   ilumina con una luz clave dorada (para atarlo a la paleta sin repintar el modelo)
-   y lo rinde a 1024×1024 **con transparencia**. Cuando el título dice `LISTO`,
-   `window.PELOTA_PNG` tiene el dataURL.
-3. Guardar ese PNG como `tools/pelota-fuente.png` y correr `python tools/build_assets.py`,
-   que lo recorta al alfa, lo centra y saca de ahí el mark, los favicons, el `.ico`
-   y la `og-image`.
+Al lado de FULBITO **rebota y gira despacio la pelota Teamgeist en 3D**: el mismo
+modelo (`assets/ball/teamgeist.glb`) y el mismo gesto que el hero de `fulbito.futbol`.
+Lo monta `js/pelota3d.js` con three.js.
 
-`tools/render3d/` trae su propia copia de three.js y del GLB (~1,4 MB) justamente
-para que esto se pueda repetir sin depender de dónde esté el repo de la app.
+Es una **mejora progresiva**, no la base. `js/main.js` la importa recién después del
+`load` y en idle, y sólo si conviene: sin `prefers-reduced-motion`, con WebGL de verdad
+(chequeado en ese momento, no al evaluar el script — en un arranque en frío la GPU puede
+no estar lista) y sin ahorro de datos ni conexión 2G. Si cualquiera de esas falla, queda
+`assets/brand/pelota.webp` — un render estático del mismo modelo — y el hero se ve igual.
+three.js + el modelo son ~1,4 MB: **eso no puede pesar en el primer paint**, y por eso no
+está en el HTML.
 
-**Licencia**: el modelo es «Adidas Teamgeist Ball (Germany 2006)» de Armellino
-Raffaele (Sketchfab), **CC BY 4.0** → la atribución es obligatoria y está en el footer
-del sitio. Las texturas ya venían editadas: **verificado que los PNG del GLB traen sólo
-las formas de los paneles, sin logos ni estrellas.**
+El lienzo va absoluto adentro de `.wordmark__caja`, más alto que la pelota para que el
+rebote tenga aire sin mover el layout, y se redimensiona con un `ResizeObserver` porque el
+wordmark es fluido. La animación se detiene cuando el hero sale de pantalla o la pestaña
+pasa a segundo plano.
+
+Para regenerar el PNG estático: servir el repo, abrir `http://localhost:8899/tools/render3d/`
+y guardar `window.PELOTA_PNG` como `tools/pelota-fuente.png`; después `build_assets.py` lo
+recorta al alfa y lo escala.
+
+**Licencia**: el modelo es «Adidas Teamgeist Ball (Germany 2006)» de Armellino Raffaele
+(Sketchfab), **CC BY 4.0** → atribución obligatoria, está en el footer. Las texturas ya
+venían editadas: **verificado que los PNG del GLB traen sólo las formas de los paneles,
+sin logos ni estrellas.**
+
+### El favicon y el `.ico` del instalador — el logo de la app + «The Game»
+
+`tools/build_icono.py` toma el **ícono de la app** (`fulbito/src/assets/icons/icon-512.webp`:
+baldosa verde, anillo dorado, Teamgeist blanca), le recorta el interior con máscara circular
+—si no, se arrastra un parche cuadrado del verde y queda un borde adentro de otro— y le
+agrega **«The Game» manuscrito** en Caveat, la misma letra de la firma del footer.
+
+⚠️ **Arte distinta por tamaño**: a 16 y 32 px un texto manuscrito es una mancha y encima le
+roba lugar a la pelota, que es lo único que identifica algo a ese tamaño.
+
+| tamaño | qué lleva |
+|---|---|
+| 16 / 32 / 48 px | el logo solo, sin texto |
+| 180 / 256 px | el logo + «The Game» |
+
+Por eso el `.ico` **se escribe a mano** (cabecera + directorio + PNG concatenados): PIL sólo
+sabe reescalar *una* imagen a todos los tamaños, no meter arte distinta en cada uno.
+
+Al cambiar el ícono hay que copiarlo al repo del juego:
+`cp assets/brand/fulbito.ico ../game-unity/installer/`
 
 <details>
 <summary>Camino descartado: generar la pelota con Gemini</summary>

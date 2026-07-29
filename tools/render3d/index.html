@@ -19,7 +19,7 @@
   estrellas. La atribución CC-BY va en el footer del sitio.
 -->
 <script type="importmap">
-  { "imports": { "three": "./vendor/three/three.module.min.js" } }
+  { "imports": { "three": "../../vendor/three/three.module.min.js" } }
 </script>
 <style>
   body { margin: 0; background: #0D1B0F; color: #C9A94E;
@@ -43,9 +43,9 @@ import {
   DirectionalLight, AmbientLight, PMREMGenerator, Box3, Vector3,
   ACESFilmicToneMapping,
 } from 'three';
-import { GLTFLoader } from './vendor/jsm/loaders/GLTFLoader.js';
-import { MeshoptDecoder } from './vendor/jsm/libs/meshopt_decoder.module.js';
-import { RoomEnvironment } from './vendor/jsm/environments/RoomEnvironment.js';
+import { GLTFLoader } from '../../vendor/jsm/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from '../../vendor/jsm/libs/meshopt_decoder.module.js';
+import { RoomEnvironment } from '../../vendor/jsm/environments/RoomEnvironment.js';
 
 const LADO = 512;   // se renderiza a 2x = 1024 px reales
 const estado = document.getElementById('estado');
@@ -84,7 +84,7 @@ escena.add(pelota);
 
 const cargador = new GLTFLoader();
 cargador.setMeshoptDecoder(MeshoptDecoder);
-cargador.load('./teamgeist.glb', (gltf) => {
+cargador.load('../../assets/ball/teamgeist.glb', (gltf) => {
   const modelo = gltf.scene;
   // normalizo a radio 1 igual que la app, así el encuadre es predecible
   const caja = new Box3().setFromObject(modelo);

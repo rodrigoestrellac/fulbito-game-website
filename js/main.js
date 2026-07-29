@@ -108,3 +108,33 @@ function montarVideos() {
   });
 }
 montarVideos();
+
+/* ── La pelota 3D del hero ────────────────────────────────────────────────
+   three.js + el modelo son ~1,4 MB: eso NO puede pesar en el primer paint. Se
+   importa despues del load y en idle, y solo si conviene:
+     - sin prefers-reduced-motion (con eso queda la imagen, quieta)
+     - con WebGL de verdad (el chequeo se hace aca, no al evaluar el script: en
+       un arranque en frio la GPU puede no estar lista todavia)
+     - sin ahorro de datos ni conexion lenta
+   Si algo de esto falla, queda el PNG del render y el hero se ve igual. */
+function pelota3DConviene() {
+  if (menosMovimiento) return false;
+  const con = navigator.connection;
+  if (con && (con.saveData || /(^|-)2g$/.test(con.effectiveType || ''))) return false;
+  try {
+    const c = document.createElement('canvas');
+    return !!(c.getContext('webgl2') || c.getContext('webgl'));
+  } catch { return false; }
+}
+
+function cargarPelota3D() {
+  const caja = document.getElementById('pelota3d');
+  if (!caja || !pelota3DConviene()) return;
+  import('./pelota3d.js')
+    .then((m) => m.montarPelota3D(caja, caja.querySelector('img')))
+    .catch((e) => console.info('[pelota3d] queda la imagen:', e.message));
+}
+
+const enCuantoSePueda = window.requestIdleCallback || ((fn) => setTimeout(fn, 300));
+if (document.readyState === 'complete') enCuantoSePueda(cargarPelota3D);
+else window.addEventListener('load', () => enCuantoSePueda(cargarPelota3D), { once: true });
