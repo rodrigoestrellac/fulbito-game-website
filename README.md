@@ -185,13 +185,25 @@ estimado —
   tipografía real, después de `document.fonts.ready`. Hace falta medirla porque el
   `font-size` es fluido (clamp) y porque con la tipografía de respaldo la métrica es otra.
 
-De ahí sale todo el encuadre, en vez de constantes a ojo: el lienzo mide exactamente
-`diámetro + recorrido`, la cámara se ubica en `(H/d) / tan(fov/2)` y la pelota reposa a un
-radio del borde de abajo. Un `ResizeObserver` lo recalcula cuando cambia el tamaño, y la
-animación se detiene cuando el hero sale de pantalla o la pestaña pasa a segundo plano.
+De ahí sale todo el encuadre, en vez de constantes a ojo: la cámara se ubica en
+`(H/d) / tan(fov/2)` y la pelota reposa a un radio del borde de abajo del lienzo. Un
+`ResizeObserver` lo recalcula cuando cambia el tamaño, y la animación se detiene cuando
+el hero sale de pantalla o la pestaña pasa a segundo plano.
+
+Dos números que no son geometría sino ojo, y que hacen falta:
+
+- **`AIRE` (7 % del diámetro)**. El lienzo NO puede medir `diámetro + recorrido` exacto.
+  La primera versión lo hacía y la pelota **se cortaba en el pico**: la silueta de una
+  esfera en perspectiva es más grande que su radio geométrico proyectado —el contorno
+  visible abarca `asin(r/d)`, no `atan(r/d)`—. Son pocos píxeles, pero pasan justo donde
+  se mira.
+- **`BAJADA` (7 % del diámetro)**. El punto de apoyo va un poco por debajo del baseline:
+  apoyada exactamente sobre la línea parece que flota, porque el ojo lee el contacto en
+  la sombra y no en la tangente de la esfera. El mismo 7 % está en CSS sobre la `<img>`
+  de respaldo, para que el fallback estático quede a la misma altura.
 
 ⚠️ El recorrido es **corto**: la pelota mide ~80 % del alto de las letras, así que entre las
-dos líneas quedan unos **30 px en desktop y 10 en mobile**. Si se quisiera un pique más
+dos líneas quedan unos **36 px en desktop y 14 en mobile**. Si se quisiera un pique más
 grande, la palanca es el `width` de `.wordmark__caja` — una pelota más chica deja más
 recorrido.
 
