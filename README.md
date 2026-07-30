@@ -110,8 +110,10 @@ Dos cosas que no son obvias:
   cortado por el `object-fit: cover` se lee como un error de la página. `1728:972:288:155`
   deja afuera el marcador (termina en y=150), el minimapa y las barras de abajo, y
   **conserva los carteles** («¡¡GOLAAAZO!!», «¡EL MARTILLAZO!»), que empiezan justo
-  debajo. Para el hero el recorte es más agresivo —`1600:900:352:215`— porque ahí no hay
-  cartel que preservar y sí está la píldora del jugador que manejás.
+  debajo. El hero y la banda de firmas llevan recortes más cerrados —`1600:900:352:215` y
+  `1400:788:452:250`— porque ahí no hay cartel que valga la pena preservar y sí está la
+  píldora del jugador que manejás, que pegada al borde se lee como cortada. En la banda de
+  firmas el epígrafe ya nombra la jugada, así que el cartel del juego sobraba.
 - **El monitor es 16:10** (2560×1600), así que la grabación sale 16:10 y el `crop` la
   lleva a 16:9. No es que la captura esté mal encuadrada.
 

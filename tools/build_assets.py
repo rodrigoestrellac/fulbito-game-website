@@ -121,12 +121,24 @@ SHOTS = [
     # El hero: el MISMO plano que `assets/video/hero.mp4`, sacado del mismo
     # clip. Antes era `web_tv_08` (un plano mas abierto, con tribuna) y al
     # entrar el video se veia el salto de encuadre. Sale de
-    #   ffmpeg -ss 17 -i <grabacion> -frames:v 1 \n    #          -vf "crop=1600:900:352:215" captures/web_hero_still.png
+    #   ffmpeg -ss 17 -i <grabacion> -frames:v 1 \
+    #          -vf "crop=1600:900:352:215" captures/web_hero_still.png
     # El crop saca el HUD del juego (marcador arriba, minimapa y barras
     # abajo, y la pildora del jugador que manejas): en un fondo detras del
     # wordmark, medio marcador cortado se lee como un error.
     ("web_hero_still", "cancha-noche"),
-    ("web_tiro_07", "muralla"),
+    # La banda de firmas: el MISMO plano que `assets/video/firma.mp4` y del
+    # mismo clip, con el mismo crop. Antes era `web_tiro_07` (La Muralla),
+    # y quedo mezclado: la foto y el epigrafe decian Muralla y el video que
+    # se montaba encima era El Martillazo.
+    #   ffmpeg -ss 82.93 -i <grabacion> -frames:v 1 \
+    #          -vf "crop=1400:788:452:250,scale=1600:900" captures/web_firma_still.png
+    # ⚠️ Este crop es MAS CERRADO que el de las otras dos: deja afuera todo el
+    # HUD, incluido el cartel "¡EL MARTILLAZO!" y la pildora del jugador que
+    # manejas, que pegada al borde de arriba se leia como cortada. El cartel no
+    # se extrana porque el epigrafe de la banda ya nombra la jugada, y de paso el
+    # golpe se ve el doble de grande.
+    ("web_firma_still", "martillazo"),
     ("web_tiro_03", "gol"),
 ]
 # ⚠️ Solo van las capturas que el sitio USA. Hasta el 30-jul-2026 esta lista
