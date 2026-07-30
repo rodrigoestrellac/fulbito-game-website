@@ -1,6 +1,6 @@
 # fulbito-game-website
 
-Sitio de **Fulbito: The Game** — fútbol arcade 7v7, gratis, hecho a mano.
+Sitio de **Fulbito: The Game** — fútbol arcade 7v7, gratis.
 En vivo: **https://game.fulbito.futbol**
 
 Sitio estático, sin build step. Se sirve tal cual desde GitHub Pages (branch `main`, root).
@@ -16,7 +16,7 @@ assets/roster/  retratos del plantel, 480x480 (WebP)
 assets/firmas/  los tres retratos grandes de las jugadas firma, 720x720
 assets/brand/   mark de la pelota, favicons, og-image, fulbito.ico
 assets/audio/   cuatro clips del relator
-assets/video/   clips de gameplay (opcional, ver abajo)
+assets/video/   los tres clips de gameplay (ver abajo)
 tools/          build_assets.py — regenera TODO lo binario de assets/
 ```
 
@@ -61,32 +61,65 @@ El caso difícil es cuando el estado SÍ le sirve al visitante: «Beta — se em
 Windows y no lo probó nadie en un Mac de verdad» se queda, porque es una advertencia que
 cambia lo que la persona va a hacer. La diferencia no es el tema, es a quién le habla.
 
-## Clips de gameplay (opcional)
+## Clips de gameplay
 
-El hero y las secciones de features funcionan **con capturas solas**. Si en algún momento
-hay clips grabados (Game Bar / OBS, 1080p60), se activan solos al dejarlos acá:
+Los tres huecos declarados en el HTML (cada uno con un `data-video`) ya tienen clip. El
+`<video>` se monta encima de la captura, en la misma caja y sin salto de layout; la
+captura se queda debajo como respaldo.
 
-Hay **tres huecos** declarados en el HTML, cada uno con un `data-video`. El clip
-reemplaza a la captura que está de fondo, en la misma caja y sin salto de layout:
+| archivo | sección | qué muestra | dura |
+|---|---|---|---|
+| `assets/video/hero.mp4` | hero | juego tranquilo de mitad de cancha — es fondo detrás del wordmark | 6,6 s |
+| `assets/video/gol.mp4` | 09', "El gol" | remate, gol, «¡¡GOLAAAZO!!» y confeti | 5,4 s |
+| `assets/video/firma.mp4` | 23', firmas | El Martillazo | 3,0 s |
 
-| archivo | sección | qué mostrar |
-|---|---|---|
-| `assets/video/hero.mp4` | hero, arriba de todo | loop general de cámara TV, sin nada que llame la atención — es fondo detrás del wordmark |
-| `assets/video/gol.mp4` | 09', "El gol" | gol + red que se hincha + confeti + replay |
-| `assets/video/firma.mp4` | 23', "Cada uno tiene la suya" | una jugada firma bien vistosa (Martillazo, Gigante o Muralla) |
+Además del archivo hay que agregar su nombre al array `CLIPS` de `js/main.js` (una línea).
+Es a propósito: sondear con `HEAD` dejaba errores 404 en la consola.
 
-Para agregar un cuarto: un `<div class="banda rev" data-video="assets/video/loquesea.mp4">`
-con una `<img>` adentro, y el nombre en `CLIPS`. Nada más.
+### Cómo se graba
 
-Además del archivo, hay que agregar su nombre al array `CLIPS` de `js/main.js`
-(una línea). Es a propósito: sondear con `HEAD` dejaba errores 404 en la consola.
-Formato: H.264, **sin audio** (`-an`), `-crf 26`, ancho 1280, y un `poster` `.jpg` al lado
-con el mismo nombre. Presupuesto total de video de la página: **≤ 15 MB**.
+Game Bar (`Win+Alt+R`) o OBS, **1080p60 como mínimo**. Un tiempo de 15 minutos alcanza
+para sacar los tres. Grabar **con audio** aunque los clips van muteados: sirve para ubicar
+los momentos escuchando al relator.
+
+⚠️ **La Game Bar viene de fábrica en 30 fps y encima pierde frames.** La primera grabación
+salió con **27,6 fps reales** y espaciado de 15 a 50 ms — se veía a los saltos contra los
+165 Hz del monitor. Se arregla en Configuración → Juegos → Capturas (ya no está en el
+overlay `Win+G`): **Velocidad de fotogramas → 60 fps** y **Calidad → Alta**. Con eso la
+misma máquina dio 53,9 fps y 59 Mbps. Conviene medirlo antes de cortar nada:
 
 ```bash
-ffmpeg -i crudo.mp4 -an -c:v libx264 -crf 26 -vf scale=1280:-2 -movflags +faststart assets/video/gol.mp4
-ffmpeg -i assets/video/gol.mp4 -vframes 1 -q:v 4 assets/video/gol.jpg
+ffprobe -v error -select_streams v:0 \
+        -show_entries stream=avg_frame_rate,nb_frames \
+        -show_entries format=duration -of default=noprint_wrappers=1 crudo.mp4
 ```
+
+`avg_frame_rate` es el dato: el `r_frame_rate` del contenedor **miente** (declaraba 120).
+
+### Cómo se cortan
+
+```bash
+ffmpeg -ss 00:02:16.8 -t 5.4 -i crudo.mp4 -an -c:v libx264 -preset slow -crf 26 \
+       -pix_fmt yuv420p -vf "crop=1728:972:288:155,scale=1280:720" -r 60 \
+       -movflags +faststart assets/video/gol.mp4
+```
+
+Dos cosas que no son obvias:
+
+- **El `crop` saca el HUD.** El juego no tiene tecla para ocultarlo, y medio marcador
+  cortado por el `object-fit: cover` se lee como un error de la página. `1728:972:288:155`
+  deja afuera el marcador (termina en y=150), el minimapa y las barras de abajo, y
+  **conserva los carteles** («¡¡GOLAAAZO!!», «¡EL MARTILLAZO!»), que empiezan justo
+  debajo. Para el hero el recorte es más agresivo —`1600:900:352:215`— porque ahí no hay
+  cartel que preservar y sí está la píldora del jugador que manejás.
+- **El monitor es 16:10** (2560×1600), así que la grabación sale 16:10 y el `crop` la
+  lleva a 16:9. No es que la captura esté mal encuadrada.
+
+No hace falta generar un `.jpg` de póster: `montarVideos` usa como `poster` la `<img>` que
+ya está en el HTML, que además ya está descargada. Un `.jpg` aparte sería una request de más.
+
+⚠️ **El still del hero sale del mismo clip** (`captures/web_hero_still.png`, con el mismo
+crop) para que no se vea el salto de encuadre cuando entra el video.
 
 ## ⚠️ Chequeo de marcas — OBLIGATORIO antes de publicar cualquier imagen o video
 

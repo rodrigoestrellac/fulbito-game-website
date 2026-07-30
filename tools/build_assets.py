@@ -118,13 +118,25 @@ FIRMA_OUT = 720
 # tree queda en Speed=0 y los jugadores aparecen con los brazos en cruz. Hay que
 # quedarse con frames de pelota EN MOVIMIENTO.
 SHOTS = [
-    ("web_tv_08", "cancha-noche"),
+    # El hero: el MISMO plano que `assets/video/hero.mp4`, sacado del mismo
+    # clip. Antes era `web_tv_08` (un plano mas abierto, con tribuna) y al
+    # entrar el video se veia el salto de encuadre. Sale de
+    #   ffmpeg -ss 17 -i <grabacion> -frames:v 1 \n    #          -vf "crop=1600:900:352:215" captures/web_hero_still.png
+    # El crop saca el HUD del juego (marcador arriba, minimapa y barras
+    # abajo, y la pildora del jugador que manejas): en un fondo detras del
+    # wordmark, medio marcador cortado se lee como un error.
+    ("web_hero_still", "cancha-noche"),
     ("web_tiro_07", "muralla"),
     ("web_tiro_03", "gol"),
-    ("m15_menu_bg", "menu"),
-    ("m3_save_5", "atajada"),
-    ("m7_match_mid", "partido"),
 ]
+# ⚠️ Solo van las capturas que el sitio USA. Hasta el 30-jul-2026 esta lista
+# generaba tambien `menu`, `atajada` y `partido`, que no estan referenciadas en
+# ningun lado —ni en el HTML, ni en el CSS, ni en el JS—: sobraron de una version
+# anterior del diseno. Ademas de pesar al pedo, tenian un problema peor: sus
+# fuentes (`m15_menu_bg`, `m3_save_5`, `m7_match_mid`) las regenera cualquier sim
+# del repo del juego, asi que un `build_assets.py` despues de re-correr SimMatch
+# metia en el commit una captura distinta que nadie habia mirado. Antes de sumar
+# una captura aca, tiene que existir el lugar donde se muestra.
 SHOT_MAX_W = 1600
 
 
@@ -179,21 +191,6 @@ def build_roster():
     print("roster: %d retratos + %d grandes" % (len(ROSTER), len(FIRMAS_BIG)))
 
 
-def desenfoque_tribuna(im):
-    """La tribuna es una textura de sprites de baja resolucion: estirada a todo
-    el hero se lee como bloques. Un desenfoque GRADUADO (fuerte arriba, nulo a la
-    altura del cesped) la convierte en profundidad de campo — que es lo que haria
-    una camara de verdad — y deja la cancha nitida."""
-    borroso = im.filter(ImageFilter.GaussianBlur(3.2))
-    h = im.height
-    corte = int(h * 0.22)          # donde termina la tribuna en esta camara
-    mascara = Image.new("L", (1, h))
-    for y in range(h):
-        t = min(1.0, max(0.0, (corte - y) / (corte * 0.55)))
-        mascara.putpixel((0, y), int(255 * t))
-    return Image.composite(borroso, im, mascara.resize(im.size))
-
-
 def build_shots():
     for src, slug in SHOTS:
         p = os.path.join(CAPS, src + ".png")
@@ -201,8 +198,6 @@ def build_shots():
             print("  FALTA", p)
             continue
         im = Image.open(p).convert("RGB")
-        if slug == "cancha-noche":
-            im = desenfoque_tribuna(im)
         if im.width > SHOT_MAX_W:
             im = im.resize((SHOT_MAX_W, round(im.height * SHOT_MAX_W / im.width)),
                            Image.LANCZOS)

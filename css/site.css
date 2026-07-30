@@ -550,9 +550,16 @@ table.specs td:first-of-type { color: var(--cal); }
    hay que dejar el vh de antes para los navegadores que no lo conocen. */
 .hero { min-height: 100vh; min-height: 100svh; }
 
-/* el <video> que inyecta main.js cuando hay un clip: va ENCIMA de la captura,
-   en la misma caja, para que no haya salto de layout al cambiar */
-.banda > video {
+/* El <video> que inyecta main.js cuando hay un clip: va ENCIMA de la captura,
+   en la misma caja, para que no haya salto de layout al cambiar.
+   ⚠️ El hero TAMBIEN lo necesita, y faltaba: la regla de mas arriba
+   (`.hero__fondo img, .hero__fondo video`) solo le da tamano, no posicion, asi
+   que el video quedaba en flujo DEBAJO de la imagen — fuera de la caja y tapado
+   por el `overflow: hidden` del hero. Se veia la captura y el clip corria
+   invisible. Como los dos huecos son cajas con `position: relative/absolute` y
+   `object-fit: cover`, la misma declaracion sirve para ambos. */
+.banda > video,
+.hero__fondo > video {
   position: absolute; inset: 0; z-index: 0;
   width: 100%; height: 100%; object-fit: cover;
 }

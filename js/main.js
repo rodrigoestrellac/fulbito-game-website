@@ -89,7 +89,7 @@ document.querySelectorAll('[data-voz]').forEach((boton) => {
    anotado en la consola aunque el JS lo maneje — dos errores rojos en una
    página que no tiene ninguno. Una lista explícita es más barata y más clara.
    Ver README § Clips de gameplay. */
-const CLIPS = [];   // p.ej.: ['hero.mp4', 'gol.mp4']
+const CLIPS = ['hero.mp4', 'gol.mp4', 'firma.mp4'];
 
 function montarVideos() {
   if (menosMovimiento || !CLIPS.length) return;
@@ -103,7 +103,15 @@ function montarVideos() {
     v.muted = true; v.loop = true; v.autoplay = true;
     v.playsInline = true; v.preload = 'none';
     if (poster) v.poster = poster.currentSrc || poster.src;
-    v.addEventListener('canplay', () => { if (poster) poster.remove(); }, { once: true });
+    /* ⚠️ La <img> SE QUEDA. Antes esto la borraba en `canplay`, y el bug estuvo
+       latente hasta el primer clip de verdad: en las bandas la altura de la caja
+       la da la <img> (`.banda__img { aspect-ratio: 16/9 }`), porque el <video>
+       es `position: absolute; inset: 0` y no ocupa lugar en el layout. Borrarla
+       colapsaba la seccion a ALTURA CERO — y de paso Chrome pausa un video que
+       no esta visible, asi que ni siquiera se reproducia.
+       Dejarla ademas es gratis: el <video> la tapa (los dos son `object-fit:
+       cover` sobre la misma caja) y si el clip falla a mitad de camino, la
+       captura sigue ahi debajo. */
     hueco.appendChild(v);
   });
 }
