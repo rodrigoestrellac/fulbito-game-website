@@ -73,8 +73,10 @@ ffmpeg -i assets/video/gol.mp4 -vframes 1 -q:v 4 assets/video/gol.jpg
 
 ## ⚠️ Chequeo de marcas — OBLIGATORIO antes de publicar cualquier imagen o video
 
-El modelo `rc3b` del juego tiene **el escudo del Real Madrid y el logo de adidas horneados
-en la textura**. Nada donde se lea una marca registrada puede publicarse.
+Nada donde se lea una marca registrada puede publicarse. El caso testigo fue `rc3b`
+(Rober): tenía **el escudo del Real Madrid y el logo de adidas horneados en la textura**,
+y por eso estuvo fuera del álbum hasta que se re-texturizó el 30-jul-2026. Que un modelo
+ya se haya revisado una vez no sirve de nada — las texturas cambian.
 
 Antes de commitear una imagen o un video nuevo:
 
@@ -85,7 +87,9 @@ Antes de commitear una imagen o un video nuevo:
 4. En el copy, alt-texts y **nombres de archivo**: sólo los apodos in-game
    (EL VIKINGO, IL CAPITANO, EL MOTORCITO…), nunca los apellidos reales.
 
-Pendiente del lado del juego (no bloquea la web): limpiar la textura de `rc3b`.
+La textura de `rc3b` se limpió el 30-jul-2026 y Rober entró al álbum. Se verificó con
+zoom sobre el render, no sobre la palabra de nadie: la limpieza de una textura no exime
+del chequeo.
 
 ## Deploy
 
@@ -153,8 +157,8 @@ El recorte del busto **se mide** sobre cada render (`ventana_del_busto`) en vez 
 una ventana fija en píxeles, así conviven los renders viejos y los nuevos en la misma
 grilla sin descuadrarse.
 
-**Rober se queda sin figurita a propósito**: su modelo es `chibi_rc3b`, el único con el
-escudo y el logo de adidas horneados en la textura.
+El álbum está **completo, los 28**. Rober fue el último: su modelo (`chibi_rc3b`) era el
+único con el escudo y el logo horneados, y entró cuando se re-texturizó.
 
 ## La pelota y el ícono
 

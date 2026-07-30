@@ -67,10 +67,12 @@ ROSTER = [
     # los genera `game-unity/assets-src/render_check_front.py`.
     ("dinho", "dinho"), ("depaul", "el-motorcito"), ("samu", "samu"),
     ("zlatan", "zlatan"), ("pupi", "el-pupi"),
+    # 30-jul-2026: Rober entra y el album queda completo. Su modelo (`chibi_rc3b`)
+    # era el unico con el escudo del Real Madrid y el logo de adidas horneados en
+    # la textura, asi que hasta hoy no se podia publicar. Rodrigo la re-texturizo;
+    # verificado con zoom sobre el render antes de subirlo.
+    ("rc3b", "rober"),
 ]
-# El sexto hueco, «Rober», SE QUEDA VACIO A PROPOSITO: su modelo es `chibi_rc3b`,
-# el unico que tiene el escudo y el logo de adidas horneados en la textura. No se
-# publica hasta que esa textura se limpie (ver README § Chequeo de marcas).
 # La ventana del busto (cabeza + hombros, sin los brazos en T-pose) NO es fija:
 # se MIDE sobre cada render. Antes era la constante BUST = (135, 55, 505, 425),
 # calibrada a mano contra los renders viejos de 640x720 — y funcionaba mientras
