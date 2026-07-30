@@ -180,6 +180,13 @@ p:last-child { margin-bottom: 0; }
 .wordmark__caja > canvas { z-index: 1; }
 .wordmark__pelota {
   width: 100%; height: auto;
+  /* Los mismos 7 % que baja la pelota 3D (BAJADA en pelota3d.js): apoyada justo
+     sobre el baseline parece flotar, porque el ojo lee el contacto en la sombra
+     y no en la tangente de la esfera. Va acá tambien para que el fallback
+     estatico —sin WebGL, o con prefers-reduced-motion— quede a la misma altura
+     y no se note el cambio cuando la 3D entra. Es 7 % del ALTO, que en una caja
+     cuadrada es lo mismo que 7 % del diametro. */
+  transform: translateY(7%);
   /* La pelota es un render 3D, no un vector: le va una sombra BLANDA. La sombra
      dura del wordmark (offset plano, sin blur) sobre un objeto con volumen se
      ve como una calcomania mal pegada. */

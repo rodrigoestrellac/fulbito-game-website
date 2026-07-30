@@ -34,6 +34,20 @@ const PERIODO = 1.25;      // segundos por pique
 const GIRO = 0.42;         // radianes por segundo — "levemente"
 const RECORRIDO_MIN = 0.10;  // fracción del diámetro: piso, para que siempre se note algo
 
+/* ⚠️ AIRE — por qué el lienzo NO puede medir justo lo que mide el recorrido.
+   La primera versión calculaba el alto como `diámetro + recorrido` exacto, con
+   la idea de que en el pico la pelota tocara el borde de arriba y nada más. En
+   la práctica se CORTABA: la silueta de una esfera en perspectiva es más grande
+   que su radio geométrico proyectado —el contorno visible abarca un ángulo
+   asin(r/d) y no atan(r/d)—, y encima la pelota lleva una `drop-shadow` que
+   también ocupa. Los dos sobrantes son chicos, pero pasan justo en el pico, que
+   es donde se mira. Con aire alrededor no hay nada que ajustar al píxel. */
+const AIRE = 0.07;         // fracción del diámetro, de aire alrededor de la pelota
+/* La pelota apoya un poco POR DEBAJO del baseline. Con el punto de apoyo
+   exactamente sobre la línea, el pique arranca pareciendo que flota: el ojo lee
+   el contacto en el ecuador de la sombra, no en la tangente de la esfera. */
+const BAJADA = 0.07;       // fracción del diámetro que baja el punto de apoyo
+
 /** Altura de mayúscula en px de la tipografía REAL del elemento. */
 function altoDeMayuscula(el) {
   const cs = getComputedStyle(el);
@@ -70,15 +84,22 @@ export async function montarPelota3D(caja, imagen, titulo) {
     const d = caja.clientWidth;                       // diámetro de la pelota, en px
     if (!d) return;
     const mayuscula = titulo ? altoDeMayuscula(titulo) : d * 1.25;
-    // lo que hay entre el baseline y el tope de las letras, descontando la pelota
-    const subePx = Math.max(mayuscula - d, d * RECORRIDO_MIN);
+    const aire = d * AIRE;
+    const bajada = d * BAJADA;
+    /* Recorrido: la pelota apoya `bajada` px DEBAJO del baseline y en el pico su
+       tope tiene que llegar justo al alto de las mayúsculas. O sea que sube todo
+       lo que va del tope de la pelota en reposo (d − bajada) al de las letras. */
+    const subePx = Math.max(mayuscula - d + bajada, d * RECORRIDO_MIN);
 
-    const W = Math.ceil(d) + 2;                       // 1 px de aire a cada lado
-    const H = Math.ceil(d + subePx);
+    const W = Math.ceil(d + 2 * aire);
+    const H = Math.ceil(d + subePx + aire);
     renderer.setSize(W, H, false);
     lienzo.style.width = W + 'px';
     lienzo.style.height = H + 'px';
     lienzo.style.left = (d - W) / 2 + 'px';
+    // el piso del lienzo baja con la pelota; como está en position:absolute,
+    // asomarse por abajo de la caja no mueve nada del layout
+    lienzo.style.bottom = -bajada + 'px';
 
     /* Un radio de pelota = d/2 px, así que el alto visible en unidades de mundo
        es 2H/d y la cámara va a (H/d)/tan(fov/2). El borde de abajo del lienzo cae
