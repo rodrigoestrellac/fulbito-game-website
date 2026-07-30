@@ -6,13 +6,16 @@
 
 const REPO = 'rodrigoestrellac/fulbito-game-website';
 
-/* Espejo estático del release M78. Actualizar al publicar uno nuevo. */
+/* Espejo estático del release M88. Actualizar al publicar uno nuevo.
+   Los bytes salen de `dist/` después de correr pack_release (stat, no redondeo):
+   si no coinciden con el asset real, la web muestra un tamaño equivocado justo
+   cuando la API falla — o sea, justo cuando nadie lo va a poder verificar. */
 const FALLBACK = {
-  tag: 'M78',
+  tag: 'M88',
   archivos: {
-    winSetup: { nombre: 'FulbitoSetup-M78.exe', bytes: 87969180 },
-    winZip:   { nombre: 'Fulbito-M78-windows.zip', bytes: 112354036 },
-    mac:      { nombre: 'Fulbito-M78-mac.zip', bytes: 121029486 },
+    winSetup: { nombre: 'FulbitoSetup-M88.exe', bytes: 89623546 },
+    winZip:   { nombre: 'Fulbito-M88-windows.zip', bytes: 113854998 },
+    mac:      { nombre: 'Fulbito-M88-mac.zip', bytes: 122530416 },
     checksums:{ nombre: 'CHECKSUMS.txt', bytes: 311 },
   },
 };
