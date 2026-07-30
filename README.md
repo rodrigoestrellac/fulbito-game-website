@@ -123,6 +123,13 @@ grupos son `web_tiro_*` (remate en vuelo: el único instante donde el arquero es
 estirado de verdad), `web_golazo_*` (la ráfaga alrededor del gol), `web_tv_*` (el plano
 de transmisión, para el hero) y `web_cerca_*` (contrapicado).
 
+⚠️ **`SimWeb` no es reproducible frame a frame.** Usa un seed fijo, pero la física
+y la evaluación de animaciones no son deterministas entre corridas: dos ejecuciones
+del mismo código dan el mismo partido a grandes rasgos y fotos distintas. O sea que
+`web_tv_08.png` **no es un identificador estable** — el PNG elegido es la fuente de
+verdad, no su nombre. Si hace falta rehacer el sitio tal cual está, no alcanza con
+volver a correr el sim.
+
 ⚠️ **Al elegir, descartar los frames de saque.** Con el juego detenido el blend tree
 queda en `Speed = 0` y los jugadores aparecen con los brazos en cruz. Hay que quedarse
 con frames de **pelota en movimiento** — se chequea con zoom, igual que las marcas.
