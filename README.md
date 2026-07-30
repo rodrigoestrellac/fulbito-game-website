@@ -44,6 +44,23 @@ Si cambian esos patrones, actualizar `js/releases.js`.
 usa los datos hardcodeados en `FALLBACK` dentro de `js/releases.js`. Conviene actualizar
 ese bloque cuando se publica una versión nueva (es una constante, 4 líneas).
 
+## ⚠️ El copy habla del JUEGO, nunca del estado del sitio
+
+Regla dura, porque ya se coló tres veces: **nada de lo que se lee en la página puede ser
+una nota de producción**. El visitante vino a ver un juego, no el avance de la obra.
+
+Lo que hubo que sacar el 30-jul-2026:
+
+- «Acá va el clip de una firma en acción» — un recordatorio para nosotros, publicado.
+- «Ya están los veintiocho. El último en entrar fue Rober» — a nadie le importa el orden
+  en que se hicieron los retratos.
+- «28 retratados · álbum completo» — contaba **assets del sitio**, no jugadores. Ahora
+  dice «26 de campo · 2 arqueros», que es un dato del juego.
+
+El caso difícil es cuando el estado SÍ le sirve al visitante: «Beta — se empaquetó desde
+Windows y no lo probó nadie en un Mac de verdad» se queda, porque es una advertencia que
+cambia lo que la persona va a hacer. La diferencia no es el tema, es a quién le habla.
+
 ## Clips de gameplay (opcional)
 
 El hero y las secciones de features funcionan **con capturas solas**. Si en algún momento
