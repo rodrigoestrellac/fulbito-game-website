@@ -62,10 +62,28 @@ ROSTER = [
     ("puyol", "tarzan"), ("r9", "fenomeno"), ("dutch", "el-holandes"),
     ("batigol", "batigol"), ("bruja", "la-bruja"), ("lucky", "lucky"),
     ("arana", "la-arana"),
+    # 30-jul-2026: estos cinco no tenian `_check_front.png` — los modelos se
+    # integraron despues de que se dejaran de hacer esos renders a mano. Ahora
+    # los genera `game-unity/assets-src/render_check_front.py`.
+    ("dinho", "dinho"), ("depaul", "el-motorcito"), ("samu", "samu"),
+    ("zlatan", "zlatan"), ("pupi", "el-pupi"),
 ]
-# ventana del busto dentro del render 640x720 (cabeza + hombros, sin los brazos
-# en T-pose, que arrancan cerca de y=430)
-BUST = (135, 55, 505, 425)
+# El sexto hueco, «Rober», SE QUEDA VACIO A PROPOSITO: su modelo es `chibi_rc3b`,
+# el unico que tiene el escudo y el logo de adidas horneados en la textura. No se
+# publica hasta que esa textura se limpie (ver README § Chequeo de marcas).
+# La ventana del busto (cabeza + hombros, sin los brazos en T-pose) NO es fija:
+# se MIDE sobre cada render. Antes era la constante BUST = (135, 55, 505, 425),
+# calibrada a mano contra los renders viejos de 640x720 — y funcionaba mientras
+# todos los retratos salieran del mismo Blender con el mismo encuadre. Dejo de
+# funcionar el 30-jul-2026, cuando se agregaron los cinco que faltaban con
+# `game-unity/assets-src/render_check_front.py`: ese script encuadra desde el
+# bounding box del modelo, asi que el muneco entra mas grande y mas arriba, y la
+# ventana fija le cortaba la frente.
+# Estas tres fracciones REPRODUCEN la ventana vieja sobre los renders viejos
+# (contenido en y 83..636 => lado 370, tope 55, centrado en x=320), asi que las
+# 22 figuritas que ya estaban no se mueven un pixel.
+BUST_LADO = 0.67    # lado del cuadrado, en alturas de muneco
+BUST_TOPE = 0.05    # cuanto aire deja arriba de la cabeza, idem
 BUST_OUT = 480
 
 # Los tres retratos que van GRANDES en las tarjetas de jugadas firma. Se sacan
@@ -77,10 +95,30 @@ FIRMAS_BIG = [("haaland", "el-vikingo"), ("toro", "el-toro"), ("maldini", "il-ca
 FIRMA_OUT = 720
 
 # ── Capturas ─────────────────────────────────────────────────────────────────
+# ⚠️ NO USAR LAS `postfx_*`. Son el A/B de post-proceso de `PocSetup.SimPostFxAB`,
+# que abre la escena en MODO EDITOR y renderiza sin jugar: ningun Animator tickea,
+# el director no avanza y la fisica esta quieta. Las tres capturas que estuvieron
+# publicadas hasta el 30-jul-2026 salian de ahi, y por eso se veian mal:
+#   · todos los jugadores en T-pose,
+#   · el arquero parado en vez de volando,
+#   · nadie pateando,
+#   · y la pelota en el punto del medio — la seccion "El gol" no tenia ni un gol.
+# Encima son de 720p (el resto ya esta en 2560x1440), asi que ademas se veian
+# blandas en pantalla retina.
+# Las `web_*` salen de `PocSetup.SimWeb`, que corre el partido de verdad (mismo
+# loop que SimMatch: tickea director + fisica + Animator uno por uno) y dispara
+# atado a lo que pasa. Para regenerarlas:
+#     Unity.exe -batchmode -quit -projectPath <FulbitoPenales> \
+#               -executeMethod PocSetup.SimWeb
+# y despues elegir a mano: salen ~40 y sirven tres.
+#
+# ⚠️ Al elegir: descartar los frames de SAQUE. Con el juego detenido el blend
+# tree queda en Speed=0 y los jugadores aparecen con los brazos en cruz. Hay que
+# quedarse con frames de pelota EN MOVIMIENTO.
 SHOTS = [
-    ("postfx_tv_ON", "cancha-noche"),
-    ("postfx_cerca_ON", "saque-del-medio"),
-    ("postfx_gol_ON", "gol"),
+    ("web_tv_08", "cancha-noche"),
+    ("web_tiro_07", "muralla"),
+    ("web_tiro_03", "gol"),
     ("m15_menu_bg", "menu"),
     ("m3_save_5", "atajada"),
     ("m7_match_mid", "partido"),
@@ -99,8 +137,36 @@ def recortar(src_id, slug, carpeta, lado):
     if not os.path.exists(p):
         print("  FALTA", p)
         return
-    im = Image.open(p).convert("RGB").crop(BUST).resize((lado, lado), Image.LANCZOS)
-    im.save(out("assets", carpeta, slug + ".webp"), "WEBP", quality=84, method=6)
+    im = Image.open(p).convert("RGB")
+    im.crop(ventana_del_busto(im)).resize((lado, lado), Image.LANCZOS) \
+      .save(out("assets", carpeta, slug + ".webp"), "WEBP", quality=84, method=6)
+
+
+def ventana_del_busto(im):
+    """Cuadrado cabeza+hombros, medido sobre el render.
+
+    El fondo de estos renders es un gris plano, asi que el muneco es todo lo que
+    se despegue de la esquina. Pero solo se mide el ALTO: horizontalmente se usa
+    el centro del CUADRO, no el del bulto, porque los dos pipelines encuadran al
+    muneco centrado y con los brazos en T el centro del bulto se corre para el
+    lado del que lleva un prop — el martillo del Vikingo lo mueve 40 px, que es
+    justo lo que le sacaria de cuadro media cara.
+    """
+    g = im.convert("L")
+    fondo = g.getpixel((2, 2))
+    mascara = g.point(lambda v: 255 if abs(v - fondo) > 12 else 0)
+    caja = mascara.getbbox()
+    if not caja:
+        return (0, 0, im.width, im.height)
+    _, arriba, _, abajo = caja
+    alto = abajo - arriba
+    lado = alto * BUST_LADO
+    tope = arriba - alto * BUST_TOPE
+    # clamp: si el muneco viene pegado al borde de arriba, PIL rellena lo que
+    # falta con NEGRO y la figurita sale con una banda encima
+    tope = max(0.0, min(tope, im.height - lado))
+    cx = im.width / 2
+    return (int(cx - lado / 2), int(tope), int(cx + lado / 2), int(tope + lado))
 
 
 def build_roster():
@@ -118,7 +184,7 @@ def desenfoque_tribuna(im):
     una camara de verdad — y deja la cancha nitida."""
     borroso = im.filter(ImageFilter.GaussianBlur(3.2))
     h = im.height
-    corte = int(h * 0.30)          # donde termina la tribuna en esta camara
+    corte = int(h * 0.22)          # donde termina la tribuna en esta camara
     mascara = Image.new("L", (1, h))
     for y in range(h):
         t = min(1.0, max(0.0, (corte - y) / (corte * 0.55)))
@@ -172,7 +238,7 @@ def build_brand():
 def build_og():
     """1200x630 — el wordmark sobre la cancha de noche, oscurecida."""
     W, H = 1200, 630
-    base = Image.open(os.path.join(CAPS, "postfx_tv_ON.png")).convert("RGB")
+    base = Image.open(os.path.join(CAPS, "web_tv_08.png")).convert("RGB")
     s = max(W / base.width, H / base.height)
     base = base.resize((round(base.width * s), round(base.height * s)), Image.LANCZOS)
     x = (base.width - W) // 2

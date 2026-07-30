@@ -56,7 +56,7 @@ reemplaza a la captura que está de fondo, en la misma caja y sin salto de layou
 |---|---|---|
 | `assets/video/hero.mp4` | hero, arriba de todo | loop general de cámara TV, sin nada que llame la atención — es fondo detrás del wordmark |
 | `assets/video/gol.mp4` | 09', "El gol" | gol + red que se hincha + confeti + replay |
-| `assets/video/firma.mp4` | 23', "Cada uno tiene la suya" | una jugada firma bien vistosa (Martillazo o Gigante) |
+| `assets/video/firma.mp4` | 23', "Cada uno tiene la suya" | una jugada firma bien vistosa (Martillazo, Gigante o Muralla) |
 
 Para agregar un cuarto: un `<div class="banda rev" data-video="assets/video/loquesea.mp4">`
 con una `<img>` adentro, y el nombre en `CLIPS`. Nada más.
@@ -92,19 +92,62 @@ Pendiente del lado del juego (no bloquea la web): limpiar la textura de `rc3b`.
 Push a `main` → GitHub Pages deploya solo. Custom domain `game.fulbito.futbol` (CNAME en
 el repo) + Enforce HTTPS. DNS: `CNAME game → rodrigoestrellac.github.io` en `fulbito.futbol`.
 
-## Por qué las capturas se veían pixeladas
+## De dónde salen las capturas — y por qué las primeras estaban mal
 
-`PocSetup.ShotWithCam` (repo del juego) renderizaba a **1280x720 sin antialias**. En una
-pantalla de 1440 CSS px con devicePixelRatio 2 eso se estira al doble, y el outline de 1 px
-del shader toon queda escalonado. El 29-jul-2026 se subió a **2560x1440 con MSAA 8**, pero
-las capturas que ya estaban en `captures/` siguen en 720p: para regenerar las de una escena
-hay que volver a correr su sim en Unity (`PocSetup.SimPostFxAB` para las `postfx_*`,
-`PocSetup.SimFirmas` para las `m24n_*`).
+Las tres capturas que estuvieron publicadas hasta el 30-jul-2026 (el fondo del hero,
+"El gol" y la banda de jugadas firma) salían de `PocSetup.SimPostFxAB`, que es el
+**A/B de post-proceso**: abre la escena en modo editor y renderiza. En modo editor no
+corre el loop de Unity — ningún `Animator` tickea, el director no avanza y la física
+está quieta. O sea que esas capturas mostraban la escena **congelada en su pose de
+bind**, y por eso:
 
-Mientras tanto, el sitio evita el problema: ninguna captura se muestra a más ancho del que
-tiene, las tarjetas de jugadas firma usan los **retratos** (renders limpios) en vez de la
-jugada en acción, y el hero le aplica un desenfoque graduado a la tribuna — que es una
-textura de sprites de baja resolución — para que lea como profundidad de campo.
+- todos los jugadores en T-pose,
+- el arquero parado en vez de volando,
+- nadie pateando,
+- y la pelota en el punto del medio: la sección "El gol" no tenía ni un gol.
+
+Encima eran de 720p (el resto ya estaba en 2560x1440), así que además se veían blandas
+en pantalla retina. Las dos cosas se leían juntas como "está pixelado", pero eran dos
+problemas distintos y el grave era el primero.
+
+Ahora salen de **`PocSetup.SimWeb`**, que corre el partido de verdad — el mismo loop
+que `SimMatch`: tickea el director, simula la física a mano y llama `Animator.Update`
+uno por uno — y dispara **atado a lo que pasa** en vez de a un frame fijo:
+
+```
+Unity.exe -batchmode -quit -projectPath <FulbitoPenales> -executeMethod PocSetup.SimWeb
+```
+
+Deja unas 40 capturas en `captures/web_*` a 2560x1440 con MSAA 8; sirven tres. Los
+grupos son `web_tiro_*` (remate en vuelo: el único instante donde el arquero está
+estirado de verdad), `web_golazo_*` (la ráfaga alrededor del gol), `web_tv_*` (el plano
+de transmisión, para el hero) y `web_cerca_*` (contrapicado).
+
+⚠️ **Al elegir, descartar los frames de saque.** Con el juego detenido el blend tree
+queda en `Speed = 0` y los jugadores aparecen con los brazos en cruz. Hay que quedarse
+con frames de **pelota en movimiento** — se chequea con zoom, igual que las marcas.
+
+Las que se eligieron están en `SHOTS`, en `tools/build_assets.py`. Las `m15_menu_bg`,
+`m3_save_5` y `m7_match_mid` vienen de otros sims que ya corrían el juego y están bien.
+
+## Los retratos del álbum
+
+Salen de `captures/<tag>_check_front.png`, que hasta julio de 2026 se hacían **a mano**
+en Blender durante el riggeo de cada modelo. Los cinco modelos que se integraron después
+(Dinho, El Motorcito, Samu, Zlatan, El Pupi) nunca tuvieron el suyo, y en la web eso se
+veía como huecos en el álbum. Ahora los genera un script:
+
+```
+blender -b --factory-startup -P assets-src/render_check_front.py        # los que faltan
+blender -b --factory-startup -P assets-src/render_check_front.py -- zizou   # uno puntual
+```
+
+El recorte del busto **se mide** sobre cada render (`ventana_del_busto`) en vez de usar
+una ventana fija en píxeles, así conviven los renders viejos y los nuevos en la misma
+grilla sin descuadrarse.
+
+**Rober se queda sin figurita a propósito**: su modelo es `chibi_rc3b`, el único con el
+escudo y el logo de adidas horneados en la textura.
 
 ## La pelota y el ícono
 

@@ -3,3 +3,4 @@ Thumbs.db
 node_modules/
 *.tmp
 tools/logo_candidatos/
+__pycache__/
