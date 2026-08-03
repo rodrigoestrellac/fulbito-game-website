@@ -209,8 +209,56 @@ El recorte del busto **se mide** sobre cada render (`ventana_del_busto`) en vez 
 una ventana fija en píxeles, así conviven los renders viejos y los nuevos en la misma
 grilla sin descuadrarse.
 
-El álbum está **completo, los 28**. Rober fue el último: su modelo (`chibi_rc3b`) era el
-único con el escudo y el logo horneados, y entró cuando se re-texturizó.
+Rober fue el último de los 28 originales: su modelo (`chibi_rc3b`) era el único con el
+escudo y el logo horneados, y entró cuando se re-texturizó.
+
+### ⚠️ El álbum se DERIVA del juego (3-ago-2026) — antes era una lista a mano
+
+**El álbum se había quedado en 28 jugadores mientras el juego tenía 50, y nadie lo
+notó.** Faltaban los DOCE de M92 (desde el 1-ago) y los DIEZ de M94. La causa era que
+`ROSTER` en `tools/build_assets.py` se escribía a mano: una lista que tiene que decir lo
+mismo que otra y que nada comparaba. Es el mismo bug que en el repo del juego costó a La
+Tortuga (`BluePoolIds` vs. los cuerpos de la escena, M92g), y falla igual de mal — **en
+silencio**, porque un álbum incompleto se ve tan bien como uno completo.
+
+Ahora los candidatos **salen del juego** (`MatchTuning.BluePoolIds` + `GkPoolIds`) y el
+slug se **deriva de `NombreDe`**. Sumar un jugador al juego lo mete en la lista solo.
+
+**Pero no se publica solo, y eso es deliberado.** El chequeo de marcas de más arriba es
+manual a propósito: si el álbum fuera 100% automático, un modelo nuevo con el escudo de
+un club se publicaría sin que nadie lo haya mirado — cambiaríamos un bug silencioso
+(falta gente) por uno peor (se publica lo que no se revisó). Por eso son **dos piezas**:
+
+1. la lista se deriva del juego;
+2. cada id tiene que estar en **`APROBADOS`**, que es la firma de *"yo miré este retrato
+   con zoom"*.
+
+Un id sin aprobar **no se publica** y el script **avisa fuerte y termina con error**, en
+vez de faltar calladito. Lo mismo si a alguien le falta el `<li>` en `index.html`:
+generar el `.webp` no alcanza — sin la figurita en el HTML, en el sitio no se ve.
+`auditar_album()` compara **las tres listas** (plantel del juego · `APROBADOS` · grilla
+del `index.html`) al final de cada corrida.
+
+⚠️ **`SLUGS_CONGELADOS`**: los slugs ya publicados son URLs vivas. Como el slug ahora
+sale de `NombreDe`, cambiarle el apodo a un jugador en el juego renombraría su archivo y
+rompería enlaces y SEO sin que nadie lo pida. Los 28 publicados quedan congelados: si la
+derivación deja de coincidir, el script lo dice y sigue publicando el viejo. Renombrar
+una URL tiene que ser una decisión, no un efecto secundario.
+
+**Estado: los 50** (46 de campo + 4 arqueros). Los 22 que entraron el 3-ago pasaron el
+chequeo de marcas con zoom al torso: todos con el kit magenta liso de Meshy, sin escudo
+ni sponsor. El único que asustaba era **El Faraón** por las rayas azul/oro — pero es el
+**nemes**, el tocado de faraón, no una camiseta.
+
+Para agregar un jugador nuevo al álbum:
+
+```
+# 1) el retrato, en el repo del juego
+blender -b --factory-startup -P assets-src/render_check_front.py -- <id>
+# 2) MIRARLO CON ZOOM (escudos, sponsors) y recién ahí sumarlo a APROBADOS
+# 3) el <li> en index.html   ·   4) correr build_assets.py: tiene que dar VERDE
+python tools/build_assets.py
+```
 
 ## La pelota y el ícono
 

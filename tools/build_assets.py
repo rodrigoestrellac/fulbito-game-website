@@ -14,12 +14,16 @@ Produce:
     assets/img/*.webp              capturas del juego, máx 1600 de ancho
 
 ⚠️ CHEQUEO DE MARCAS: este script NO valida marcas registradas. Toda captura
-   nueva que se agregue a SHOTS o ROSTER hay que mirarla con zoom ANTES
+   nueva que se agregue a SHOTS o al álbum hay que mirarla con zoom ANTES
    (escudos de clubes, logos de sponsors). Ver README § Chequeo de marcas.
-   El modelo `rc3b` del juego tiene el escudo del Real Madrid y el logo de
-   adidas horneados en la textura: no entra ni en ROSTER ni en SHOTS.
+   El caso testigo fue `rc3b`, que tenía el escudo del Real Madrid y el logo de
+   adidas horneados en la textura y estuvo fuera del álbum hasta que se
+   re-texturizó (30-jul-2026); hoy sí entra.
+   El álbum ya NO se lista a mano: sale del juego, pero cada id tiene que estar
+   en `APROBADOS` — esa lista ES el chequeo de marcas. Ver `auditar_album()`.
 """
 import os
+import re
 import sys
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
@@ -53,26 +57,105 @@ CAL = (240, 237, 228)
 # nunca un apellido real, ni acá ni en el alt-text (ver README § Chequeo).
 # El árbitro (pierluigi_check_front.png) queda AFUERA a propósito: es la
 # caricatura más reconocible del juego y no aporta a la grilla.
-ROSTER = [
-    ("pulga", "la-pulga"), ("haaland", "el-vikingo"), ("maldini", "il-capitano"),
-    ("dibu", "dibu"), ("neuer", "manuelito"), ("zizou", "zizou"),
-    ("beckham", "david"), ("neymarfix", "ney"), ("riquelme", "el-torero"),
-    ("diegote", "diegote"), ("dienton", "dienton"), ("cuti", "cuti"),
-    ("licha", "the-butcher"), ("toro", "el-toro"), ("iniesta", "el-cerebro"),
-    ("puyol", "tarzan"), ("r9", "fenomeno"), ("dutch", "el-holandes"),
-    ("batigol", "batigol"), ("bruja", "la-bruja"), ("lucky", "lucky"),
-    ("arana", "la-arana"),
-    # 30-jul-2026: estos cinco no tenian `_check_front.png` — los modelos se
-    # integraron despues de que se dejaran de hacer esos renders a mano. Ahora
-    # los genera `game-unity/assets-src/render_check_front.py`.
-    ("dinho", "dinho"), ("depaul", "el-motorcito"), ("samu", "samu"),
-    ("zlatan", "zlatan"), ("pupi", "el-pupi"),
-    # 30-jul-2026: Rober entra y el album queda completo. Su modelo (`chibi_rc3b`)
-    # era el unico con el escudo del Real Madrid y el logo de adidas horneados en
-    # la textura, asi que hasta hoy no se podia publicar. Rodrigo la re-texturizo;
-    # verificado con zoom sobre el render antes de subirlo.
-    ("rc3b", "rober"),
-]
+# ⚠️⚠️ EL ROSTER YA NO SE ESCRIBE A MANO (3-ago-2026). Era una lista fija y se
+# DESINCRONIZO del juego sin que nadie lo notara: al revisarlo, el album tenia 28
+# jugadores y el juego 50 — faltaban los DOCE de M92 (desde el 1-ago) y los DIEZ de
+# M94. Es la misma clase de bug que `BluePoolIds` vs. los cuerpos de la escena
+# (game-unity, M92g): dos listas que tienen que decir lo mismo y nada las compara.
+# Y falla EN SILENCIO, que es lo peor: un album incompleto se ve igual de bien que
+# uno completo.
+#
+# Ahora los candidatos SALEN DEL JUEGO (`MatchTuning.BluePoolIds` + `GkPoolIds`) y el
+# slug se DERIVA de `NombreDe`. Sumar un jugador al juego lo pone en la lista solo.
+#
+# ⚠️ PERO NO SE PUBLICA SOLO, Y ESO ES A PROPOSITO. El README manda mirar cada
+# retrato con zoom antes de publicarlo (escudos de clubes, logos de sponsors; el caso
+# testigo es `rc3b`). Con un album 100% automatico, un modelo nuevo con el escudo del
+# Real Madrid se publicaria sin que nadie lo haya visto: cambiariamos un bug
+# silencioso (falta gente) por otro peor (se publica lo que no se reviso).
+# Por eso son DOS piezas: la lista se deriva, pero cada id tiene que estar en
+# `APROBADOS`, que es la firma de "yo mire este retrato". Un id sin aprobar hace que
+# el script AVISE FUERTE y termine con error, en vez de faltar calladito.
+APROBADOS = {
+    # revisados hasta el 30-jul-2026
+    "pulga", "haaland", "maldini", "dibu", "neuer", "zizou", "beckham", "neymar",
+    "riquelme", "diegote", "dienton", "cuti", "licha", "toro", "iniesta", "puyol",
+    "r9", "dutch", "bati", "bruja", "lucky", "arana", "dinho", "depaul", "samu",
+    "zlatan", "pupi",
+    # `rc3b` tenia el escudo del Real Madrid y el logo de adidas horneados en la
+    # textura y estuvo fuera del album hasta que Rodrigo la re-texturizo (30-jul).
+    "rc3",
+    # 3-ago-2026 — los DOCE de M92 y los DIEZ de M94. Chequeo de marcas hecho sobre
+    # los `_check_front.png` con zoom al torso: los 22 llevan el kit magenta liso de
+    # Meshy, sin escudo ni sponsor. (El unico que asustaba era el Faraon por las
+    # rayas azul/oro, pero es el NEMES —el tocado de faraon— y no una camiseta.)
+    "ruud", "lea", "faraon", "nico", "carlitos", "cholo", "arjen", "pepito",
+    "sergio", "kuni", "cr007", "tortuga",
+    "ciudadano", "baby", "vini", "franco", "tommy", "lami", "pavelito", "fabio",
+    "gigi", "checo",
+}
+
+# el archivo de captura cuando NO se llama como el id del juego
+ALIAS_CAPTURA = {"bati": "batigol", "rc3": "rc3b", "neymar": "neymarfix"}
+
+# ⚠️ SLUGS YA PUBLICADOS: son URLs vivas. El slug se deriva de `NombreDe`, asi que un
+# cambio de apodo en el juego renombraria el archivo y romperia enlaces (y el SEO) sin
+# que nadie lo pida. Estos quedan CONGELADOS: si la derivacion deja de coincidir, el
+# script avisa — renombrar una URL publicada tiene que ser una decision, no un efecto
+# secundario de tocar un nombre en el juego.
+SLUGS_CONGELADOS = {
+    "pulga": "la-pulga", "haaland": "el-vikingo", "maldini": "il-capitano",
+    "dibu": "dibu", "neuer": "manuelito", "zizou": "zizou", "beckham": "david",
+    "neymar": "ney", "riquelme": "el-torero", "diegote": "diegote",
+    "dienton": "dienton", "cuti": "cuti", "licha": "the-butcher", "toro": "el-toro",
+    "iniesta": "el-cerebro", "puyol": "tarzan", "r9": "fenomeno",
+    "dutch": "el-holandes", "bati": "batigol", "bruja": "la-bruja", "lucky": "lucky",
+    "arana": "la-arana", "dinho": "dinho", "depaul": "el-motorcito", "samu": "samu",
+    "zlatan": "zlatan", "pupi": "el-pupi", "rc3": "rober",
+}
+
+MATCHTUNING = os.path.join(RAIZ, "game-unity", "FulbitoPenales", "Assets",
+                           "Scripts", "MatchTuning.cs")
+
+
+def _sin_acentos(s):
+    return s.translate(str.maketrans("ÁÉÍÓÚÜÑáéíóúüñ", "AEIOUUNaeiouun"))
+
+
+def slug_de(nombre):
+    """`EL VIKINGO` -> `el-vikingo`. Reproduce EXACTO los 28 slugs ya publicados."""
+    s = _sin_acentos(nombre).lower().strip()
+    return "-".join(p for p in s.replace("/", " ").split(" ") if p)
+
+
+def _lista_cs(txt, nombre):
+    m = re.search(nombre + r"\s*=\s*\{(.*?)\};", txt, re.S)
+    return re.findall(r'"([a-z0-9_]+)"', m.group(1)) if m else []
+
+
+def roster_del_juego():
+    """[(id, archivo_captura, slug)] del plantel APROBADO, en el orden del juego."""
+    txt = open(MATCHTUNING, encoding="utf-8").read()
+    ids = _lista_cs(txt, "BluePoolIds")
+    ids += [g for g in _lista_cs(txt, "GkPoolIds") if g not in ids]
+    bloque = re.search(r"NombreDe\(string id\).*?\n    \};", txt, re.S).group(0)
+    nombres = dict(re.findall(r'"([a-z0-9_]+)"\s*=>\s*"([^"]+)"', bloque))
+    out, sin_aprobar, choques = [], [], []
+    for i in ids:
+        if i not in APROBADOS:
+            sin_aprobar.append(i)
+            continue
+        slug = slug_de(nombres.get(i, i))
+        congelado = SLUGS_CONGELADOS.get(i)
+        if congelado and congelado != slug:
+            choques.append((i, congelado, slug))
+            slug = congelado          # manda la URL viva
+        out.append((i, ALIAS_CAPTURA.get(i, i), slug))
+    return out, sin_aprobar, choques
+
+
+ROSTER_JUEGO, SIN_APROBAR, SLUG_CHOQUES = roster_del_juego()
+ROSTER = [(cap, slug) for _id, cap, slug in ROSTER_JUEGO]
 # La ventana del busto (cabeza + hombros, sin los brazos en T-pose) NO es fija:
 # se MIDE sobre cada render. Antes era la constante BUST = (135, 55, 505, 425),
 # calibrada a mano contra los renders viejos de 640x720 — y funcionaba mientras
@@ -290,8 +373,59 @@ def build_og():
                            quality=86, optimize=True)
 
 
+def auditar_album():
+    """Compara TRES listas que tienen que decir lo mismo, y grita si no.
+
+    ⚠️ Existe porque el album ya se desincronizo una vez EN SILENCIO (28 jugadores
+    contra 50 del juego, durante tres dias). Las tres listas son:
+        1. el plantel del juego (`BluePoolIds` + `GkPoolIds`)
+        2. `APROBADOS`  — el chequeo de marcas, que es manual a proposito
+        3. la grilla de `index.html` — donde el jugador realmente los ve
+    Generar el .webp no alcanza: si no hay `<li>` en el HTML, la figurita no existe
+    para nadie. Es la misma leccion de `BluePoolIds` vs. los cuerpos de la escena.
+    """
+    problemas = []
+    if SIN_APROBAR:
+        problemas.append(
+            "SIN CHEQUEO DE MARCAS (%d): %s\n"
+            "   -> abri game-unity/captures/<id>_check_front.png, HACE ZOOM A LA\n"
+            "      CAMISETA (escudos de clubes, sponsors) y si esta limpia sumalo a\n"
+            "      APROBADOS. Ver README seccion 'Chequeo de marcas'."
+            % (len(SIN_APROBAR), ", ".join(SIN_APROBAR)))
+    for i, congelado, derivado in SLUG_CHOQUES:
+        problemas.append(
+            "SLUG PUBLICADO QUE CAMBIARIA: '%s' esta publicado como '%s' y de\n"
+            "   `NombreDe` ahora sale '%s'. Se publica el viejo para no romper la URL.\n"
+            "   Si el cambio es a proposito, actualiza SLUGS_CONGELADOS Y el index.html."
+            % (i, congelado, derivado))
+    # ¿estan todos en la grilla del sitio?
+    html = open(os.path.join(WEB, "index.html"), encoding="utf-8").read()
+    faltan_html = [s for _i, _c, s in ROSTER_JUEGO
+                   if ("assets/roster/%s.webp" % s) not in html]
+    if faltan_html:
+        problemas.append(
+            "SIN <li> EN index.html (%d): %s\n"
+            "   -> el .webp se genera igual, pero en el sitio NO SE VE."
+            % (len(faltan_html), ", ".join(faltan_html)))
+    if problemas:
+        print("\n" + "=" * 70)
+        print("ALBUM INCOMPLETO")
+        print("=" * 70)
+        for p in problemas:
+            print(" - " + p)
+        print("=" * 70)
+        return False
+    print("album: %d jugadores, todos aprobados y en el index" % len(ROSTER_JUEGO))
+    return True
+
+
 if __name__ == "__main__":
     build_brand()
     build_roster()
     build_shots()
+    ok = auditar_album()
     print("listo")
+    # ⚠️ sale con error DESPUES de generar todo: los assets quedan igual, pero el
+    # que corrio esto se entera. Un album incompleto que termina en verde es
+    # exactamente como se perdieron doce jugadores durante tres dias.
+    sys.exit(0 if ok else 1)
