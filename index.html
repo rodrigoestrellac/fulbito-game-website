@@ -40,9 +40,15 @@
 }
 </script>
 
-<!-- Google Analytics: va ACÁ el snippet gtag cuando Rodrigo cree la propiedad
-     nueva y pase el ID (G-…). No se reusa el de web.fulbito.futbol: este sitio
-     lleva stream propio. -->
+<!-- Google Analytics — propiedad PROPIA de game.fulbito.futbol (la web de la
+     app usa otra: G-D4FS2P80Q4). Mismo patrón de embed que web.fulbito.futbol. -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-7RZ7NN662N"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-7RZ7NN662N');
+</script>
 
 <link rel="icon" href="assets/brand/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="assets/brand/favicon-32.png" sizes="32x32">
