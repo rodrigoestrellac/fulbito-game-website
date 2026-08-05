@@ -114,11 +114,29 @@ function pintar(release) {
 async function cargar() {
   pintar(FALLBACK); // se pinta ya, sin esperar a la red
   try {
-    const r = await fetch(`https://api.github.com/repos/${REPO}/releases/latest`, {
+    /* /releases en vez de /releases/latest: cuesta el mismo pedido y trae,
+       además del último release, el download_count de TODOS los assets — de
+       ahí sale el contador de descargas. */
+    const r = await fetch(`https://api.github.com/repos/${REPO}/releases?per_page=100`, {
       headers: { Accept: 'application/vnd.github+json' },
     });
     if (!r.ok) throw new Error(`GitHub respondió ${r.status}`);
-    const data = await r.json();
+    const releases = await r.json();
+
+    /* contador: los binarios de todas las versiones (CHECKSUMS.txt no es una
+       descarga del juego). Sin dato de la API el elemento queda oculto — un
+       número hardcodeado acá envejecería mintiendo. */
+    const total = releases.flatMap((rel) => rel.assets || [])
+      .filter((a) => /\.(exe|zip)$/i.test(a.name))
+      .reduce((s, a) => s + (a.download_count || 0), 0);
+    const cont = document.querySelector('[data-rel="descargas"]');
+    if (cont && total > 0) {
+      cont.textContent = `Ya se descargó ${total.toLocaleString('es-AR')} ${total === 1 ? 'vez' : 'veces'}.`;
+      cont.hidden = false;
+    }
+
+    const data = releases.find((rel) => !rel.draft && !rel.prerelease);
+    if (!data) return;
     const archivos = clasificar(data.assets || []);
     if (!archivos.winSetup && !archivos.winZip && !archivos.mac) return; // release sin binarios: queda el fallback
     pintar({ tag: data.tag_name, archivos });

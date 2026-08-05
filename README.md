@@ -387,6 +387,40 @@ texto real: escala, se indexa y lo lee un lector de pantalla) y un escudo, que p
 badge de club — justo lo que el sitio evita. El script queda por si sirve para otra cosa.
 </details>
 
+## Tipografías — self-hosteadas (5-ago-2026)
+
+Oswald 500/700, DM Sans 400/500 y Caveat 600 se sirven desde `assets/fonts/` (woff2,
+subset latin) vía `css/fonts.css`. Antes venían de fonts.googleapis.com: dos preconnect,
+una request de terceros en el camino crítico y la IP de cada visitante contada a Google.
+Para regenerar (p.ej. si se suma un peso): pedir
+`https://fonts.googleapis.com/css2?family=…&display=swap` con un User-Agent de Chrome,
+bajar los woff2 del bloque `/* latin */` de cada cara y reescribir `css/fonts.css` con
+los mismos `unicode-range`.
+
+## El contador de descargas
+
+`releases.js` pide `/releases?per_page=100` (mismo costo de rate limit que
+`/releases/latest`) y suma el `download_count` de todos los `.exe`/`.zip` de todas las
+versiones — CHECKSUMS.txt no cuenta. Se muestra en la sección de descarga
+(`[data-rel="descargas"]`). **Sin dato de la API el elemento queda oculto**: no hay
+número hardcodeado porque envejecería mintiendo.
+
+## Deep-link de la ficha
+
+Cada cromo tiene URL: `#cromo/<slug>` (p.ej. `#cromo/el-vikingo`). Se escribe con
+`replaceState` — no con `location.hash` — para que el historial no se llene con cada
+flecha: volver atrás sale de la página, no repasa 52 cromos. Al cerrar la ficha el hash
+se limpia. Llegar con el hash puesto abre la ficha sola sobre el álbum.
+
+## ⚠️ La sección de modos TAMBIÉN es una lista que se desincroniza
+
+El menú real vive en `MenuDirector.cs` (game-unity, el array de tuplas al principio).
+El 5-ago-2026 la web decía "Seis modos" y el juego tenía SIETE — faltaba la COPA
+FULBITO, que existe desde M85. Al tocar el menú del juego, actualizar la sección 61'
+**y** el zócalo del hero **y** la meta description. (Es la misma clase de bug que el
+álbum 28 vs 50; esta lista sigue siendo a mano porque son siete renglones con copy
+propio, pero el chequeo es: contar los ítems del array y contar los `<li>` del menú.)
+
 ## Legal
 
 Proyecto personal, sin fines comerciales. No está afiliado ni autorizado por ningún club,

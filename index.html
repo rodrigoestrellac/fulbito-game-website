@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Fulbito: The Game — fútbol arcade 7v7, gratis, para Windows y Mac</title>
-<meta name="description" content="Fútbol arcade 7v7: 52 jugadores, 35 jugadas firma, relator propio, seis modos y dos jugadores en la misma PC. Gratis, sin cuenta. Corre a 1080p y 60 fps en una placa integrada.">
+<meta name="description" content="Fútbol arcade 7v7: 52 jugadores, 35 jugadas firma, relator propio, siete modos y dos jugadores en la misma PC. Gratis, sin cuenta. Corre a 1080p y 60 fps en una placa integrada.">
 <link rel="canonical" href="https://game.fulbito.futbol/">
 
 <meta property="og:type" content="website">
@@ -18,15 +18,42 @@
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 
+<!-- ficha estructurada p/ buscadores: es un juego, es gratis, corre en Win/Mac -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "VideoGame",
+  "name": "Fulbito: The Game",
+  "url": "https://game.fulbito.futbol/",
+  "image": "https://game.fulbito.futbol/assets/brand/og-image.jpg",
+  "description": "Fútbol arcade 7v7: 52 jugadores, 35 jugadas firma, relator propio y siete modos. Gratis, sin cuenta y sin publicidad.",
+  "inLanguage": "es-AR",
+  "genre": "Sports",
+  "gamePlatform": ["PC (Windows)", "macOS"],
+  "operatingSystem": "Windows 10, Windows 11, macOS",
+  "applicationCategory": "GameApplication",
+  "playMode": ["SinglePlayer", "MultiPlayer"],
+  "numberOfPlayers": { "@type": "QuantitativeValue", "minValue": 1, "maxValue": 2 },
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD",
+              "availability": "https://schema.org/InStock" },
+  "author": { "@type": "Person", "name": "Rodrigo" }
+}
+</script>
+
+<!-- Google Analytics: va ACÁ el snippet gtag cuando Rodrigo cree la propiedad
+     nueva y pase el ID (G-…). No se reusa el de web.fulbito.futbol: este sitio
+     lleva stream propio. -->
+
 <link rel="icon" href="assets/brand/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="assets/brand/favicon-32.png" sizes="32x32">
 <link rel="apple-touch-icon" href="assets/brand/apple-touch-180.png">
 <meta name="theme-color" content="#0D1B0F">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="image" href="assets/img/cancha-noche.webp" fetchpriority="high">
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=DM+Sans:wght@400;500&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<!-- tipografías propias (css/fonts.css): sin requests a Google -->
+<link rel="preload" as="font" type="font/woff2" href="assets/fonts/oswald-700.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="assets/fonts/dmsans-400.woff2" crossorigin>
+<link rel="stylesheet" href="css/fonts.css">
 <script type="importmap">
   { "imports": { "three": "./vendor/three/three.module.min.js" } }
 </script>
@@ -81,7 +108,7 @@
       <span>Windows <b>+</b> macOS</span>
       <span><b>52</b> jugadores</span>
       <span><b>35</b> jugadas firma</span>
-      <span><b>6</b> modos</span>
+      <span><b>7</b> modos</span>
       <span>Sin cuenta, sin publicidad</span>
     </p>
   </div>
@@ -322,7 +349,7 @@
   <section class="seccion" aria-labelledby="t-modos">
     <div class="env">
       <div class="seccion__intro rev">
-        <p class="minuto" data-min="61'">Seis modos</p>
+        <p class="minuto" data-min="61'">Siete modos</p>
         <h2 id="t-modos">Lo que hay en el menú</h2>
         <p class="bajada">Tal cual aparece cuando abrís el juego. Se juega con teclado o con joystick
           (Xbox o PlayStation, por USB o Bluetooth); con dos joysticks, de a dos en la misma PC.</p>
@@ -335,6 +362,14 @@
           <span class="menu__mando">1 mando o teclado</span>
           <span class="menu__que">Vos y seis compañeros contra la máquina. Antes elegís formación,
             dificultad y los seis que salen a la cancha.</span>
+        </li>
+        <li>
+          <span class="menu__flecha" aria-hidden="true">▸</span>
+          <span class="menu__label">Copa Fulbito · 8 equipos</span>
+          <span class="menu__mando">1 mando o teclado</span>
+          <span class="menu__que">Un torneo con cuadro: cuartos, semifinal y final. Si el partido
+            termina empatado, tanda de penales. La copa en curso se guarda sola y te espera
+            en el menú.</span>
         </li>
         <li>
           <span class="menu__flecha" aria-hidden="true">▸</span>
@@ -418,7 +453,8 @@
         <p class="minuto" data-min="86'">Bajalo</p>
         <h2 id="t-bajar">Descargar e instalar</h2>
         <p class="bajada">Versión <strong data-rel="version">M88</strong>. Es gratis, no pide cuenta, no
-          tiene publicidad y no manda nada a ningún lado.</p>
+          tiene publicidad y no manda nada a ningún lado.
+          <span data-rel="descargas" hidden></span></p>
       </div>
 
       <div class="descargas rev" data-rel="lista">

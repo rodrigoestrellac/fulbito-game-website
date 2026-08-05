@@ -17,7 +17,7 @@ const FIRMAS_DESC = {
   'EL GIGANTE': 'Se agranda una vez y media durante tres segundos y medio, y con rozarte te voltea.',
   'LA PAUSA': 'Cuatro segundos de pausa: los rivales pasan a cámara lenta y un compañero pica catorce metros al arco.',
   'EL CAÑONAZO': 'Saca un cañón pirata y dispara la pelota en llamas. Adentro de los dieciséis metros, no hay arquero.',
-  'EL MISIL': 'La misma bala que El Cañonazo, pero sale de un lanzamisiles. Decisión de diseño.',
+  'EL MISIL': 'Se carga un lanzamisiles al hombro y la pelota sale con ojiva. Cerca del arco no hay forma de atajarla.',
   'EL TRACTOR': 'Tres segundos lento pero imparable: baja un cambio y va volteando gente a su paso.',
   'LA TELARAÑA': 'Teje una red de cuatro metros que atrapa dos segundos y medio a todo rival que agarra adentro.',
   'EL HECHIZO': 'Deja quietos a los rivales en cinco metros a la redonda durante dos segundos, con estrellitas.',
@@ -202,6 +202,13 @@ async function montarAlbum() {
 
   // clic en el fondo = cerrar (el panel adentro se traga sus propios clics)
   ficha.addEventListener('click', (e) => { if (e.target === ficha) ficha.close(); });
+  /* cada cromo tiene URL: #cromo/el-vikingo. replaceState y no location.hash
+     para no ensuciar el historial con cada flecha (volver atrás debe salir de
+     la página, no repasar 52 cromos). */
+  ficha.addEventListener('close', () => {
+    slugAbierto = null;
+    history.replaceState(null, '', location.pathname + location.search);
+  });
   ficha.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowRight') { e.preventDefault(); pasarFicha(1); }
     if (e.key === 'ArrowLeft') { e.preventDefault(); pasarFicha(-1); }
@@ -273,6 +280,7 @@ async function montarAlbum() {
       b.addEventListener('click', () => abrirFicha(b.dataset.slug)));
 
     if (!ficha.open) ficha.showModal();
+    history.replaceState(null, '', '#cromo/' + slug);
 
     /* las barras crecen desde cero al abrir; sin motion, aparecen llenas.
        El doble rAF es para que el estilo inicial (--v:0) llegue a pintarse. */
@@ -282,6 +290,14 @@ async function montarAlbum() {
       requestAnimationFrame(() => requestAnimationFrame(() =>
         barras.forEach((b) => b.style.setProperty('--v', b.dataset.v))));
     }
+  }
+
+  // si alguien llega con #cromo/<slug> (le compartieron una figurita), la
+  // ficha se abre sola sobre el álbum
+  const pedido = (location.hash.match(/^#cromo\/([a-z0-9-]+)$/) || [])[1];
+  if (pedido && porSlug.has(pedido)) {
+    tarjetas.get(pedido)?.scrollIntoView({ block: 'center' });
+    abrirFicha(pedido);
   }
 }
 
