@@ -21,6 +21,10 @@ if ('IntersectionObserver' in window && !menosMovimiento) {
   document.querySelectorAll('.rev').forEach((el) => el.classList.add('dentro'));
 }
 
+/* los cromos entran en cascada: cada uno sabe su lugar en la fila. El delay
+   lo aplica el CSS (cromo-entra) y solo si hay motion. */
+document.querySelectorAll('.album .figu').forEach((el, i) => el.style.setProperty('--i', i));
+
 /* ── Marcador fijo + reloj ───────────────────────────────────────────────── */
 const marcador = document.querySelector('.marcador');
 const reloj = document.querySelector('[data-reloj]');
@@ -38,7 +42,17 @@ function alScrollear() {
     const recorrible = document.documentElement.scrollHeight - window.innerHeight;
     const avance = recorrible > 0 ? Math.min(1, Math.max(0, y / recorrible)) : 0;
     const min = Math.round(avance * 90);
-    reloj.textContent = avance >= 0.995 ? "90+'" : `${min}'`;
+    const nuevo = avance >= 0.995 ? "90+'" : `${min}'`;
+    if (nuevo !== reloj.textContent) {
+      reloj.textContent = nuevo;
+      // el latido de minuto nuevo: sacar la clase y forzar reflow para que la
+      // animación pueda volver a arrancar (el dato cambia igual sin motion)
+      if (!menosMovimiento) {
+        reloj.classList.remove('tic');
+        void reloj.offsetWidth;
+        reloj.classList.add('tic');
+      }
+    }
   }
   pendiente = false;
 }

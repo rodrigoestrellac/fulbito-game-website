@@ -228,9 +228,13 @@ p:last-child { margin-bottom: 0; }
   background: var(--oro); color: var(--noche);
   padding: 11px 0; overflow: hidden;
   border-block: 1px solid rgba(13, 27, 15, .18);
-  --ticker-dur: 46s;
+  /* 46s cuando eran 20 firmas; con 35 la pista mide ~75% más y a la misma
+     duración volaría. Se estira para conservar la velocidad de lectura. */
+  --ticker-dur: 80s;
 }
 .ticker__pista { display: flex; width: max-content; animation: correr var(--ticker-dur) linear infinite; }
+/* al apoyar el puntero, el cartel se deja leer */
+.ticker:hover .ticker__pista { animation-play-state: paused; }
 .ticker__grupo {
   display: flex; gap: 34px; padding-right: 34px; flex: none;
   font-family: var(--display); font-weight: 700;
@@ -609,4 +613,293 @@ code {
   .hero__acciones .btn--grande { font-size: 1rem; padding: 16px 24px; }
   .hero__acciones .btn--grande [data-rel="cta-peso"],
   .hero__acciones .btn--grande [aria-hidden="true"] { display: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   EL CROMO PREMIUM — la figurita dorada del álbum.
+   Sin JS este bloque casi no actúa: la grilla estática de .figu de arriba
+   sigue siendo la base. roster.js agrega el botón (.figu__abrir), el número,
+   los filtros y la ficha; el foil/tilt sólo corre con puntero fino.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* marco dorado con degradé: dos fondos, uno para el papel y otro para el
+   borde. El borde plano de antes queda para el fallback de navegadores sin
+   soporte (la doble declaración de border lo resuelve el cascade). */
+.figu {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(170deg, #232a23, #141914) padding-box,
+    linear-gradient(165deg, rgba(201, 169, 78, .62), rgba(201, 169, 78, .1) 34%,
+                    rgba(232, 212, 139, .5) 72%, rgba(201, 169, 78, .2)) border-box;
+}
+
+/* el cromo entero es un botón (lo arma roster.js): se resetea el UA y el
+   contenido queda tal cual estaba en el <li> */
+.figu__abrir {
+  display: block; width: 100%; position: relative;
+  background: none; border: 0; padding: 0; margin: 0;
+  font: inherit; color: inherit; text-align: inherit; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.figu__abrir:focus-visible { outline: 2px solid var(--oro-claro); outline-offset: -2px; }
+
+.figu__num {
+  position: absolute; top: 8px; right: 8px; z-index: 2;
+  font-family: var(--display); font-weight: 500; font-size: .6rem;
+  letter-spacing: .08em; font-variant-numeric: tabular-nums;
+  color: rgba(240, 237, 228, .6); background: rgba(7, 14, 8, .55);
+  padding: 2px 6px; border-radius: 3px;
+}
+.figu__nuevo {
+  position: absolute; top: 8px; left: 8px; z-index: 2;
+  font-family: var(--display); font-weight: 700; font-size: .56rem;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--noche); background: linear-gradient(120deg, var(--oro), var(--oro-claro));
+  padding: 3px 7px; border-radius: 3px;
+}
+/* si el cromo lleva NUEVO, el aro de posición de los arqueros no compite:
+   ningún arquero es nuevo hoy, pero si un día lo es, el aro baja */
+.figu__nuevo ~ .figu__pos, .figu__pos ~ .figu__nuevo { top: 36px; }
+
+/* ── foil + tilt (roster.js pone --mx/--my/--rx/--ry con el puntero) ─────
+   El lift del hover se muda a `translate` para que no pelee con el tilt, que
+   vive en `transform`: son propiedades distintas y componen solas. */
+.album--foil .figu {
+  transform: perspective(700px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform .18s ease-out, translate .28s var(--ease-back),
+              border-color .28s var(--ease), box-shadow .28s var(--ease);
+  will-change: transform;
+}
+.album--foil .figu:hover, .album--foil .figu:focus-within {
+  transform: perspective(700px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  translate: 0 -5px;
+}
+.album--foil .figu__abrir::after {
+  content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  opacity: 0; transition: opacity .3s var(--ease);
+  background:
+    radial-gradient(300px circle at var(--mx, 50%) var(--my, 50%),
+                    rgba(232, 212, 139, .3), transparent 58%),
+    linear-gradient(115deg, transparent 32%, rgba(201, 169, 78, .1) 44%,
+                    rgba(240, 237, 228, .14) 50%, rgba(201, 169, 78, .1) 56%,
+                    transparent 68%);
+}
+.album--foil .figu:hover .figu__abrir::after { opacity: 1; }
+
+/* ── filtros del álbum ──────────────────────────────────────────────────── */
+.album__filtros {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+  margin-bottom: var(--s5);
+}
+.album__filtro {
+  font-family: var(--display); font-weight: 500;
+  font-size: .8rem; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--cal); background: none; cursor: pointer;
+  padding: 8px 15px; border: 1px solid rgba(201, 169, 78, .25); border-radius: 100px;
+  transition: border-color .2s, background .2s, color .2s;
+}
+.album__filtro b { color: var(--oro); font-weight: 700; font-variant-numeric: tabular-nums; }
+.album__filtro:hover { border-color: var(--oro); }
+.album__filtro[aria-pressed="true"] {
+  background: var(--oro); border-color: var(--oro); color: var(--noche);
+}
+.album__filtro[aria-pressed="true"] b { color: var(--noche); }
+.album__firma-select {
+  margin-left: auto;
+  font-family: var(--display); font-weight: 500;
+  font-size: .8rem; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--oro-claro); background: rgba(13, 27, 15, .7);
+  padding: 8px 12px; border: 1px solid rgba(201, 169, 78, .3); border-radius: var(--r-sm);
+  cursor: pointer; max-width: 100%;
+}
+.album__firma-select:hover, .album__firma-select:focus-visible { border-color: var(--oro); }
+@media (max-width: 620px) {
+  .album__firma-select { margin-left: 0; flex: 1 1 100%; }
+}
+
+/* ── la ficha: el dorso de la figurita ──────────────────────────────────── */
+.ficha {
+  border: 0; padding: 16px; margin: auto; background: transparent;
+  width: min(880px, 100%); max-height: 100dvh; color: var(--cal);
+  /* en un teléfono la ficha es más alta que la pantalla: tiene que scrollear
+     ELLA (las flechas del pie quedan al final), no desbordar invisible */
+  overflow: auto; overscroll-behavior: contain;
+}
+.ficha::backdrop { background: rgba(7, 14, 8, .82); backdrop-filter: blur(8px); }
+.ficha__panel {
+  position: relative; overflow: hidden;
+  border: 1px solid transparent; border-radius: var(--r-lg);
+  background:
+    linear-gradient(168deg, #1a211a, #0c120d 55%, #131a13) padding-box,
+    linear-gradient(160deg, rgba(201, 169, 78, .7), rgba(201, 169, 78, .16) 40%,
+                    rgba(232, 212, 139, .55)) border-box;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, .6);
+}
+@keyframes ficha-entra {
+  from { opacity: 0; transform: translateY(18px) scale(.97); }
+}
+.ficha[open] .ficha__panel { animation: ficha-entra .38s var(--ease); }
+@media (prefers-reduced-motion: reduce) {
+  .ficha[open] .ficha__panel { animation: none; }
+}
+
+.ficha__cabeza {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 18px 0;
+}
+.ficha__num {
+  font-family: var(--display); font-weight: 700; font-size: 1rem;
+  letter-spacing: .06em; color: var(--oro); font-variant-numeric: tabular-nums;
+}
+.ficha__num i { font-style: normal; font-weight: 500; font-size: .75rem; color: var(--cal-tenue); }
+.ficha__cerrar {
+  width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
+  display: grid; place-items: center; font-size: 1.15rem; line-height: 1;
+  color: var(--cal); background: rgba(240, 237, 228, .06);
+  border: 1px solid rgba(201, 169, 78, .25);
+  transition: border-color .2s, background .2s;
+}
+.ficha__cerrar:hover { border-color: var(--oro); background: rgba(201, 169, 78, .12); }
+
+.ficha__cuerpo {
+  display: grid; grid-template-columns: minmax(190px, 300px) 1fr;
+  gap: clamp(18px, 3.4vw, 40px); align-items: start;
+  padding: clamp(16px, 3vw, 28px);
+}
+.ficha__retrato { margin: 0; }
+.ficha__retrato img {
+  width: 100%; aspect-ratio: 1; object-fit: cover;
+  border-radius: var(--r-md); border: 1px solid rgba(201, 169, 78, .3);
+  background: radial-gradient(70% 70% at 50% 35%, #2b322b, #151a15);
+}
+.ficha__nombre {
+  font-size: clamp(1.5rem, 3.6vw, 2.2rem); letter-spacing: .04em; color: var(--cal);
+}
+.ficha__firma {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+  margin: 6px 0 0; font-family: var(--display); font-weight: 700;
+  font-size: .92rem; letter-spacing: .16em; text-transform: uppercase; color: var(--oro);
+}
+.ficha__sello {
+  font-size: .62rem; font-weight: 500; letter-spacing: .14em;
+  color: var(--cal); border: 1px solid rgba(201, 169, 78, .35);
+  padding: 2px 8px; border-radius: 100px;
+}
+.ficha__sello--arq { color: var(--oro-claro); }
+.ficha__sello--nuevo { background: var(--oro); border-color: var(--oro); color: var(--noche); font-weight: 700; }
+.ficha__desc {
+  margin: 12px 0 0; font-size: .95rem; color: var(--cal-tenue); max-width: 44ch;
+}
+
+.ficha__stats {
+  margin: var(--s4) 0 0; display: grid;
+  grid-template-columns: repeat(2, 1fr); gap: 9px clamp(14px, 2.4vw, 28px);
+}
+.ficha__stat dt {
+  font-family: var(--display); font-weight: 500; font-size: .64rem;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--cal-tenue);
+}
+.ficha__stat dd { display: flex; align-items: center; gap: 9px; margin: 3px 0 0; }
+.ficha__stat b {
+  font-family: var(--display); font-weight: 700; font-size: .85rem;
+  color: var(--oro-claro); font-variant-numeric: tabular-nums; min-width: 2ch;
+}
+.ficha__barra {
+  flex: 1; height: 5px; border-radius: 3px; overflow: hidden;
+  background: rgba(240, 237, 228, .1);
+}
+.ficha__barra i {
+  display: block; height: 100%; border-radius: 3px;
+  width: calc(var(--v) / 99 * 100%);
+  background: linear-gradient(90deg, var(--oro), var(--oro-claro));
+  transition: width .6s var(--ease);
+}
+
+.ficha__comparten {
+  margin: var(--s4) 0 0; font-size: .85rem; color: var(--cal-tenue);
+}
+.ficha__comparten button {
+  font: inherit; font-size: .82rem; color: var(--oro-claro); cursor: pointer;
+  background: none; border: 0; padding: 0; margin-right: 2px;
+  text-decoration: underline; text-decoration-color: rgba(201, 169, 78, .4);
+  text-underline-offset: 3px;
+}
+.ficha__comparten button:hover { text-decoration-color: var(--oro); }
+
+.ficha__pasar {
+  display: flex; justify-content: flex-end; gap: 8px;
+  padding: 0 18px 16px;
+}
+.ficha__flecha {
+  width: 42px; height: 42px; border-radius: 50%; cursor: pointer;
+  display: grid; place-items: center; font-size: 1rem;
+  color: var(--oro-claro); background: rgba(240, 237, 228, .05);
+  border: 1px solid rgba(201, 169, 78, .3);
+  transition: border-color .2s, background .2s, color .2s;
+}
+.ficha__flecha:hover { border-color: var(--oro); background: rgba(201, 169, 78, .12); }
+
+@media (max-width: 640px) {
+  .ficha { padding: 10px; }
+  .ficha__cuerpo { grid-template-columns: 1fr; gap: var(--s4); }
+  .ficha__retrato { max-width: 190px; }
+  .ficha__stats { grid-template-columns: 1fr; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PASADA ULTRA — motion de entrada y micro-interacciones.
+   Todo adentro de no-preference y gateado a que el JS esté vivo: sin JS la
+   clase .no-js queda puesta y nada de esto arranca (la página se ve entera,
+   quieta, como siempre).
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: no-preference) {
+
+  /* ── la salida del túnel: el hero entra por partes, de arriba a abajo ── */
+  @keyframes sube { from { opacity: 0; transform: translateY(22px); } }
+  html:not(.no-js) .hero__cuerpo > * { animation: sube .7s var(--ease) backwards; }
+  html:not(.no-js) .hero__cuerpo > :nth-child(1) { animation-delay: .05s; }
+  html:not(.no-js) .hero__cuerpo > :nth-child(2) { animation-delay: .16s; }
+  html:not(.no-js) .hero__cuerpo > :nth-child(3) { animation-delay: .28s; }
+  html:not(.no-js) .hero__cuerpo > :nth-child(4) { animation-delay: .4s; }
+  html:not(.no-js) .hero__cuerpo > :nth-child(5) { animation-delay: .52s; }
+  /* la línea de THE GAME se dibuja sola, después de que llegó el texto */
+  @keyframes traza { from { transform: scaleX(0); } }
+  html:not(.no-js) .wordmark__sub::before {
+    transform-origin: left center;
+    animation: traza .5s var(--ease) .55s backwards;
+  }
+
+  /* ── los cromos entran en cascada, no en bloque ─────────────────────────
+     El delay sale de --i (lo pone main.js por tarjeta) y se topea: pasada la
+     primera pantalla de cromos, el resto entra junto. Es una ANIMACIÓN y no
+     una transición a propósito: al terminar suelta `transform`, que en las
+     tarjetas con foil lo necesita el tilt. */
+  @keyframes cromo-entra { from { opacity: 0; transform: translateY(16px); } }
+  .album.rev.dentro .figu {
+    animation: cromo-entra .55s var(--ease) backwards;
+    animation-delay: min(calc(var(--i, 0) * 26ms), 500ms);
+  }
+  .firmas .firma:nth-child(2) { transition-delay: .1s; }
+  .firmas .firma:nth-child(3) { transition-delay: .2s; }
+
+  /* ── el brillo que cruza el botón dorado ──────────────────────────────── */
+  .btn { position: relative; overflow: hidden; }
+  .btn::after {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(115deg, transparent 35%,
+                rgba(255, 255, 255, .38) 50%, transparent 65%);
+    transform: translateX(-130%);
+  }
+  .btn:hover::after { transform: translateX(130%); transition: transform .55s ease; }
+
+  /* ── el reloj del marcador late al cambiar de minuto (clase de main.js) ── */
+  @keyframes tic { 35% { transform: translateY(-2px); color: var(--oro-claro); } }
+  .marcador__reloj.tic { display: inline-block; animation: tic .3s var(--ease); }
+}
+
+/* grano de transmisión: una textura apenas visible sobre las secciones suaves,
+   para que el fondo no sea un degradé de laboratorio. SVG inline, sin request. */
+.seccion--suave::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .1;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='.5'/%3E%3C/svg%3E");
 }

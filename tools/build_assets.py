@@ -22,6 +22,7 @@ Produce:
    El álbum ya NO se lista a mano: sale del juego, pero cada id tiene que estar
    en `APROBADOS` — esa lista ES el chequeo de marcas. Ver `auditar_album()`.
 """
+import json
 import os
 import re
 import sys
@@ -93,6 +94,10 @@ APROBADOS = {
     "sergio", "kuni", "cr007", "tortuga",
     "ciudadano", "baby", "vini", "franco", "tommy", "lami", "pavelito", "fabio",
     "gigi", "checo",
+    # 5-ago-2026 — los DOS de M111. Chequeo de marcas con zoom al torso sobre
+    # `iceman_check_front.png` y `general_check_front.png`: kit magenta liso de
+    # Meshy, pantalon blanco, sin escudo ni sponsor en ninguno de los dos.
+    "iceman", "general",
 }
 
 # el archivo de captura cuando NO se llama como el id del juego
@@ -116,6 +121,8 @@ SLUGS_CONGELADOS = {
 
 MATCHTUNING = os.path.join(RAIZ, "game-unity", "FulbitoPenales", "Assets",
                            "Scripts", "MatchTuning.cs")
+MATCHDIRECTOR = os.path.join(RAIZ, "game-unity", "FulbitoPenales", "Assets",
+                             "Scripts", "MatchDirector.cs")
 
 
 def _sin_acentos(s):
@@ -134,10 +141,12 @@ def _lista_cs(txt, nombre):
 
 
 def roster_del_juego():
-    """[(id, archivo_captura, slug)] del plantel APROBADO, en el orden del juego."""
+    """[(id, archivo_captura, slug, nombre)] del plantel APROBADO, en el orden
+    del juego. Los arqueros van al final (el orden de `GkPoolIds`)."""
     txt = open(MATCHTUNING, encoding="utf-8").read()
     ids = _lista_cs(txt, "BluePoolIds")
-    ids += [g for g in _lista_cs(txt, "GkPoolIds") if g not in ids]
+    gks = [g for g in _lista_cs(txt, "GkPoolIds") if g not in ids]
+    ids += gks
     bloque = re.search(r"NombreDe\(string id\).*?\n    \};", txt, re.S).group(0)
     nombres = dict(re.findall(r'"([a-z0-9_]+)"\s*=>\s*"([^"]+)"', bloque))
     out, sin_aprobar, choques = [], [], []
@@ -145,17 +154,100 @@ def roster_del_juego():
         if i not in APROBADOS:
             sin_aprobar.append(i)
             continue
-        slug = slug_de(nombres.get(i, i))
+        nombre = nombres.get(i, i.upper())
+        slug = slug_de(nombre)
         congelado = SLUGS_CONGELADOS.get(i)
         if congelado and congelado != slug:
             choques.append((i, congelado, slug))
             slug = congelado          # manda la URL viva
-        out.append((i, ALIAS_CAPTURA.get(i, i), slug))
-    return out, sin_aprobar, choques
+        out.append((i, ALIAS_CAPTURA.get(i, i), slug, nombre))
+    return out, sin_aprobar, choques, set(gks)
 
 
-ROSTER_JUEGO, SIN_APROBAR, SLUG_CHOQUES = roster_del_juego()
-ROSTER = [(cap, slug) for _id, cap, slug in ROSTER_JUEGO]
+ROSTER_JUEGO, SIN_APROBAR, SLUG_CHOQUES, GK_IDS = roster_del_juego()
+ROSTER = [(cap, slug) for _id, cap, slug, _n in ROSTER_JUEGO]
+
+
+# ── roster.json: la ficha de cada jugador, derivada del juego ────────────────
+# La web muestra STATS REALES (la ficha de la figurita) y esos numeros viven en
+# los `P("id", pa, po, cu, co, st:, shp:, psp:, dr:, zur:)` de MatchTuning.cs.
+# Se parsean de ahi por la misma razon por la que el album se deriva del juego:
+# una copia a mano se desincroniza EN SILENCIO (ya paso: 28 vs 50 durante tres
+# dias). Lo mismo con la jugada firma, que sale del switch del HUD en
+# MatchDirector.cs (`"id" => "LA FIRMA (F)"`) — la unica lista del juego que
+# nombra la firma de CADA id (la web decia que El Kuni tenia "El Fenomeno" y en
+# el juego su firma es "EL KUNI": exactamente el bug que esto elimina).
+STAT_KEYS = ("ritmo", "pegada", "comba", "control",
+             "fuerza", "precision", "pase", "gambeta")
+
+
+def stats_del_juego():
+    """{id: {stat: multiplicador}} + {id: zurdo} desde los P(...) del juego."""
+    txt = open(MATCHTUNING, encoding="utf-8").read()
+    # la compresion del techo de velocidad (M65) se aplica en la fabrica P():
+    # el multiplicador ESCRITO no es el que juega — hay que replicarla aca o
+    # la web publicaria numeros que el juego ya no usa
+    knee = float(re.search(r"PaceKnee = ([\d.]+)f", txt).group(1))
+    topmul = float(re.search(r"PaceTopMul = ([\d.]+)f", txt).group(1))
+    stats, zurdos = {}, {}
+    for m in re.finditer(
+            r'P\("([a-z0-9_]+)",\s*([\d.]+)f,\s*([\d.]+)f,\s*([\d.]+)f,'
+            r'\s*([\d.]+)f([^)]*)\)', txt):
+        i, pa, po, cu, co = m.group(1), *(float(m.group(k)) for k in (2, 3, 4, 5))
+        extra = m.group(6)
+
+        def kw(nombre, default=1.0):
+            k = re.search(nombre + r":\s*([\d.]+)f", extra)
+            return float(k.group(1)) if k else default
+
+        if pa > knee:
+            pa = knee + (pa - knee) * topmul
+        stats[i] = dict(zip(STAT_KEYS, (pa, po, cu, co, kw("st"), kw("shp"),
+                                        kw("psp"), kw("dr"))))
+        zurdos[i] = "zur: true" in extra
+    return stats, zurdos
+
+
+def firmas_del_juego():
+    """{id: 'LA FIRMA'} desde el switch del HUD (DrawHumanMeters)."""
+    txt = open(MATCHDIRECTOR, encoding="utf-8").read()
+    return dict(re.findall(r'"([a-z0-9_]+)"\s*=>\s*"([^"]+) \(F\)"', txt))
+
+
+def build_roster_json():
+    stats, zurdos = stats_del_juego()
+    firmas = firmas_del_juego()
+    ids = [i for i, _c, _s, _n in ROSTER_JUEGO]
+    sin_datos = [i for i in ids if i not in stats]
+    sin_firma = [i for i in ids if i not in firmas and i not in GK_IDS]
+    if sin_datos or sin_firma:
+        # mismo criterio que auditar_album: gritar, no faltar calladito
+        print("!! roster.json INCOMPLETO — sin stats: %s / sin firma: %s"
+              % (sin_datos or "-", sin_firma or "-"))
+        sys.exit(1)
+    # 0-99 con min-max POR ATRIBUTO sobre el plantel, piso 40: el peor del
+    # juego en algo sigue siendo un jugador de Fulbito, no un tronco. El techo
+    # 99 es del mejor REAL en ese atributo — no hay curva inventada.
+    rango = {}
+    for k in STAT_KEYS:
+        vals = [stats[i][k] for i in ids]
+        lo, hi = min(vals), max(vals)
+        rango[k] = (lo, (hi - lo) or 1.0)
+    jugadores = []
+    for i, _cap, slug, nombre in ROSTER_JUEGO:
+        jugadores.append({
+            "id": i, "slug": slug, "nombre": nombre,
+            "firma": firmas.get(i, "ARQUERO" if i in GK_IDS else "?"),
+            "gk": i in GK_IDS, "zurdo": zurdos.get(i, False),
+            "stats": {k: int(round(40 + 59 * (stats[i][k] - rango[k][0])
+                                   / rango[k][1])) for k in STAT_KEYS},
+        })
+    with open(out("assets", "roster", "roster.json"), "w", encoding="utf-8") as f:
+        json.dump(jugadores, f, ensure_ascii=False, separators=(",", ":"))
+    print("roster.json: %d jugadores (%d arqueros, %d zurdos)"
+          % (len(jugadores), sum(j["gk"] for j in jugadores),
+             sum(j["zurdo"] for j in jugadores)))
+    return jugadores
 # La ventana del busto (cabeza + hombros, sin los brazos en T-pose) NO es fija:
 # se MIDE sobre cada render. Antes era la constante BUST = (135, 55, 505, 425),
 # calibrada a mano contra los renders viejos de 640x720 — y funcionaba mientras
@@ -400,7 +492,7 @@ def auditar_album():
             % (i, congelado, derivado))
     # ¿estan todos en la grilla del sitio?
     html = open(os.path.join(WEB, "index.html"), encoding="utf-8").read()
-    faltan_html = [s for _i, _c, s in ROSTER_JUEGO
+    faltan_html = [s for _i, _c, s, _n in ROSTER_JUEGO
                    if ("assets/roster/%s.webp" % s) not in html]
     if faltan_html:
         problemas.append(
@@ -422,6 +514,7 @@ def auditar_album():
 if __name__ == "__main__":
     build_brand()
     build_roster()
+    build_roster_json()
     build_shots()
     ok = auditar_album()
     print("listo")

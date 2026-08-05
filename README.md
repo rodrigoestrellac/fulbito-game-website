@@ -9,10 +9,11 @@ Sitio estático, sin build step. Se sirve tal cual desde GitHub Pages (branch `m
 index.html      la one-page entera
 css/            variables.css (tokens) + site.css
 js/             releases.js (descargas) + main.js (motion) + pelota3d.js (la pelota)
+                + roster.js (filtros del álbum, foil de los cromos y la ficha)
 vendor/         three.js (sólo lo usa la pelota 3D, se carga diferido)
 assets/ball/    teamgeist.glb
 assets/img/     capturas del juego (WebP)
-assets/roster/  retratos del plantel, 480x480 (WebP)
+assets/roster/  retratos del plantel, 480x480 (WebP) + roster.json (la ficha)
 assets/firmas/  los tres retratos grandes de las jugadas firma, 720x720
 assets/brand/   mark de la pelota, favicons, og-image, fulbito.ico
 assets/audio/   cuatro clips del relator
@@ -245,10 +246,41 @@ rompería enlaces y SEO sin que nadie lo pida. Los 28 publicados quedan congelad
 derivación deja de coincidir, el script lo dice y sigue publicando el viejo. Renombrar
 una URL tiene que ser una decisión, no un efecto secundario.
 
-**Estado: los 50** (46 de campo + 4 arqueros). Los 22 que entraron el 3-ago pasaron el
+**Estado: los 52** (48 de campo + 4 arqueros). Los 22 que entraron el 3-ago pasaron el
 chequeo de marcas con zoom al torso: todos con el kit magenta liso de Meshy, sin escudo
 ni sponsor. El único que asustaba era **El Faraón** por las rayas azul/oro — pero es el
-**nemes**, el tocado de faraón, no una camiseta.
+**nemes**, el tocado de faraón, no una camiseta. Iceman y El General (M111, 5-ago)
+pasaron el mismo chequeo: kit magenta liso los dos.
+
+### La grilla va EN EL ORDEN DEL JUEGO (5-ago-2026)
+
+Cada cromo muestra su número (`figu__num`, lo pone roster.js) y el número es el índice
+en `BluePoolIds` + `GkPoolIds` — el orden del juego, con los arqueros al final. La
+grilla del HTML está en ESE orden: con números visibles, un álbum desordenado se lee
+como un error. Si se agrega un jugador, su `<li>` va donde el juego lo ponga (o sea:
+regenerá la grilla, no la agregues al final "para que quede cerca").
+
+### roster.json — la ficha con los stats del juego (5-ago-2026)
+
+Al tocar un cromo se abre una **ficha** (dialog nativo, roster.js) con la jugada firma,
+una descripción y los ocho stats del jugador. Nada de eso está escrito a mano:
+
+- **stats**: `build_assets.py` parsea los `P("id", …)` de `MatchTuning.cs` — con la
+  compresión del techo de velocidad de M65 replicada, porque el multiplicador escrito no
+  es el que juega — y los normaliza a 40–99 con min-max por atributo sobre el plantel.
+- **firma por jugador**: sale del switch del HUD en `MatchDirector.cs`
+  (`"id" => "LA FIRMA (F)"`), la única lista del juego que las nombra todas. (La web
+  decía que El Kuni tenía "El Fenómeno"; su firma es "EL KUNI". Ese bug ya no puede
+  volver.)
+- Todo va a `assets/roster/roster.json`, que se regenera en cada corrida.
+
+Lo único editorial son las **descripciones de las 35 firmas** (`FIRMAS_DESC` en
+`js/roster.js`): el juego no las tiene escritas. Citan números de `MatchTuning.cs` —
+si una firma cambia de duración o radio, esa línea se toca a mano.
+
+⚠️ `roster.js` se carga con `type="module"` a propósito: aísla el scope (main.js ya
+declara `menosMovimiento` y un segundo `const` global rompería TODO el JS de la página
+con un SyntaxError).
 
 Para agregar un jugador nuevo al álbum:
 
