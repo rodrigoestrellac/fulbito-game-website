@@ -739,6 +739,10 @@ code {
   from { opacity: 0; transform: translateY(18px) scale(.97); }
 }
 .ficha[open] .ficha__panel { animation: ficha-entra .38s var(--ease); }
+/* al pasar de cromo el panel entra desde el lado del gesto (lo pone roster.js
+   como animación inline: pisa a ficha-entra, que es sólo de la primera vez) */
+@keyframes ficha-pasa-sig { from { opacity: .25; transform: translateX(30px); } }
+@keyframes ficha-pasa-ant { from { opacity: .25; transform: translateX(-30px); } }
 @media (prefers-reduced-motion: reduce) {
   .ficha[open] .ficha__panel { animation: none; }
 }

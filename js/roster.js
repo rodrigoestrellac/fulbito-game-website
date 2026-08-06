@@ -214,6 +214,23 @@ async function montarAlbum() {
     if (e.key === 'ArrowRight') { e.preventDefault(); pasarFicha(1); }
     if (e.key === 'ArrowLeft') { e.preventDefault(); pasarFicha(-1); }
   });
+  /* en un táctil la ficha se pasa DESLIZANDO, como las hojas del álbum. Se
+     decide recién al soltar y sin preventDefault: el scroll vertical (que en
+     mobile lo hace la ficha misma) sigue siendo del navegador. Horizontal
+     manda sólo si dx supera el umbral Y le gana claro al dy — un scroll en
+     diagonal no tiene que cambiar de cromo. */
+  let toqueX = 0, toqueY = 0;
+  ficha.addEventListener('touchstart', (e) => {
+    toqueX = e.changedTouches[0].clientX;
+    toqueY = e.changedTouches[0].clientY;
+  }, { passive: true });
+  ficha.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].clientX - toqueX;
+    const dy = e.changedTouches[0].clientY - toqueY;
+    if (Math.abs(dx) > 48 && Math.abs(dx) > 1.6 * Math.abs(dy)) {
+      pasarFicha(dx < 0 ? 1 : -1);   // deslizar a la izquierda = cromo siguiente
+    }
+  }, { passive: true });
 
   let slugAbierto = null;
 
@@ -225,10 +242,10 @@ async function montarAlbum() {
     const lista = visibles();
     if (!lista.length) return;
     const i = lista.findIndex((j) => j.slug === slugAbierto);
-    abrirFicha(lista[(i + paso + lista.length) % lista.length].slug);
+    abrirFicha(lista[(i + paso + lista.length) % lista.length].slug, paso);
   }
 
-  function abrirFicha(slug) {
+  function abrirFicha(slug, rumbo) {
     const j = porSlug.get(slug);
     if (!j) return;
     slugAbierto = slug;
@@ -278,10 +295,17 @@ async function montarAlbum() {
     ficha.querySelectorAll('[data-paso]').forEach((b) =>
       b.addEventListener('click', () => pasarFicha(Number(b.dataset.paso))));
     ficha.querySelectorAll('[data-slug]').forEach((b) =>
-      b.addEventListener('click', () => abrirFicha(b.dataset.slug)));
+      b.addEventListener('click', () => abrirFicha(b.dataset.slug, 1)));
 
     if (!ficha.open) ficha.showModal();
     history.replaceState(null, '', '#cromo/' + slug);
+
+    // al PASAR de cromo (flechas, swipe, «también la tiene»), el panel entra
+    // deslizándose desde el lado del gesto — la hoja del álbum que se da vuelta
+    if (rumbo && !menosMovimiento) {
+      ficha.querySelector('.ficha__panel').style.animation =
+        `ficha-pasa-${rumbo > 0 ? 'sig' : 'ant'} .3s var(--ease)`;
+    }
 
     /* las barras crecen desde cero al abrir; sin motion, aparecen llenas.
        El doble rAF es para que el estilo inicial (--v:0) llegue a pintarse. */
