@@ -12,7 +12,7 @@
 import {
   WebGLRenderer, PerspectiveCamera, Scene, Group,
   DirectionalLight, AmbientLight, PMREMGenerator, Box3, Vector3,
-  ACESFilmicToneMapping,
+  ACESFilmicToneMapping, NoToneMapping, Color,
 } from 'three';
 import { GLTFLoader } from '../vendor/jsm/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from '../vendor/jsm/libs/meshopt_decoder.module.js';
@@ -146,10 +146,38 @@ export async function montarPelota3D(caja, imagen, titulo) {
   const radio = bb.getSize(new Vector3()).length() / (2 * Math.sqrt(3));
   modelo.position.sub(bb.getCenter(new Vector3()));
   modelo.scale.setScalar(1 / radio);
+  /* PRUEBA (no publicar sin OK de Rodrigo): la pelota dorada de la final de la
+     Copa (M106), con los tintes de Pelota.Oro / Pelota.Verde del juego. El
+     mecanismo es el mismo de Unity (el tinte MULTIPLICA la textura), pero la
+     luz de este hero está calibrada para la pelota BLANCA y lavaba el color:
+     acá el tinte va pre-saturado y con menos reflejo de entorno, y la clave
+     dorada baja un punto — sólo mientras la pelota va tintada. */
+  /* La pelota de la final, con los COLORES MEDIDOS del juego: los hex salen de
+     samplear una captura in-game (cuerpo 172,135,17 · paneles 39,113,61), no
+     de los tintes — el color final en Unity es tinte × textura × luz toon y
+     acá esa cadena no existe. Material UNLIT (MeshBasicMaterial): ni ACES, ni
+     especular, ni sombreado — plano y opaco como lo pinta el juego. El hex se
+     pasa por Color() para que three lo tome como sRGB y no lo aclare. */
+  renderer.toneMapping = NoToneMapping;
+  const PLANOS = { Ball_Triangles: 0xac8811, Ball_Ovals: 0x27713d };
+  /* luz suave: la ambiente sostiene el color medido tal cual y la direccional
+     agrega el poquito de volumen y brillo que pidio Rodrigo ("muy plana") —
+     en el tono medio sigue estando el color sampleado del juego */
+  clave.intensity = 0.55;
+  relleno.intensity = 0.2;
+  escena.children.forEach((l) => { if (l.isAmbientLight) l.intensity = 0.78; });
   modelo.traverse((o) => {
     if (o.isMesh && o.material) {
-      o.material.envMapIntensity = 1.15;
-      if (o.material.map) o.material.map.anisotropy = 8;
+      const hex = PLANOS[o.material.name];
+      if (hex !== undefined) {
+        if (o.material.map) o.material.map.anisotropy = 8;
+        o.material.color = new Color(hex);
+        o.material.roughness = 0.72;
+        o.material.metalness = 0;
+        o.material.envMapIntensity = 0.12;
+        // el GLB trae BARNIZ (clearcoat): su lustre no lo baja `roughness`
+        if ('clearcoat' in o.material) o.material.clearcoat = 0;
+      }
     }
   });
   pelota.add(modelo);

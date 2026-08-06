@@ -41,7 +41,7 @@
 import {
   WebGLRenderer, PerspectiveCamera, Scene, Group,
   DirectionalLight, AmbientLight, PMREMGenerator, Box3, Vector3,
-  ACESFilmicToneMapping,
+  NoToneMapping, Color,
 } from 'three';
 import { GLTFLoader } from '../../vendor/jsm/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from '../../vendor/jsm/libs/meshopt_decoder.module.js';
@@ -53,8 +53,9 @@ const estado = document.getElementById('estado');
 const renderer = new WebGLRenderer({ alpha: true, antialias: true, preserveDrawingBuffer: true });
 renderer.setPixelRatio(2);
 renderer.setSize(LADO, LADO, false);
-renderer.toneMapping = ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.18;
+/* SIN tone mapping: la pelota va con los colores MEDIDOS del juego (la dorada
+   de la final, M106) y el ACES los lavaba — misma decisión que en pelota3d.js */
+renderer.toneMapping = NoToneMapping;
 const lienzo = renderer.domElement;
 lienzo.style.width = lienzo.style.height = LADO + 'px';
 document.getElementById('caja').appendChild(lienzo);
@@ -71,13 +72,13 @@ escena.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 // Luz principal DORADA desde arriba a la izquierda: ata la pelota a la paleta
 // del sitio sin repintar el modelo. Relleno frío tenue del otro lado para que
 // el lado en sombra no se coma el dibujo de los paneles.
-const clave = new DirectionalLight(0xF2DFA6, 2.6);
+const clave = new DirectionalLight(0xF2DFA6, 0.55);
 clave.position.set(-2.4, 3.0, 2.2);
 escena.add(clave);
-const relleno = new DirectionalLight(0x8FA98C, 0.55);
+const relleno = new DirectionalLight(0x8FA98C, 0.2);
 relleno.position.set(2.6, -1.2, 1.4);
 escena.add(relleno);
-escena.add(new AmbientLight(0xF0EDE4, 0.35));
+escena.add(new AmbientLight(0xF0EDE4, 0.78));
 
 const pelota = new Group();
 escena.add(pelota);
@@ -92,10 +93,24 @@ cargador.load('../../assets/ball/teamgeist.glb', (gltf) => {
   const radio = caja.getSize(new Vector3()).length() / (2 * Math.sqrt(3));
   modelo.position.sub(centro);
   modelo.scale.setScalar(1 / radio);
+  // los colores sampleados de una captura in-game de la final (pelota M106):
+  // cuerpo #AC8811, paneles ovalados #27713D — la MISMA receta que pelota3d.js
+  const PLANOS = { Ball_Triangles: 0xac8811, Ball_Ovals: 0x27713d };
   modelo.traverse((o) => {
     if (o.isMesh && o.material) {
-      o.material.envMapIntensity = 1.15;
       if (o.material.map) o.material.map.anisotropy = 8;
+      const hex = PLANOS[o.material.name];
+      if (hex !== undefined) {
+        o.material.color = new Color(hex);
+        o.material.roughness = 0.72;
+        o.material.metalness = 0;
+        o.material.envMapIntensity = 0.12;
+        // el GLB trae BARNIZ (clearcoat) y ese lustre no lo baja `roughness`:
+        // era lo que dejaba los chorros de brillo blanco en el render
+        if ('clearcoat' in o.material) o.material.clearcoat = 0;
+        window.MAT_INFO = (window.MAT_INFO || []).concat(
+          `${o.material.name}: ${o.material.type} clearcoat=${o.material.clearcoat}`);
+      }
     }
   });
   pelota.add(modelo);
