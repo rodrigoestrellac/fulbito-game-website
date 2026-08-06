@@ -98,6 +98,9 @@ APROBADOS = {
     # `iceman_check_front.png` y `general_check_front.png`: kit magenta liso de
     # Meshy, pantalon blanco, sin escudo ni sponsor en ninguno de los dos.
     "iceman", "general",
+    # 5-ago-2026 (tarde) — FIDEO (M117, LOS TALLARINES). Mismo chequeo sobre
+    # `fideo_check_front.png`: kit magenta liso, pantalon blanco, limpio.
+    "fideo",
 }
 
 # el archivo de captura cuando NO se llama como el id del juego
