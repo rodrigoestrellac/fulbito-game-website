@@ -11,7 +11,7 @@
    MatchTuning.cs — si una firma cambia de duración o radio, esto hay que
    tocarlo a mano; por eso cada línea nombra el dato y no "un rato" o "cerca". */
 const FIRMAS_DESC = {
-  'EL MARTILLAZO': 'Saca un martillo de la nada, lo levanta, lo baja — y todo el que esté a tres metros y medio sale por el aire.',
+  'EL MARTILLAZO': 'Saca un martillo de la nada, lo levanta, lo baja — y todo el que esté a tres metros y medio queda dos segundos aplastado, hecho panqueque.',
   'LA EMBESTIDA': 'Arranca al doble de velocidad durante tres segundos y medio y hace panqueque a todo el que se le cruza.',
   'LA MURALLA': 'Levanta una pared de cinco metros y la deja seis segundos. No te da la pelota: te da tiempo.',
   'EL GIGANTE': 'Se agranda una vez y media durante tres segundos y medio, y con rozarte te voltea.',
