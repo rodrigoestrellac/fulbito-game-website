@@ -297,7 +297,16 @@ async function montarAlbum() {
     ficha.querySelectorAll('[data-slug]').forEach((b) =>
       b.addEventListener('click', () => abrirFicha(b.dataset.slug, 1)));
 
-    if (!ficha.open) ficha.showModal();
+    if (!ficha.open) {
+      ficha.showModal();
+    } else {
+      /* el innerHTML de recién se llevó puesto al botón que tenía el foco, y
+         con el foco en el body el keydown del dialog no escucha más: las
+         flechas del teclado morían al primer cambio de cromo. Se devuelve el
+         foco a la flecha del rumbo, así Enter también sigue pasando cromos. */
+      const flecha = ficha.querySelector(`[data-paso="${rumbo < 0 ? -1 : 1}"]`);
+      (flecha || ficha.querySelector('.ficha__cerrar')).focus({ preventScroll: true });
+    }
     history.replaceState(null, '', '#cromo/' + slug);
 
     // al PASAR de cromo (flechas, swipe, «también la tiene»), el panel entra

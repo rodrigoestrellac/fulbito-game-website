@@ -722,8 +722,10 @@ code {
   border: 0; padding: 16px; margin: auto; background: transparent;
   width: min(880px, 100%); max-height: 100dvh; color: var(--cal);
   /* en un teléfono la ficha es más alta que la pantalla: tiene que scrollear
-     ELLA (las flechas del pie quedan al final), no desbordar invisible */
-  overflow: auto; overscroll-behavior: contain;
+     ELLA (las flechas del pie quedan al final), no desbordar invisible. En X
+     nunca: la animación de pasar cromo corre el panel 30px y con `auto` esos
+     frames hacían aparecer una barra horizontal */
+  overflow: hidden auto; overscroll-behavior: contain;
 }
 .ficha::backdrop { background: rgba(7, 14, 8, .82); backdrop-filter: blur(8px); }
 .ficha__panel {
