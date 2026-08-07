@@ -152,9 +152,9 @@ function pelota3DConviene() {
 function cargarPelota3D() {
   const caja = document.getElementById('pelota3d');
   if (!caja || !pelota3DConviene()) return;
-  // v2 = la pelota dorada de la final (los colores medidos del juego). El
-  // parámetro es sólo versionado de caché: al cambiar la pelota, subirlo.
-  import('./pelota3d.js?v=2')
+  // v3 = la pelota dorada con un punto más de brillo. El parámetro es sólo
+  // versionado de caché: al cambiar la pelota, subirlo.
+  import('./pelota3d.js?v=3')
     .then((m) => m.montarPelota3D(caja, caja.querySelector('img'),
                                   document.querySelector('.wordmark__texto')))
     .catch((e) => console.info('[pelota3d] queda la imagen:', e.message));

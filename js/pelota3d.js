@@ -163,7 +163,7 @@ export async function montarPelota3D(caja, imagen, titulo) {
   /* luz suave: la ambiente sostiene el color medido tal cual y la direccional
      agrega el poquito de volumen y brillo que pidio Rodrigo ("muy plana") —
      en el tono medio sigue estando el color sampleado del juego */
-  clave.intensity = 0.55;
+  clave.intensity = 0.7;
   relleno.intensity = 0.2;
   escena.children.forEach((l) => { if (l.isAmbientLight) l.intensity = 0.78; });
   modelo.traverse((o) => {
@@ -174,7 +174,7 @@ export async function montarPelota3D(caja, imagen, titulo) {
         o.material.color = new Color(hex);
         o.material.roughness = 0.72;
         o.material.metalness = 0;
-        o.material.envMapIntensity = 0.12;
+        o.material.envMapIntensity = 0.18;
         // el GLB trae BARNIZ (clearcoat): su lustre no lo baja `roughness`
         if ('clearcoat' in o.material) o.material.clearcoat = 0;
       }

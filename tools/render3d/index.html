@@ -72,7 +72,7 @@ escena.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 // Luz principal DORADA desde arriba a la izquierda: ata la pelota a la paleta
 // del sitio sin repintar el modelo. Relleno frío tenue del otro lado para que
 // el lado en sombra no se coma el dibujo de los paneles.
-const clave = new DirectionalLight(0xF2DFA6, 0.55);
+const clave = new DirectionalLight(0xF2DFA6, 0.7);
 clave.position.set(-2.4, 3.0, 2.2);
 escena.add(clave);
 const relleno = new DirectionalLight(0x8FA98C, 0.2);
@@ -104,7 +104,7 @@ cargador.load('../../assets/ball/teamgeist.glb', (gltf) => {
         o.material.color = new Color(hex);
         o.material.roughness = 0.72;
         o.material.metalness = 0;
-        o.material.envMapIntensity = 0.12;
+        o.material.envMapIntensity = 0.18;
         // el GLB trae BARNIZ (clearcoat) y ese lustre no lo baja `roughness`:
         // era lo que dejaba los chorros de brillo blanco en el render
         if ('clearcoat' in o.material) o.material.clearcoat = 0;
