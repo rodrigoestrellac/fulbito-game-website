@@ -65,15 +65,23 @@ cambia lo que la persona va a hacer. La diferencia no es el tema, es a quién le
 
 ## Clips de gameplay
 
-Los tres huecos declarados en el HTML (cada uno con un `data-video`) ya tienen clip. El
+Los cuatro huecos declarados en el HTML (cada uno con un `data-video`) ya tienen clip. El
 `<video>` se monta encima de la captura, en la misma caja y sin salto de layout; la
 captura se queda debajo como respaldo.
 
-| archivo | sección | qué muestra | dura |
-|---|---|---|---|
-| `assets/video/hero.mp4` | hero | juego tranquilo de mitad de cancha — es fondo detrás del wordmark | 6,6 s |
-| `assets/video/gol.mp4` | 09', "El gol" | remate, gol, «¡¡GOLAAAZO!!» y confeti | 5,4 s |
-| `assets/video/firma.mp4` | 23', firmas | El Martillazo | 3,0 s |
+| archivo | sección | qué muestra | dura | crop |
+|---|---|---|---|---|
+| `assets/video/hero.mp4` | hero | juego de mitad de cancha — es fondo detrás del wordmark | 4,7 s | `1500:844:400:280` |
+| `assets/video/gol.mp4` | El gol | remate, gol, «¡¡GOLAAAZO!!» y confeti | 5,4 s | `1728:972:288:155` |
+| `assets/video/firma.mp4` | firmas | El Martillazo | 3,0 s | `1400:788:452:250` |
+| `assets/video/cajas.mp4` | cajas sorpresa | tres efectos seguidos: cancha inclinada, Pierluigi comprado y el colectivo | 12,6 s | `1728:972:288:138` |
+
+El de cajas es el único **concatenado**: tres tramos de 4,2 s de momentos distintos del
+mismo partido, pegados con `-f concat -c copy`. Va con el crop ancho porque ahí el
+**cartel del juego es el contenido**: sin «¡PIERLUIGI SE PUSO LA CAMISETA!» el tramo del
+árbitro es un muñequito amarillo cualquiera. Ojo que el cartel muestra lo último que pasó,
+no el efecto: en el tramo del colectivo dice «¡SUPER TIRO!» y cosas así. Es charla del
+juego, no un error.
 
 Además del archivo hay que agregar su nombre al array `CLIPS` de `js/main.js` (una línea).
 Es a propósito: sondear con `HEAD` dejaba errores 404 en la consola.
@@ -97,6 +105,39 @@ ffprobe -v error -select_streams v:0 \
 ```
 
 `avg_frame_rate` es el dato: el `r_frame_rate` del contenedor **miente** (declaraba 120).
+La captura del 12-ago-2026 dio **52,6 fps reales** con `r_frame_rate=120`. Los clips salen
+igual a `-r 60` como el resto, para no tener dos cadencias distintas en la misma página.
+
+### ⚠️ Lo que hay que mirar ANTES de cortar (captura del 12-ago-2026)
+
+Los timestamps que llegan «del 5:12 al 5:20» casi nunca son la toma. En esa captura:
+
+- **La cámara se mueve adentro del rango.** El colectivo estaba pedido de 5:12 a 5:20 y
+  recién entra en cuadro a los **5:14,2**. Sacar una tira de contacto del rango (un frame
+  por segundo) antes de cortar cuesta diez segundos y ahorra rehacer el clip.
+- **Los primeros segundos son la placa de formaciones.** El «gameplay desde 00:07»
+  arrancaba con el cartel FULBITO / PARTIDO AMISTOSO: el juego empieza a los **09 s**.
+- **Hay frames oscuros.** A los 14,5 s la pantalla se oscurece porque alguien carga una
+  firma. En un loop de fondo eso es un parpadeo.
+- **La cámara se abre.** De los 18 s en adelante entra media tribuna, que es justo lo que
+  no queremos en el hero.
+
+### El crop del hero bajó a `1500:844:400:280`
+
+El `1600:900:352:215` del hero viejo mete **público** arriba, y en un teléfono eso ocupa el
+primer 15 % de la pantalla — `object-fit: cover` sobre un contenedor alto y angosto recorta
+en HORIZONTAL, así que se ve el alto completo del cuadro y `object-position` en Y no
+arregla nada. La ventana bajó hasta que arriba queda sólo la línea de carteles, que hace
+de horizonte. El piso lo pone el **minimapa del HUD, que arranca en y≈1125**: 280+844=1124
+pasa por un píxel. Si alguna vez se sube el alto del crop, mirar el borde de abajo.
+
+### El cartel de la jugada y la píldora del jugador se pisan
+
+El crop del gol (`y=155`) parte al medio la píldora del jugador que manejás, que en esta
+captura cae en **y≈152-175**, justo abajo del marcador (que termina en y≈148) y encima del
+cartel de la jugada (y≈165-190). No hay corte que deje el cartel y saque la píldora: se
+pisan. Para el clip de cajas la ventana subió a **y=138**, que deja las dos enteras y el
+marcador afuera.
 
 ### Cómo se cortan
 

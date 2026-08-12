@@ -112,7 +112,7 @@ document.querySelectorAll('[data-voz]').forEach((boton) => {
    anotado en la consola aunque el JS lo maneje — dos errores rojos en una
    página que no tiene ninguno. Una lista explícita es más barata y más clara.
    Ver README § Clips de gameplay. */
-const CLIPS = ['hero.mp4', 'gol.mp4', 'firma.mp4'];
+const CLIPS = ['hero.mp4', 'gol.mp4', 'firma.mp4', 'cajas.mp4'];
 
 function montarVideos() {
   if (menosMovimiento || !CLIPS.length) return;
