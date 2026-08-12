@@ -1008,6 +1008,10 @@ code {
   position: absolute; left: var(--x); bottom: var(--y);
   transform: translate(-50%, 12%);
   margin: 0; width: 23%; text-align: center;
+  /* por ARRIBA de las líneas de cal: el círculo central y el área son
+     pseudo-elementos de la cancha y pintan DESPUÉS de los hijos — sin esto
+     la raya cruza la cara del jugador y la ficha parece transparente */
+  z-index: 1;
 }
 .pizarra__jug img {
   width: 74%; aspect-ratio: 1; object-fit: cover; border-radius: 50%;
