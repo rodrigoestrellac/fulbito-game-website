@@ -6,16 +6,20 @@
 
 const REPO = 'rodrigoestrellac/fulbito-game-website';
 
-/* Espejo estático del release M133. Actualizar al publicar uno nuevo.
+/* Espejo estático del release M174. Actualizar al publicar uno nuevo.
    Los bytes salen del release real (`gh release view --json assets`, stat sin
    redondeo): si no coinciden con el asset, la web muestra un tamaño equivocado
-   justo cuando la API falla — o sea, justo cuando nadie lo va a poder verificar. */
+   justo cuando la API falla — o sea, justo cuando nadie lo va a poder verificar.
+   ⚠️ Se quedó en M133 durante DOS releases (M155 y M174 se publicaron sin tocarlo),
+   así que cualquiera que cayera con la API caída veía una versión de tres semanas
+   atrás y un tamaño que no era el del archivo. Es el paso del checklist que más
+   fácil se saltea porque vive en OTRO repo. */
 const FALLBACK = {
-  tag: 'M133',
+  tag: 'M174',
   archivos: {
-    winSetup: { nombre: 'FulbitoSetup-M133.exe', bytes: 136925986 },
-    winZip:   { nombre: 'Fulbito-M133-windows.zip', bytes: 171410395 },
-    mac:      { nombre: 'Fulbito-M133-mac.zip', bytes: 181292439 },
+    winSetup: { nombre: 'FulbitoSetup-M174.exe', bytes: 172162157 },
+    winZip:   { nombre: 'Fulbito-M174-windows.zip', bytes: 215183973 },
+    mac:      { nombre: 'Fulbito-M174-mac.zip', bytes: 225065978 },
     checksums:{ nombre: 'CHECKSUMS.txt', bytes: 315 },
   },
 };
