@@ -72,11 +72,11 @@ captura se queda debajo como respaldo.
 | archivo | sección | qué muestra | dura | crop |
 |---|---|---|---|---|
 | `assets/video/hero.mp4` | hero | juego de mitad de cancha — es fondo detrás del wordmark | 4,7 s | `1500:844:400:280` |
-| `assets/video/gol.mp4` | El gol | remate, gol, «¡¡GOLAAAZO!!» y confeti | 5,4 s | `1728:972:288:155` |
+| `assets/video/gol.mp4` | El gol | vaselina de Il Divino, palo, adentro y confeti | 4,2 s | `1728:972:288:138` |
 | `assets/video/firma.mp4` | firmas | El Martillazo | 3,0 s | `1400:788:452:250` |
-| `assets/video/cajas.mp4` | cajas sorpresa | tres efectos seguidos: cancha inclinada, Pierluigi comprado y el colectivo | 12,6 s | `1728:972:288:138` |
+| `assets/video/cajas.mp4` | cajas sorpresa | cuatro tramos: cae una caja, cancha inclinada, Pierluigi comprado y el colectivo | 14,7 s | `1728:972:288:138` |
 
-El de cajas es el único **concatenado**: tres tramos de 4,2 s de momentos distintos del
+El de cajas es el único **concatenado**: cuatro tramos de ~3,7 s de momentos distintos del
 mismo partido, pegados con `-f concat -c copy`. Va con el crop ancho porque ahí el
 **cartel del juego es el contenido**: sin «¡PIERLUIGI SE PUSO LA CAMISETA!» el tramo del
 árbitro es un muñequito amarillo cualquiera. Ojo que el cartel muestra lo último que pasó,
@@ -108,6 +108,22 @@ ffprobe -v error -select_streams v:0 \
 La captura del 12-ago-2026 dio **52,6 fps reales** con `r_frame_rate=120`. Los clips salen
 igual a `-r 60` como el resto, para no tener dos cadencias distintas en la misma página.
 
+### Capturas de pantalla de menús (`.pantalla`)
+
+`assets/img/selector-equipos.webp` — la pantalla ELEGIR EQUIPOS, en LOS EQUIPOS. **No** va
+recortada a 16:9 como las bandas: es un menú, y recortarlo se come justo la fila de arriba
+y la de abajo. Clase `.pantalla`, con el ancho natural y un epígrafe en tiza.
+
+Dos cosas que hubo que sacarle, y que van a volver a aparecer en cualquier captura de menú:
+
+- **El sello de build** abajo a la derecha (decía `vM176`, y el sitio publica M174). Es una
+  nota de producción publicada — mismo pecado que la sección de más arriba.
+- **La barra de ayuda del menú principal**, que se filtra abajo de la del selector. Es del
+  juego, pero se lee como un error de render.
+
+Las dos se van con `crop=2304:1348:0:0`. Y conviene sacarla de la **grabación**, no de un
+screenshot del reproductor: el JPG que llegó tenía la barra de controles encima.
+
 ### ⚠️ Lo que hay que mirar ANTES de cortar (captura del 12-ago-2026)
 
 Los timestamps que llegan «del 5:12 al 5:20» casi nunca son la toma. En esa captura:
@@ -121,6 +137,10 @@ Los timestamps que llegan «del 5:12 al 5:20» casi nunca son la toma. En esa ca
   firma. En un loop de fondo eso es un parpadeo.
 - **La cámara se abre.** De los 18 s en adelante entra media tribuna, que es justo lo que
   no queremos en el hero.
+- **El póster no siempre conviene sacarlo del clip.** Para el hero sí (es la regla). Para
+  el gol no: el frame 0 del clip nuevo es un plano lejano con media tribuna, y la foto que
+  ya estaba — desde atrás del arco, con el arquero — cuenta mejor la sección. Lo mismo con
+  la foto de la caja sorpresa: en esta grabación la caja siempre queda chica y lejos.
 
 ### El crop del hero bajó a `1500:844:400:280`
 

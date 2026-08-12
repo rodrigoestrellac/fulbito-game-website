@@ -1130,6 +1130,18 @@ code {
   .cita { font-size: 1.5rem; }
 }
 
+/* Una captura de pantalla del juego, sin recortar a 16:9: son menús, y un menú
+   recortado pierde justo las filas de arriba y de abajo. */
+.pantalla { margin: var(--s6) 0 0; }
+.pantalla img {
+  width: 100%; height: auto; border-radius: var(--r-md);
+  border: 1px solid var(--glass-borde); box-shadow: var(--sombra-card);
+}
+.pantalla figcaption {
+  margin-top: var(--s3); max-width: 62ch;
+  font-family: var(--tiza); font-size: 1.35rem; line-height: 1.25; color: var(--oro-claro);
+}
+
 /* ══ MOBILE SIN AGOBIO ══════════════════════════════════════════════
    Medido a 390×844: la página entera eran 31.909 px ≈ 38 pantallas, y tres
    grillas se comían el 72 %. LOS EQUIPOS sola eran 11,8 pantallas porque caía
