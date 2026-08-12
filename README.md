@@ -274,7 +274,7 @@ una descripción y los ocho stats del jugador. Nada de eso está escrito a mano:
   volver.)
 - Todo va a `assets/roster/roster.json`, que se regenera en cada corrida.
 
-Lo único editorial son las **descripciones de las 35 firmas** (`FIRMAS_DESC` en
+Lo único editorial son las **descripciones de las 39 firmas** (`FIRMAS_DESC` en
 `js/roster.js`): el juego no las tiene escritas. Citan números de `MatchTuning.cs` —
 si una firma cambia de duración o radio, esa línea se toca a mano.
 
@@ -291,6 +291,33 @@ blender -b --factory-startup -P assets-src/render_check_front.py -- <id>
 # 3) el <li> en index.html   ·   4) correr build_assets.py: tiene que dar VERDE
 python tools/build_assets.py
 ```
+
+## Los equipos — el catálogo, la pizarra y los escudos (12-ago-2026)
+
+Desde M153 el juego se juega POR EQUIPOS: un catálogo de 27 con nombre, concepto,
+formación, arquero y barras VEL/FUE/PRE. La sección LOS EQUIPOS del sitio se deriva
+entera del juego, con el mismo contrato que el álbum:
+
+- **`assets/equipos/equipos.json`**: `build_assets.py` parsea `Equipos.Catalogo`,
+  `EscudoId`, `AbrevId` y `MatchTuning.Formations` (con los SLOTS reales de cada
+  esquema — de ahí sale la mini-cancha de la ficha, no de un dibujito).
+- **Las barras se RECALCULAN** con la réplica exacta de `Equipos.Barra()` (z contra el
+  pool de campo, σ/√6, escala 15, clamp 10–95). Verificada contra la salida real de
+  `PocEquipos.SimEquipos`: 27/27 exactos. Si dudás, corré `tools/verificar_barras.py`
+  con un log fresco de SimEquipos — un DIFF ahí significa que la réplica quedó vieja.
+- **Escudos**: `Resources/Escudos/*.png` → `assets/equipos/*.webp`. Mismo mecanismo de
+  chequeo de marcas que el álbum: cada slug tiene que estar en `ESCUDOS_APROBADOS` o el
+  build termina en error. Son las parodias de `gen_escudos.py`; la regla es que el
+  escudo dibuja el CONCEPTO, nunca la marca de un club real.
+- **La grilla es estática** (barras incluidas, con `--v` inline): sin JS se ve todo.
+  `js/equipos.js` (module, como roster.js) sólo AGREGA la pizarra: el dialog con la
+  formación real y los retratos del álbum parados en sus slots.
+- `auditar_equipos()` grita si un equipo no tiene tarjeta en el HTML, si un id del
+  catálogo no tiene retrato aprobado, o si hay escudos huérfanos.
+
+Para un equipo nuevo en el juego: correr `build_assets.py`, mirar el escudo nuevo con
+zoom, sumarlo a `ESCUDOS_APROBADOS`, y agregar su tarjeta en `index.html` (el build
+dice exactamente qué falta).
 
 ## La pelota y el ícono
 

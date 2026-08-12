@@ -101,6 +101,16 @@ APROBADOS = {
     # 5-ago-2026 (tarde) — FIDEO (M117, LOS TALLARINES). Mismo chequeo sobre
     # `fideo_check_front.png`: kit magenta liso, pantalon blanco, limpio.
     "fideo",
+    # 12-ago-2026 — los QUINCE que la web le debia al juego: TITAN (M164),
+    # los cuatro de CA MILLONETAS (M164), los cuatro italianos de SPORTIVO
+    # AZZURRI (M173), y los SEIS arqueros que entraron con M159/M173 (pato,
+    # mono, casillero, dado, doblev, pinocho). Chequeo de marcas hecho sobre
+    # los `_check_front.png` (contact sheet + zoom al torso): los quince
+    # llevan el kit magenta liso de Meshy, pantalon blanco o magenta, sin
+    # escudo ni sponsor; los arqueros con guantes lisos sin logo.
+    "titan", "payasito", "valdanito", "muneco", "jefecito",
+    "maestro", "pinturicchio", "divino", "reyromano",
+    "pato", "mono", "casillero", "dado", "doblev", "pinocho",
 }
 
 # el archivo de captura cuando NO se llama como el id del juego
@@ -138,8 +148,20 @@ def slug_de(nombre):
     return "-".join(p for p in s.replace("/", " ").split(" ") if p)
 
 
+def _sin_comentarios(txt):
+    # los bloques de los .cs llevan comentarios con comillas y llaves adentro
+    # ("DIA" no es "MIL", *"pedido de Rodrigo"*): parsear sin sacarlos primero
+    # es garantía de leer basura.
+    return re.sub(r"//[^\n]*", "", txt)
+
+
 def _lista_cs(txt, nombre):
-    m = re.search(nombre + r"\s*=\s*\{(.*?)\};", txt, re.S)
+    # ⚠️ sin comentarios SIEMPRE. El 11-ago M173 metió un comentario entre el
+    # `=` y la `{` de `GkPoolIds` y esta regex dejó de matchear: los DIEZ
+    # arqueros desaparecieron del álbum EN SILENCIO (roster.json decía
+    # "0 arqueros" y nada gritaba — la clase de bug que este script existe
+    # para no tener).
+    m = re.search(nombre + r"\s*=\s*\{(.*?)\};", _sin_comentarios(txt), re.S)
     return re.findall(r'"([a-z0-9_]+)"', m.group(1)) if m else []
 
 
@@ -251,6 +273,215 @@ def build_roster_json():
           % (len(jugadores), sum(j["gk"] for j in jugadores),
              sum(j["zurdo"] for j in jugadores)))
     return jugadores
+# ── equipos.json: el catálogo de equipos, derivado del juego (M153…M173) ─────
+# Desde M153 el juego no se arma jugador por jugador: se ELIGE un equipo del
+# catálogo (`Equipos.cs`), con formación, arquero, escudo y barras VEL/FUE/PRE.
+# La web lo deriva de ahí por la misma razón que el álbum: una copia a mano se
+# desincroniza en silencio. Se parsean CUATRO cosas del juego:
+#   1. `Equipos.Catalogo`  — nombre, concepto, formación, gk y los 6 de campo
+#   2. `Equipos.EscudoId`  — el slug del escudo (mismo orden que el catálogo)
+#   3. `Equipos.AbrevId`   — las tres letras del marcador (ídem)
+#   4. `MatchTuning.Formations` — los esquemas con sus SLOTS reales (z, x),
+#      que es lo que permite dibujar la mini-cancha de la ficha con las
+#      posiciones de verdad y no un dibujito inventado.
+#
+# ⚠️ LAS BARRAS SE RECALCULAN ACÁ con la MISMA cuenta que `Equipos.Barra()`:
+# z contra la media y el desvío del pool DE CAMPO (58), desvío dividido √6
+# porque se compara una media de seis, escala 15, clamp 10..95. Cualquier
+# desvío de esa réplica publica números que el juego no muestra — por eso
+# `tools/verificar_barras.py` (una vez) se comparó contra la salida real de
+# `PocEquipos.SimEquipos` (27/27 exactos, 12-ago-2026). Si un perfil de
+# `MatchTuning` cambia, las barras de acá se mueven SOLAS igual que en el juego.
+EQUIPOS_CS = os.path.join(RAIZ, "game-unity", "FulbitoPenales", "Assets",
+                          "Scripts", "Equipos.cs")
+ESCUDOS_SRC = os.path.join(RAIZ, "game-unity", "FulbitoPenales", "Assets",
+                           "Resources", "Escudos")
+
+# El chequeo de marcas de los ESCUDOS, misma mecánica que APROBADOS: el slug
+# tiene que estar acá o el script termina con error. Son las parodias de
+# `game-unity/tools/gen_escudos.py` — la regla de la casa es que el escudo
+# dibuja el CONCEPTO, nunca la marca del club real.
+ESCUDOS_APROBADOS = {
+    # revisados el 12-ago-2026 (contact sheet + zoom, los 27): ninguno
+    # reproduce un escudo registrado. Los tres guiños más fuertes usan
+    # símbolos de ciudad o heráldica genérica, no la marca: boke = azul/oro
+    # con ancla y estrellas (no el escudo de CABJ), millonetas = banda roja
+    # sin monograma, culebra = el biscione visconteo (heráldica de Milán).
+    "fulbitofc", "scaloneta22", "scaloneta26", "albiceleste", "boke",
+    "scratch", "piernacambiada", "capitanes", "pulmones", "polvora", "magos",
+    "galacticos", "jogobonito", "rompehuesos", "vikingos", "ultimotango",
+    "potrero", "indomables", "millonetas", "tikitaka", "culebra", "diavolo",
+    "viejasenora", "teatro", "parisiens", "cantera", "azzurri",
+}
+
+ESCUDO_OUT = 256    # los PNG fuente son 256×256; se convierten sin escalar
+
+
+def formaciones_del_juego():
+    """Los 7 esquemas con sus slots (z, x) reales — GK primero."""
+    txt = _sin_comentarios(open(MATCHTUNING, encoding="utf-8").read())
+    bloque = re.search(r"Formations\s*=\s*\{(.*?)\n    \};", txt, re.S).group(1)
+    formas = []
+    for m in re.finditer(
+            r'new Formacion\s*\{\s*name = "([^"]+)",\s*def = (\d+),\s*'
+            r'mid = (\d+),\s*fwd = (\d+),\s*slots = new\[\]\s*\{(.*?)\}\s*\}',
+            bloque, re.S):
+        slots = [[float(z), float(x)] for z, x in
+                 re.findall(r"new Vector2\(\s*([-\d.]+)f?,\s*([-\d.]+)f?\s*\)",
+                            m.group(5))]
+        formas.append({"name": m.group(1), "def": int(m.group(2)),
+                       "mid": int(m.group(3)), "fwd": int(m.group(4)),
+                       "slots": slots})
+    return formas
+
+
+def equipos_del_juego():
+    """El catálogo entero, en su orden (que es el de EscudoId y AbrevId)."""
+    txt = _sin_comentarios(open(EQUIPOS_CS, encoding="utf-8").read())
+    bloque = re.search(r"Catalogo\s*=[^{]*\{(.*?)\n    \};", txt, re.S).group(1)
+    equipos = []
+    # el lazy corta en la PRIMERA `}`, que es la del arreglo de ids — como los
+    # ids son el último campo del struct, el chunk trae todos los campos
+    for m in re.finditer(r"new Equipo\s*\{(.*?)\}", bloque, re.S):
+        chunk = m.group(1)
+        equipos.append({
+            "nombre": re.search(r'nombre = "([^"]+)"', chunk).group(1),
+            "form": int(re.search(r"form = (\d+)", chunk).group(1)),
+            "gk": re.search(r'gk = "([a-z0-9_]+)"', chunk).group(1),
+            "concepto": re.search(r'concepto = "([^"]+)"', chunk).group(1),
+            "ids": re.findall(r'"([a-z0-9_]+)"',
+                              chunk.split("ids = new[]")[1]),
+        })
+    escudos = re.findall(r'"([a-z0-9_]+)"',
+                         re.search(r"EscudoId\s*=\s*\{(.*?)\};", txt,
+                                   re.S).group(1))
+    abrevs = re.findall(r'"([A-Z0-9]{2,3})"',
+                        re.search(r"AbrevId\s*=\s*\{(.*?)\};", txt,
+                                  re.S).group(1))
+    if not (len(equipos) == len(escudos) == len(abrevs)):
+        print("!! equipos.json ROTO — catálogo %d / escudos %d / abrevs %d"
+              % (len(equipos), len(escudos), len(abrevs)))
+        sys.exit(1)
+    for eq, esc, ab in zip(equipos, escudos, abrevs):
+        eq["slug"], eq["abrev"] = esc, ab
+    return equipos
+
+
+def _eje(s, e):
+    """Los TRES ejes con los MISMOS pesos que `Equipos.Eje` (claves en
+    castellano porque `stats_del_juego` ya traduce pace→ritmo, etc.)."""
+    if e == 0:                                    # VELOCIDAD
+        return 0.60 * s["ritmo"] + 0.40 * s["gambeta"]
+    if e == 1:                                    # FUERZA
+        return 0.50 * s["pegada"] + 0.50 * s["fuerza"]
+    return (0.30 * s["precision"] + 0.25 * s["pase"]      # PRECISIÓN
+            + 0.25 * s["control"] + 0.20 * s["comba"])
+
+
+def barras_del_catalogo(equipos, stats):
+    """Réplica de `Equipos.Calibrar` + `Barra`: μ/σ del pool DE CAMPO
+    (BluePoolIds — los arqueros NO entran, igual que en el juego)."""
+    import math
+    pool = _lista_cs(_sin_comentarios(open(MATCHTUNING, encoding="utf-8")
+                                      .read()), "BluePoolIds")
+    mu, sd = [], []
+    for e in range(3):
+        vals = [_eje(stats[i], e) for i in pool]
+        m = sum(vals) / len(vals)
+        mu.append(m)
+        sd.append(math.sqrt(sum((v - m) ** 2 for v in vals) / len(vals)))
+    for eq in equipos:
+        for e, k in enumerate(("vel", "fue", "pre")):
+            t = sum(_eje(stats[i], e) for i in eq["ids"]) / len(eq["ids"])
+            z = (t - mu[e]) / (sd[e] / math.sqrt(len(eq["ids"])))
+            eq[k] = max(10, min(95, round(50 + z * 15)))
+    return equipos
+
+
+def build_equipos_json():
+    stats, _zurdos = stats_del_juego()
+    equipos = barras_del_catalogo(equipos_del_juego(), stats)
+    data = {"formaciones": formaciones_del_juego(),
+            "equipos": [{k: eq[k] for k in
+                         ("slug", "nombre", "abrev", "concepto", "form",
+                          "gk", "ids", "vel", "fue", "pre")}
+                        for eq in equipos]}
+    with open(out("assets", "equipos", "equipos.json"), "w",
+              encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, separators=(",", ":"))
+    print("equipos.json: %d equipos, %d formaciones"
+          % (len(equipos), len(data["formaciones"])))
+    return equipos
+
+
+def build_escudos(equipos):
+    for eq in equipos:
+        p = os.path.join(ESCUDOS_SRC, eq["slug"] + ".png")
+        if not os.path.exists(p):
+            print("  FALTA", p)
+            continue
+        Image.open(p).convert("RGBA").save(
+            out("assets", "equipos", eq["slug"] + ".webp"),
+            "WEBP", quality=90, method=6)
+    print("escudos: %d" % len(equipos))
+
+
+def auditar_equipos(equipos):
+    """Mismo contrato que `auditar_album`: las listas que tienen que decir lo
+    mismo, comparadas — y si no, se grita. Devuelve False si hay problemas."""
+    # ⚠️ sin comentarios: `GkPoolIds` tiene uno entre el `=` y la `{` que a
+    # `_lista_cs` le devuelve lista vacía — y entonces TODO arquero es "de afuera"
+    txt = _sin_comentarios(open(MATCHTUNING, encoding="utf-8").read())
+    pool = set(_lista_cs(txt, "BluePoolIds"))
+    gks = set(_lista_cs(txt, "GkPoolIds"))
+    html = open(os.path.join(WEB, "index.html"), encoding="utf-8").read()
+    problemas = []
+    sin_aprobar = [eq["slug"] for eq in equipos
+                   if eq["slug"] not in ESCUDOS_APROBADOS]
+    if sin_aprobar:
+        problemas.append(
+            "ESCUDOS SIN CHEQUEO DE MARCAS (%d): %s\n"
+            "   -> abri Resources/Escudos/<slug>.png, verifica que sea la\n"
+            "      parodia y no un escudo real, y sumalo a ESCUDOS_APROBADOS."
+            % (len(sin_aprobar), ", ".join(sin_aprobar)))
+    for eq in equipos:
+        if len(eq["ids"]) != 6 or len(set(eq["ids"])) != 6:
+            problemas.append("PLANTEL ROTO en %s: %s"
+                             % (eq["nombre"], eq["ids"]))
+        afuera = [i for i in eq["ids"] if i not in pool]
+        if afuera or eq["gk"] not in gks:
+            problemas.append("ID FUERA DEL POOL en %s: %s"
+                             % (eq["nombre"], afuera or eq["gk"]))
+        # la ficha dibuja los retratos: un jugador sin aprobar en la web se
+        # veria como figurita vacia en la mini-cancha
+        sin_retrato = [i for i in eq["ids"] + [eq["gk"]]
+                       if i not in APROBADOS]
+        if sin_retrato:
+            problemas.append("SIN RETRATO EN LA WEB, %s: %s"
+                             % (eq["nombre"], ", ".join(sin_retrato)))
+        if ("assets/equipos/%s.webp" % eq["slug"]) not in html:
+            problemas.append("SIN TARJETA EN index.html: %s (%s)"
+                             % (eq["slug"], eq["nombre"]))
+    # ¿algun escudo huerfano en el juego que el catalogo no usa?
+    import glob as _glob
+    en_disco = {os.path.basename(p)[:-4]
+                for p in _glob.glob(os.path.join(ESCUDOS_SRC, "*.png"))}
+    huerfanos = en_disco - {eq["slug"] for eq in equipos}
+    if huerfanos:
+        problemas.append("ESCUDOS SIN EQUIPO en Resources/Escudos: %s"
+                         % ", ".join(sorted(huerfanos)))
+    if problemas:
+        print("\n" + "=" * 70)
+        print("CATALOGO DE EQUIPOS INCOMPLETO")
+        print("=" * 70)
+        for p in problemas:
+            print(" - " + p)
+        print("=" * 70)
+        return False
+    print("equipos: %d, todos aprobados y en el index" % len(equipos))
+    return True
+
+
 # La ventana del busto (cabeza + hombros, sin los brazos en T-pose) NO es fija:
 # se MIDE sobre cada render. Antes era la constante BUST = (135, 55, 505, 425),
 # calibrada a mano contra los renders viejos de 640x720 — y funcionaba mientras
@@ -318,6 +549,12 @@ SHOTS = [
     # golpe se ve el doble de grande.
     ("web_firma_still", "martillazo"),
     ("web_tiro_03", "gol"),
+    # M172 — la caja sorpresa en el círculo central, los dos equipos alrededor.
+    # Sale de `PocSimCajas.FotoCajas` (foto ESCENIFICADA de los props, no un
+    # frame de sim): los jugadores están en poses de idle, no en T-pose, así
+    # que no le cabe la advertencia de arriba. Es 700px y se muestra a mitad
+    # de columna, donde alcanza y sobra.
+    ("m172_caja_tv", "caja-sorpresa"),
 ]
 # ⚠️ Solo van las capturas que el sitio USA. Hasta el 30-jul-2026 esta lista
 # generaba tambien `menu`, `atajada` y `partido`, que no estan referenciadas en
@@ -518,8 +755,11 @@ if __name__ == "__main__":
     build_brand()
     build_roster()
     build_roster_json()
+    equipos = build_equipos_json()
+    build_escudos(equipos)
     build_shots()
     ok = auditar_album()
+    ok = auditar_equipos(equipos) and ok
     print("listo")
     # ⚠️ sale con error DESPUES de generar todo: los assets quedan igual, pero el
     # que corrio esto se entera. Un album incompleto que termina en verde es

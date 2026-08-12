@@ -909,3 +909,153 @@ code {
   content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .1;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='.5'/%3E%3C/svg%3E");
 }
+
+/* ══ LOS EQUIPOS: el catálogo (M153 del juego) ═══════════════════════════════
+   La tarjeta es el ESCUDO con su estilo abajo — sobria a propósito: acá el
+   personaje es el catálogo entero, no una tarjeta. El gesto grande está en la
+   ficha (la pizarra del DT, más abajo). Todo lo que se ve sin JS está en el
+   HTML, barras incluidas (los --v vienen inline del build). */
+.equipos {
+  list-style: none; padding: 0; margin: var(--s6) 0 0;
+  display: grid; gap: var(--s3);
+  grid-template-columns: repeat(auto-fill, minmax(196px, 1fr));
+}
+.equipo {
+  position: relative; display: flex; flex-direction: column;
+  background: linear-gradient(180deg, rgba(201, 169, 78, .07), rgba(13, 27, 15, .55) 52%);
+  border: 1px solid var(--glass-borde); border-radius: var(--r-md);
+  padding: var(--s4) var(--s3) var(--s3); text-align: center;
+  transition: transform .25s var(--ease), border-color .25s, box-shadow .25s;
+}
+.equipo:hover, .equipo:focus-within {
+  transform: translateY(-4px); border-color: rgba(201, 169, 78, .5);
+  box-shadow: var(--sombra-card), var(--brillo-oro);
+}
+/* con JS cada tarjeta entera se vuelve el botón que abre la pizarra */
+.equipo__abrir {
+  display: flex; flex-direction: column; flex: 1; width: 100%; cursor: pointer;
+  background: none; border: 0; padding: 0; margin: 0;
+  font: inherit; color: inherit; text-align: inherit;
+}
+.equipo__abrir:focus-visible { outline: 2px solid var(--oro-claro); outline-offset: 4px; }
+.equipo__escudo {
+  width: 92px; height: 92px; object-fit: contain; align-self: center;
+  filter: drop-shadow(0 8px 14px rgba(0, 0, 0, .5));
+}
+.equipo__nombre {
+  margin-top: var(--s3); font-family: var(--display); font-weight: 700;
+  font-size: 1.02rem; letter-spacing: .08em; color: var(--cal); line-height: 1.2;
+}
+.equipo__concepto {
+  margin: 4px 0 0; font-family: var(--tiza); font-size: 1.2rem;
+  line-height: 1.15; color: var(--oro-claro);
+}
+.equipo__meta {
+  margin: 8px 0 0; font-size: .78rem; letter-spacing: .04em; color: var(--cal-tenue);
+}
+.equipo__meta b { font-family: var(--display); font-weight: 700; color: var(--oro); letter-spacing: .1em; }
+.equipo__barras { margin: var(--s3) 0 0; padding-top: var(--s3); border-top: 1px solid rgba(201, 169, 78, .14); display: grid; gap: 7px; }
+/* la fila entera la arma el grid del <div>; dt y dd se disuelven en él */
+.equipo__barras > div { display: grid; grid-template-columns: 30px 1fr 24px; align-items: center; gap: 9px; }
+.equipo__barras dt, .equipo__barras dd { display: contents; }
+.equipo__barras abbr {
+  text-decoration: none; font-family: var(--display); font-weight: 500;
+  font-size: .62rem; letter-spacing: .12em; color: var(--cal-tenue); text-align: left;
+}
+.equipo__barras i {
+  display: block; height: 5px; border-radius: 3px; overflow: hidden;
+  background:
+    linear-gradient(90deg, var(--oro), var(--oro-claro)) no-repeat,
+    rgba(240, 237, 228, .1);
+  background-size: calc(var(--v) / 99 * 100%) 100%, auto;
+}
+.equipo__barras b {
+  font-family: var(--display); font-weight: 700; font-size: .8rem;
+  color: var(--oro-claro); font-variant-numeric: tabular-nums; text-align: right;
+}
+/* las barras van al fondo de la tarjeta: los conceptos miden distinto y sin
+   esto cada tarjeta alineaba las barras donde le quedaba */
+.equipo__abrir > .equipo__barras, .equipo > .equipo__barras { margin-top: auto; padding-top: var(--s3); }
+.equipo__concepto + .equipo__meta { margin-bottom: var(--s3); }
+
+/* ── la pizarra del DT: la ficha del equipo ──────────────────────────────────
+   La mini-cancha NO es un dibujito: los siete están parados en los slots
+   reales de la formación (MatchTuning.Formations vía equipos.json). */
+.ficha__panel--equipo { width: 100%; }
+.ficha__cuerpo--equipo { grid-template-columns: minmax(230px, 340px) 1fr; }
+.pizarra { margin: 0; }
+.pizarra__cancha {
+  position: relative; aspect-ratio: 10 / 12.5; border-radius: var(--r-md);
+  border: 2px solid rgba(240, 237, 228, .38);
+  background:
+    repeating-linear-gradient(0deg, rgba(240, 237, 228, .028) 0 12.5%, transparent 12.5% 25%),
+    linear-gradient(180deg, #34591d, #2a4c16 60%, #24430f);
+  overflow: hidden;
+  box-shadow: inset 0 0 40px rgba(7, 14, 8, .35);
+}
+/* las líneas de cal: el área abajo y la mitad de la cancha arriba */
+.pizarra__cancha::before {
+  content: ''; position: absolute; left: 24%; right: 24%; bottom: -2px; height: 17%;
+  border: 2px solid rgba(240, 237, 228, .34); border-bottom: 0;
+  border-radius: 4px 4px 0 0;
+}
+.pizarra__cancha::after {
+  content: ''; position: absolute; left: 50%; top: 0; width: 34%; aspect-ratio: 1;
+  transform: translate(-50%, -58%); border-radius: 50%;
+  border: 2px solid rgba(240, 237, 228, .3);
+}
+.pizarra__jug {
+  position: absolute; left: var(--x); bottom: var(--y);
+  transform: translate(-50%, 12%);
+  margin: 0; width: 23%; text-align: center;
+}
+.pizarra__jug img {
+  width: 74%; aspect-ratio: 1; object-fit: cover; border-radius: 50%;
+  border: 2px solid var(--oro); background: #1c231c;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, .45);
+}
+.pizarra__jug--gk img { border-color: var(--oro-claro); border-style: dashed; }
+.pizarra__jug figcaption {
+  margin-top: 2px; font-family: var(--display); font-weight: 500;
+  font-size: clamp(.5rem, 1.4vw, .66rem); letter-spacing: .05em; line-height: 1.1;
+  color: var(--cal); text-shadow: 0 1px 3px rgba(7, 14, 8, .9);
+}
+.pizarra__form {
+  margin: 10px 0 0; text-align: center; font-family: var(--tiza);
+  font-size: 1.3rem; color: var(--oro-claro);
+}
+.fichaeq__escudo { width: 84px; height: 84px; object-fit: contain; filter: drop-shadow(0 8px 14px rgba(0, 0, 0, .5)); }
+.fichaeq__concepto {
+  margin: 6px 0 0; font-family: var(--tiza); font-size: 1.5rem; color: var(--oro-claro);
+}
+.fichaeq__arco { margin: var(--s4) 0 0; font-size: .9rem; color: var(--cal-tenue); }
+.fichaeq__arco b { color: var(--cal); font-weight: 500; }
+.ficha__stats--equipo { grid-template-columns: 1fr; max-width: 340px; }
+@media (max-width: 640px) {
+  .ficha__cuerpo--equipo { grid-template-columns: 1fr; }
+  .pizarra { max-width: 340px; margin-inline: auto; }
+}
+
+/* ── CAJAS SORPRESA: la foto y los seis modificadores ──────────────────────── */
+.cajas {
+  display: grid; grid-template-columns: minmax(280px, 420px) 1fr;
+  gap: clamp(20px, 4vw, 48px); align-items: center; margin-top: var(--s6);
+}
+.cajas__foto {
+  width: 100%; height: auto; border-radius: var(--r-md);
+  border: 1px solid var(--glass-borde); box-shadow: var(--sombra-card);
+}
+.cajas__efectos { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+.cajas__efectos li {
+  padding-left: var(--s3); border-left: 2px solid rgba(201, 169, 78, .35);
+  font-size: .95rem; color: var(--cal-tenue); line-height: 1.45;
+}
+.cajas__efectos b {
+  display: block; font-family: var(--display); font-weight: 700;
+  font-size: .95rem; letter-spacing: .07em; text-transform: uppercase;
+  color: var(--oro-claro);
+}
+@media (max-width: 800px) {
+  .cajas { grid-template-columns: 1fr; }
+  .cajas__foto { max-width: 480px; justify-self: center; }
+}

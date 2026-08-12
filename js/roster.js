@@ -39,7 +39,7 @@ const FIRMAS_DESC = {
   'LA MOMIA': 'Momifica a los rivales en cinco metros: cuatro segundos y medio caminando como zombies.',
   'LA MINA': 'Entierra una mina a su espalda y ahí queda, esperando. El que la pisa, vuela tres metros.',
   'EL PISCINAZO': 'Se tira a la pileta. Siete de cada diez veces, la compran y es tiro libre.',
-  'EL TURBO': 'Un estallido en línea recta a casi el doble de lo que corre cualquiera. Dura un suspiro.',
+  'EL TURBO': 'Un estallido en línea recta a casi el doble de lo que corre cualquiera, llevándose por delante al que se le cruce. Dura un suspiro.',
   'LA MIRA': 'Cámara lenta y una mirilla desde mitad de cancha: el pase cae exactamente donde la pusiste.',
   'LA PISTOLA': 'Desenfunda y tira una ráfaga: cada tiro que entra aturde al que lo come.',
   'LA CERCA': 'Planta un alambrado de seis metros que dura doce segundos. El que lo toca queda pegado.',
@@ -47,6 +47,10 @@ const FIRMAS_DESC = {
   'EL HIELO': 'Congela en estatua dos segundos y medio a todo rival en cuatro metros y medio.',
   'LOS TALLARINES': 'Enrolla a los rivales en spaghetti a cuatro metros a la redonda y los tira al piso: dos segundos y medio comiendo pasto.',
   'EL GRITO': 'Un grito de guerra que viaja treinta metros en onda expansiva y voltea todo lo que agarra el frente.',
+  'LA CAJA': 'Convierte a los rivales a cuatro metros en cajas sorpresa: dos segundos y medio encajonados hasta que el resorte escupe al payaso.',
+  'EL ARAÑAZO': 'Tres garras que tajean DOS veces: la primera tanda voltea, y al que se corrió lo espera la segunda medio segundo después.',
+  'LA PINTURA': 'Vuelca un balde de pintura unos metros adelante y la mancha queda ocho segundos en el pasto: el que la pisa, patina.',
+  'IL MIRACOLO': 'La única firma que no le hace nada a nadie: levanta a los compañeros caídos en seis metros y les deja un envión. Divino.',
   'ARQUERO': 'Ataja. Que no es poco: en Fulbito los arqueros vuelan de verdad.',
 };
 
@@ -58,7 +62,11 @@ const STATS_ROTULOS = [
 
 /* los dos recién llegados (M111) llevan el moño de NUEVO. Editorial: cuando
    dejen de ser noticia, se vacía la lista y listo. */
-const NUEVOS = ['iceman', 'general', 'fideo'];
+const NUEVOS = [
+  'titan', 'payasito', 'valdanito', 'muneco', 'jefecito',        // M164
+  'maestro', 'pinturicchio', 'divino', 'reyromano',              // M173
+  'pato', 'mono', 'casillero', 'dado', 'doblev', 'pinocho',      // arqueros M159/M173
+];
 
 const menosMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const punteroFino = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
