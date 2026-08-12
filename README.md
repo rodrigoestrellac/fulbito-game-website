@@ -8,8 +8,9 @@ Sitio estático, sin build step. Se sirve tal cual desde GitHub Pages (branch `m
 ```
 index.html      la one-page entera
 css/            variables.css (tokens) + site.css
-js/             releases.js (descargas) + main.js (motion) + pelota3d.js (la pelota)
-                + roster.js (filtros del álbum, foil de los cromos y la ficha)
+js/             releases.js (descargas, contador y eventos GA) + main.js (motion)
+                + pelota3d.js (la pelota) + roster.js (filtros del álbum, foil de los
+                cromos y la ficha) + equipos.js (la pizarra del DT)
 vendor/         three.js (sólo lo usa la pelota 3D, se carga diferido)
 assets/ball/    teamgeist.glb
 assets/img/     capturas del juego (WebP)
@@ -428,9 +429,63 @@ los mismos `unicode-range`.
 
 `releases.js` pide `/releases?per_page=100` (mismo costo de rate limit que
 `/releases/latest`) y suma el `download_count` de todos los `.exe`/`.zip` de todas las
-versiones — CHECKSUMS.txt no cuenta. Se muestra en la sección de descarga
-(`[data-rel="descargas"]`). **Sin dato de la API el elemento queda oculto**: no hay
-número hardcodeado porque envejecería mintiendo.
+versiones — CHECKSUMS.txt no cuenta. Se muestra en dos lugares:
+
+| hueco | dónde | condición |
+|---|---|---|
+| `[data-rel="descargas"]` | sección de descarga, frase completa | `total > 0` |
+| `[data-rel="descargas-zoc"]` + `[data-rel="descargas-n"]` | zócalo del hero, sólo el número | `total >= UMBRAL_HERO` (100) |
+
+**Sin dato de la API los dos quedan ocultos**: no hay número hardcodeado porque
+envejecería mintiendo. El **umbral del hero** es aparte y es a propósito: ahí arriba el
+número es prueba social, y «10 descargas» en la primera pantalla prueba lo contrario.
+Abajo del umbral el dato igual se lee completo en la sección de descarga, donde es
+información y no argumento.
+
+## Eventos de descarga (GA)
+
+GA estaba cargado desde el primer día pero **ningún click disparaba evento**: no había
+forma de saber qué porcentaje baja el juego ni desde qué botón. `releases.js` engancha
+**un solo listener en `document`, en fase de captura** — tiene que ser así porque el
+propio `releases.js` reescribe la lista de descargas entera y los botones que había al
+cargar dejan de existir.
+
+| evento | cuándo | parámetros |
+|---|---|---|
+| `descarga` | click en cualquier `a[href*="/releases/"]` | `tipo` (`win-setup`/`win-zip`/`mac`/`checksums`/`generico`), `desde` (`hero`/`marcador`/`lista`/`otro`), `archivo` |
+| `cta_inline` | click en cualquier `a[href="#descargar"]` | `desde` = el `<h2>` de la sección donde está el botón, o `pie` |
+
+`cta_inline` es lo que dice **cuál de los dos tramos convence**: hay un botón al final de
+LOS EQUIPOS y otro al final de MODOS.
+
+## ⚠️ Las tipografías están SUBSETEADAS: ojo con los signos raros
+
+`css/fonts.css` declara `unicode-range: … U+2000-206F …` pero el .woff2 **no trae todo
+ese rango**. Y como el rango está declarado, el navegador no cae al fallback del sistema:
+dibuja tofu (▯). Pasó el 12-ago-2026 con la comilla curva `“` (U+201C) de las citas.
+
+Lo que SÍ anda y ya está usado en la página: `« »` (U+00AB/BB), `—` (U+2014), `·`, `→`.
+Antes de meter un signo nuevo, mirá el render — no alcanza con que exista en Unicode.
+
+## ⚠️ El reveal: `.rev` va en los HIJOS de una grilla, nunca en la grilla
+
+`main.js` observa los `.rev` con un `IntersectionObserver`. El **12-ago-2026** se
+descubrió que LOS EQUIPOS **no se veía nunca en un teléfono**: la clase estaba sobre la
+`<ul class="equipos">` entera, que en mobile medía 9.406 px. Con `threshold: 0.08` el
+observer pedía 752 px visibles y el root recortado (`rootMargin: -12%`) dejaba como
+máximo 743. **Nueve píxeles** — y en un iPhone SE moría también el álbum. Medido:
+38 pantallas de scroll con una sección entera en negro.
+
+Dos reglas, las dos:
+
+1. `.rev` va en **cada tarjeta**, no en el contenedor de la grilla (así lo hacía el
+   álbum desde siempre con su cascada `--i`).
+2. `threshold: 0`, porque cualquier fracción de un bloque alto puede no entrar en la
+   pantalla. La regla no puede depender del alto del bloque.
+
+Cuidado al mover `.rev` a un elemento que ya declara su propio `transition` **más abajo
+en site.css**: le gana al de `.rev` y la tarjeta aparece de golpe, sin opacidad. `.equipo`
+lo resuelve con `.equipo.rev` / `.equipo.rev.dentro` (especificidad doble).
 
 ## Deep-link de la ficha
 
@@ -439,12 +494,30 @@ Cada cromo tiene URL: `#cromo/<slug>` (p.ej. `#cromo/el-vikingo`). Se escribe co
 flecha: volver atrás sale de la página, no repasa 52 cromos. Al cerrar la ficha el hash
 se limpia. Llegar con el hash puesto abre la ficha sola sobre el álbum.
 
+## El orden de las secciones no está numerado (y por eso se puede mover)
+
+Hasta el 12-ago-2026 cada sección tenía un **chip de minuto** (`data-min="27'"`, pintado
+por `.minuto[data-min]::before`). Se fueron todos menos el `90+` del pie, por dos razones:
+
+- **Nunca coincidían con el reloj vivo del header.** Parado sobre CAJAS SORPRESA el header
+  marcaba 16' y el sello 27'. Dos relojes en pantalla que se desmienten se leen como
+  error, no como metáfora — y como los sellos eran estáticos no había forma de
+  sincronizarlos.
+- **Clavaban el orden**: mover una sección obligaba a renumerar todas.
+
+El `90+` del pie se queda porque es el único que siempre acierta: el scroll efectivamente
+llegó al final. El chip sólo se pinta si hay `data-min`, así que para sacar otro alcanza
+con borrar el atributo.
+
+Al mover una sección hay que **recalcular el `seccion--suave`**: los fondos alternan una
+sí y una no, y dos gradientes pegados se ven como un error de render.
+
 ## ⚠️ La sección de modos TAMBIÉN es una lista que se desincroniza
 
 El menú real vive en `MenuDirector.cs` (game-unity, el array de tuplas al principio).
 El 5-ago-2026 la web decía "Seis modos" y el juego tenía SIETE — faltaba la COPA
-FULBITO, que existe desde M85. Al tocar el menú del juego, actualizar la sección 61'
-**y** el zócalo del hero **y** la meta description. (Es la misma clase de bug que el
+FULBITO, que existe desde M85. Al tocar el menú del juego, actualizar la sección MODOS
+**y** la meta description. (Es la misma clase de bug que el
 álbum 28 vs 50; esta lista sigue siendo a mano porque son siete renglones con copy
 propio, pero el chequeo es: contar los ítems del array y contar los `<li>` del menú.)
 

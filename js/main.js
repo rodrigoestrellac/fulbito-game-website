@@ -8,6 +8,12 @@ document.documentElement.classList.remove('no-js');
 const menosMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* ── Reveals ─────────────────────────────────────────────────────────────── */
+/* ⚠️ `threshold: 0` y NO 0.08: el 8 % de una grilla alta es más de lo que entra en
+   la pantalla, y entonces el reveal no dispara nunca. Pasó de verdad — con `.rev`
+   sobre la <ul> de LOS EQUIPOS (9.406 px en mobile) el 8 % pedía 752 px visibles y el
+   root recortado (`rootMargin: -12%`) dejaba 743: nueve píxeles por los que la sección
+   entera no existía en un teléfono. Ahora `.rev` va por tarjeta y no por grilla, pero
+   el umbral queda en 0 igual: la regla no puede depender del alto del bloque. */
 if ('IntersectionObserver' in window && !menosMovimiento) {
   const obs = new IntersectionObserver((entradas) => {
     entradas.forEach((e) => {
@@ -15,14 +21,17 @@ if ('IntersectionObserver' in window && !menosMovimiento) {
       e.target.classList.add('dentro');
       obs.unobserve(e.target);
     });
-  }, { rootMargin: '0px 0px -12% 0px', threshold: 0.08 });
+  }, { rootMargin: '0px 0px -12% 0px', threshold: 0 });
   document.querySelectorAll('.rev').forEach((el) => obs.observe(el));
 } else {
   document.querySelectorAll('.rev').forEach((el) => el.classList.add('dentro'));
 }
 
 /* los cromos entran en cascada: cada uno sabe su lugar en la fila. El delay
-   lo aplica el CSS (cromo-entra) y solo si hay motion. */
+   lo aplica el CSS (cromo-entra) y solo si hay motion. Las tarjetas de equipo
+   NO llevan --i a proposito: ahora cada una tiene su propio `.rev`, asi que el
+   escalonado se lo da el scroll y un delay por indice solo agregaria espera a
+   las que aparecen veinte pantallas despues. */
 document.querySelectorAll('.album .figu').forEach((el, i) => el.style.setProperty('--i', i));
 
 /* ── Marcador fijo + reloj ───────────────────────────────────────────────── */

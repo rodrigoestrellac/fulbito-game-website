@@ -65,13 +65,14 @@ p:last-child { margin-bottom: 0; }
   font-size: var(--t-micro); letter-spacing: .22em; text-transform: uppercase;
   color: var(--oro); margin-bottom: var(--s3);
 }
-.minuto::before {
+.minuto[data-min]::before {
   content: attr(data-min);
   font-weight: 700; font-size: 1.05rem; letter-spacing: .02em;
   font-variant-numeric: tabular-nums;
   color: var(--noche); background: var(--oro);
   padding: 1px 9px 2px; border-radius: 2px;
 }
+.minuto:not([data-min]) { gap: 0; }
 .minuto::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(201,169,78,.35), transparent); }
 
 /* ── Marcador fijo (aparece pasado el hero) ────────────────────────────── */
@@ -204,12 +205,12 @@ p:last-child { margin-bottom: 0; }
 .hero__tagline {
   margin: clamp(20px, 3vh, 34px) 0 clamp(22px, 3.4vh, 36px);
   font-size: clamp(1.05rem, 2.4vw, 1.55rem);
-  color: var(--cal); max-width: 21ch; line-height: 1.35;
+  color: var(--cal); max-width: 30ch; line-height: 1.35;
 }
-.hero__tagline b { color: var(--oro-claro); font-weight: 500; }
+.hero__tagline b { color: var(--oro-claro); font-weight: 700; }
 
 .hero__acciones { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s3); }
-.hero__nota { font-size: .875rem; color: var(--cal-tenue); }
+.hero__nota { font-size: .875rem; color: var(--cal-tenue); max-width: 46ch; }
 
 /* lower third: la ficha del partido, como el zócalo de una transmisión */
 .zocalo {
@@ -222,6 +223,8 @@ p:last-child { margin-bottom: 0; }
   color: var(--cal-tenue);
 }
 .zocalo b { color: var(--oro); font-weight: 700; }
+/* la version es el dato que fecha todo lo demas: va en crema, no en gris */
+.zocalo__fuerte { color: var(--cal); }
 
 /* ── Ticker dorado (el separador con las jugadas firma) ────────────────── */
 .ticker {
@@ -305,20 +308,19 @@ p:last-child { margin-bottom: 0; }
 }
 .firma p { font-size: .95rem; color: var(--cal-tenue); }
 
-/* el resto de las firmas: una lista, porque es una lista */
-.firmas-resto {
-  margin-top: var(--s6); padding-top: var(--s5);
+/* Acá había una grilla con las 37 firmas restantes y su dueño. Se fue entera:
+   mapeaba firma→jugador, que es justo la decisión que el juego ya no te pide;
+   estaba duplicada tres veces (el ticker del hero, el pie de cada cromo y el
+   filtro «Por firma…» del álbum); los nombres de los dueños no significan nada
+   para quien nunca jugó; y se le veía la costura de la autogeneración
+   (EL KUNI · EL KUNI). Además contradecía el título de su propia sección:
+   «Cada uno tiene la suya» es una promesa, y la grilla la volvía un padrón.
+   Costaba 1.601 px de mobile — casi dos pantallas. */
+.firmas-resto-nota {
+  margin: var(--s6) 0 0; padding-top: var(--s5);
   border-top: 1px solid rgba(201, 169, 78, .16);
-  display: flex; flex-wrap: wrap; gap: 10px;
-  list-style: none; padding-inline: 0;
+  max-width: 62ch; color: var(--cal-tenue);
 }
-.firmas-resto li {
-  font-family: var(--display); font-weight: 500;
-  font-size: .82rem; letter-spacing: .12em; text-transform: uppercase;
-  color: var(--cal); padding: 7px 14px;
-  border: 1px solid rgba(201, 169, 78, .22); border-radius: 100px;
-}
-.firmas-resto li em { font-style: normal; color: var(--oro); }
 
 /* ── El plantel: álbum de figuritas ────────────────────────────────────── */
 .album__encabezado {
@@ -374,16 +376,6 @@ p:last-child { margin-bottom: 0; }
 }
 .figu__pos[data-pos="ARQ"] { border-color: var(--oro); color: var(--oro); }
 
-/* el hueco del álbum: honesto, faltan 6 */
-.figu--falta { background: repeating-linear-gradient(135deg, #131813 0 9px, #171d17 9px 18px); border-style: dashed; }
-.figu--falta:hover { transform: none; border-color: rgba(201, 169, 78, .3); box-shadow: var(--sombra-card); }
-.figu--falta .figu__hueco {
-  aspect-ratio: 1; display: grid; place-items: center;
-  font-family: var(--display); font-weight: 700; font-size: 2.4rem;
-  color: rgba(240, 237, 228, .12);
-}
-.figu--falta .figu__nombre { color: var(--cal-tenue); }
-
 /* ── Modos: la pantalla del menú, tal cual ─────────────────────────────── */
 .menu {
   margin-top: var(--s6); list-style: none; padding: 0;
@@ -437,6 +429,10 @@ table.specs tbody th {
 }
 table.specs td { color: var(--cal-tenue); }
 table.specs td:first-of-type { color: var(--cal); }
+@media (max-width: 640px) {
+  table.specs { min-width: 0; }
+  table.specs thead th:nth-child(3), table.specs tbody td:nth-child(3) { display: none; }
+}
 
 .medido {
   margin-top: var(--s5); padding: var(--s4);
@@ -511,7 +507,7 @@ table.specs td:first-of-type { color: var(--cal); }
 }
 
 /* ── Controles ─────────────────────────────────────────────────────────── */
-.controles { list-style: none; padding: 0; margin: var(--s5) 0 0; display: grid; gap: 2px; }
+.controles { list-style: none; padding: 0; margin: var(--s5) 0 0; display: grid; gap: 2px; max-width: 620px; }
 .controles li {
   display: grid; grid-template-columns: 1fr auto auto; gap: var(--s3);
   align-items: baseline; padding: 11px 14px;
@@ -570,7 +566,7 @@ table.specs td:first-of-type { color: var(--cal); }
 
 .controles-leyenda {
   display: grid; grid-template-columns: 1fr auto auto; gap: var(--s3);
-  margin: var(--s4) 0 0; padding: 0 14px 8px;
+  margin: var(--s4) 0 0; padding: 0 14px 8px; max-width: 620px;
   font-family: var(--display); font-weight: 500;
   font-size: .68rem; letter-spacing: .18em; text-transform: uppercase; color: var(--oro);
 }
@@ -927,6 +923,8 @@ code {
   padding: var(--s4) var(--s3) var(--s3); text-align: center;
   transition: transform .25s var(--ease), border-color .25s, box-shadow .25s;
 }
+.equipo.rev { transition: opacity .7s var(--ease), transform .7s var(--ease); }
+.equipo.rev.dentro { transition: transform .25s var(--ease), border-color .25s, box-shadow .25s; }
 .equipo:hover, .equipo:focus-within {
   transform: translateY(-4px); border-color: rgba(201, 169, 78, .5);
   box-shadow: var(--sombra-card), var(--brillo-oro);
@@ -1062,4 +1060,105 @@ code {
 @media (max-width: 800px) {
   .cajas { grid-template-columns: 1fr; }
   .cajas__foto { max-width: 480px; justify-self: center; }
+}
+
+/* ══ EL PULIDO (PLAN_WEB_PULIDO) ═══════════════════════════════════════
+   La página contaba el juego pero no lo repartía. Lo de acá abajo es lo que
+   agrega el reparto (CTAs en el camino) y lo que saca el agobio en mobile.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Frases que sólo son verdad con JS: «tocá un escudo», «tocá un cromo». Sin JS
+   la grilla estática se ve entera igual pero no se abre nada, y el sitio cuida
+   demasiado ese camino como para mentirle. */
+.no-js .solo-js { display: none; }
+
+/* Los CTA del medio del recorrido. Antes había DOS en toda la página — el hero
+   y la sección de descarga, a 29 pantallas de scroll en mobile — así que la
+   convicción moría sin salida justo donde se generaba. */
+.cta-inline {
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--s3) var(--s4);
+  margin: var(--s6) 0 0; padding-top: var(--s5);
+  border-top: 1px solid rgba(201, 169, 78, .16);
+}
+.cta-inline__gancho {
+  font-family: var(--tiza); font-size: 1.6rem; line-height: 1.2;
+  color: var(--oro-claro);
+}
+
+/* los sueltos de la sección de descarga, que vivían como style="" en el HTML */
+.bajar__checksums { margin-top: var(--s4); }
+.subtitulo-suelto { margin-top: var(--s7); }
+.nota-suelta { margin-top: var(--s4); max-width: 62ch; color: var(--cal-tenue); font-size: .92rem; }
+/* la última sección no necesita el respiro de siempre: abajo está el pie */
+#descargar { padding-bottom: clamp(40px, 5vw, 72px); }
+
+/* Las dos citas de gente que ya lo jugó. Único elemento de confianza de terceros del
+   sitio junto con el contador — y en un juego que se vende como «para jugar entre
+   amigos», una frase real vale más que un párrafo de features.
+   ⚠️ Van SIN nombre a propósito: son textuales de dos personas que lo jugaron, pero no
+   tenemos su permiso ni su nombre de pila anotado. Una atribución inventada convertiría
+   una cita real en un testimonio falso, que es peor que no firmarla. Si aparecen los
+   nombres, van en un <footer> adentro de cada <blockquote>. */
+.citas {
+  display: grid; gap: var(--s4); grid-template-columns: repeat(2, 1fr);
+  margin-top: var(--s6); padding-top: var(--s5);
+  border-top: 1px solid rgba(201, 169, 78, .16);
+}
+.citas__rotulo {
+  grid-column: 1 / -1; margin: 0;
+  font-family: var(--display); font-weight: 500;
+  font-size: var(--t-micro); letter-spacing: .22em; text-transform: uppercase;
+  color: var(--oro);
+}
+.cita {
+  /* la raya dorada y no una comilla grande: las tipografías del sitio están
+     SUBSETEADAS y ni Oswald ni DM Sans traen U+201C — la comilla curva salía
+     tofu (▯). La raya es además el mismo gesto que usan los efectos de las
+     cajas acá arriba, así que no inventa nada. */
+  margin: 0; padding-left: var(--s3);
+  border-left: 2px solid var(--oro);
+  font-family: var(--tiza); font-size: 1.65rem; line-height: 1.3;
+  color: var(--cal);
+}
+@media (max-width: 700px) {
+  .citas { grid-template-columns: 1fr; gap: var(--s5); }
+  .cita { font-size: 1.5rem; }
+}
+
+/* ══ MOBILE SIN AGOBIO ══════════════════════════════════════════════
+   Medido a 390×844: la página entera eran 31.909 px ≈ 38 pantallas, y tres
+   grillas se comían el 72 %. LOS EQUIPOS sola eran 11,8 pantallas porque caía
+   a UNA columna. Acá no se saca ningún equipo ni ningún cromo: se compacta.
+   ═══════════════════════════════════════════════════════════════════════ */
+/* PRIMERO la densidad, y hasta 700 px — no hasta 560. Con el corte único en 560
+   la página daba un salto de 17.093 a 22.628 px **de un píxel al siguiente**: a 561
+   volvían la tarjeta grande y las barras pero el contenedor seguía dando para dos
+   columnas nomás, o sea que 561 quedaba peor que 560. Separar densidad (700) de
+   compactación (560) hace que el conteo de columnas no cambie en ninguno de los dos
+   bordes y el salto desaparezca. */
+@media (max-width: 700px) {
+  .equipos { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  .album { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+}
+
+@media (max-width: 560px) {
+  /* dos columnas: a 390 px el «env» mide 350 y entran 2×150 + 16 de gap */
+  .equipo { padding: var(--s3) 10px 10px; }
+  .equipo__escudo { width: 64px; height: 64px; }
+  .equipo__nombre { font-size: .88rem; letter-spacing: .05em; }
+  .equipo__concepto { font-size: 1.05rem; }
+  .equipo__meta { font-size: .72rem; }
+  /* las tres barras a esa escala son ruido, y viven completas en la pizarra
+     que se abre al tocar. Gateado a que el JS esté vivo: sin JS no hay pizarra
+     y esconderlas sería esconder el dato, no moverlo. */
+  html:not(.no-js) .equipo__barras { display: none; }
+
+  /* tres columnas de cromos: 3×100 + 24 de gap entran en los 350 */
+  .album { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+  .figu__pie { padding: 6px 7px 8px; }
+  .figu__nombre { font-size: .68rem; letter-spacing: .04em; }
+  html:not(.no-js) .figu__firma { display: none; }  /* está en la ficha */
+
+  .cta-inline__gancho { font-size: 1.4rem; }
+  .cta-inline .btn { width: 100%; justify-content: center; }
 }

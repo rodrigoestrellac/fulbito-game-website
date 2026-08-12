@@ -76,17 +76,21 @@ function pintar(release) {
     if (peso) peso.textContent = mb(principal.a.bytes);
   });
 
+  /* El hueco de la nota YA trae texto fijo en el HTML ("sin cuenta, sin
+     instalador raro…"): esto le AGREGA el link al otro sistema operativo, no lo
+     reemplaza. Antes el hueco estaba vacío hasta que contestaba la API, o sea
+     que en el primer paint el hero no decía una sola razón para bajarlo.
+     Y el zip de Mac ya no se anuncia acá como beta: la advertencia se lee
+     completa en la sección de descarga, que es donde cambia lo que la persona
+     va a hacer. En el hero era un freno de mano. */
   const nota = document.querySelector('[data-rel="cta-nota"]');
   if (nota) {
     if (so === 'mac' && archivos.winSetup) {
-      nota.innerHTML = `¿Estás en Windows? <a href="${urlDescarga(tag, archivos.winSetup.nombre)}">Bajá el instalador</a>.`;
+      nota.innerHTML = ` ¿Estás en Windows? <a href="${urlDescarga(tag, archivos.winSetup.nombre)}">Bajá el instalador</a>.`;
     } else if (archivos.mac) {
-      nota.innerHTML = `¿Mac? <a href="${urlDescarga(tag, archivos.mac.nombre)}">Bajá el zip</a> — va como beta.`;
+      nota.innerHTML = ` ¿Mac? <a href="${urlDescarga(tag, archivos.mac.nombre)}">Bajá el zip</a>.`;
     }
   }
-
-  const pesoHero = document.querySelector('[data-rel="peso"]');
-  if (pesoHero && principal.a) pesoHero.textContent = mb(principal.a.bytes);
 
   /* ── Lista completa de descargas ── */
   const lista = document.querySelector('[data-rel="lista"]');
@@ -138,6 +142,21 @@ async function cargar() {
       cont.textContent = `Ya se descargó ${total.toLocaleString('es-AR')} ${total === 1 ? 'vez' : 'veces'}.`;
       cont.hidden = false;
     }
+    /* El mismo número, arriba de todo: es el único elemento de confianza de
+       terceros que tiene el sitio y vivía solo en la sección de descarga, a 29
+       pantallas de scroll. Sigue oculto si la API no contesta — un número
+       hardcodeado envejecería mintiendo.
+       ⚠️ Con UMBRAL: en el zócalo del hero el número es prueba social, y «10
+       descargas» en la primera pantalla prueba lo contrario. Abajo del umbral
+       el dato igual se lee completo en la sección de descarga, donde es
+       información y no argumento. */
+    const UMBRAL_HERO = 100;
+    const zoc = document.querySelector('[data-rel="descargas-zoc"]');
+    const zocN = document.querySelector('[data-rel="descargas-n"]');
+    if (zoc && zocN && total >= UMBRAL_HERO) {
+      zocN.textContent = total.toLocaleString('es-AR');
+      zoc.hidden = false;
+    }
 
     const data = releases.find((rel) => !rel.draft && !rel.prerelease);
     if (!data) return;
@@ -148,5 +167,42 @@ async function cargar() {
     console.info('[releases] queda el release estático:', e.message);
   }
 }
+
+/* GA estaba cargado pero NINGÚN click de descarga disparaba evento: no había
+   forma de saber qué porcentaje baja el juego ni desde qué CTA. Un solo
+   listener en el documento, en captura, porque releases.js reescribe la lista
+   de descargas entera y los botones de antes dejan de existir. */
+function medirDescargas() {
+  document.addEventListener('click', (ev) => {
+    if (typeof gtag !== 'function') return;
+
+    /* los botones del medio del recorrido no bajan nada: llevan a la seccion.
+       Se miden aparte para saber cual de los dos tramos convence. */
+    const salto = ev.target.closest?.('a[href="#descargar"]');
+    if (salto) {
+      const seccion = salto.closest('section')?.querySelector('h2')?.textContent.trim();
+      gtag('event', 'cta_inline', { desde: seccion || (salto.closest('.pie') ? 'pie' : 'otro') });
+      return;
+    }
+
+    const a = ev.target.closest?.('a[href*="/releases/"]');
+    if (!a) return;
+    const archivo = decodeURIComponent(a.href.split('/').pop() || '');
+    const donde = a.closest('.marcador') ? 'marcador'
+                : a.closest('.hero') ? 'hero'
+                : a.closest('[data-rel="lista"]') ? 'lista'
+                : 'otro';
+    gtag('event', 'descarga', {
+      // el CHECKSUMS.txt y el link a /releases/latest sin archivo no son el juego
+      tipo: /setup.*\.exe$/i.test(archivo) ? 'win-setup'
+          : /windows.*\.zip$/i.test(archivo) ? 'win-zip'
+          : /mac.*\.zip$/i.test(archivo) ? 'mac'
+          : /^checksums/i.test(archivo) ? 'checksums' : 'generico',
+      desde: donde,
+      archivo,
+    });
+  }, true);
+}
+medirDescargas();
 
 cargar();
