@@ -91,8 +91,11 @@ async function montarEquipos() {
     if (!j) return '';
     const x = (50 + slot[1] * 3.6).toFixed(1);
     const y = (6 + slot[0] * 1.75).toFixed(1);
+    // assets/pizarra/, no assets/roster/: son los mismos bustos pero con el
+    // gris del render reemplazado por sólido — sobre el verde de la cancha el
+    // gris se leía como un círculo semitransparente
     return `<figure class="pizarra__jug${esGk ? ' pizarra__jug--gk' : ''}" style="--x:${x}%;--y:${y}%">
-        <img src="assets/roster/${j.slug}.webp" alt="" width="120" height="120" loading="lazy">
+        <img src="assets/pizarra/${j.slug}.webp" alt="" width="120" height="120" loading="lazy">
         <figcaption>${componer(j.nombre)}</figcaption>
       </figure>`;
   }

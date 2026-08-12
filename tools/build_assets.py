@@ -618,6 +618,46 @@ def build_roster():
     print("roster: %d retratos + %d grandes" % (len(ROSTER), len(FIRMAS_BIG)))
 
 
+# ── retratos para la pizarra: el gris del estudio se vuelve sólido ───────────
+# Los retratos del álbum viven sobre tarjetas oscuras y el gris del render no
+# molesta; sobre el VERDE de la mini-cancha ese mismo gris se lee como un
+# círculo SEMITRANSPARENTE (bug report de Rodrigo, 12-ago: "están con
+# opacidad"). No hay opacidad ninguna — es el fondo del retrato. Acá se
+# reemplaza por el sólido oscuro del panel (#1C231C, el mismo `background` que
+# el CSS le pone al círculo) y la ficha queda sólida de verdad.
+#
+# ⚠️ FLOOD-FILL DESDE LOS BORDES, no umbral global: el gris del fondo (~#3a)
+# cae en el rango de las barbas y el pelo oscuro, y un umbral por valor le
+# haría agujeros a la cara. Lo que se pinta es lo CONECTADO al borde, que es
+# la definición de "fondo". Sembrado cada 40 px por los cuatro lados porque
+# los brazos en T parten el fondo en regiones que un solo corner no alcanza.
+PIZARRA_OUT = 240
+PIZARRA_FONDO = (28, 35, 28)    # #1C231C
+
+
+def build_pizarra():
+    for src, slug in ROSTER:
+        p = os.path.join(CAPS, src + "_check_front.png")
+        if not os.path.exists(p):
+            print("  FALTA", p)
+            continue
+        im = Image.open(p).convert("RGB")
+        im = im.crop(ventana_del_busto(im))
+        fondo = im.getpixel((2, 2))
+        seeds = ([(x, y) for x in range(1, im.width, 40)
+                  for y in (1, im.height - 2)]
+                 + [(x, y) for y in range(1, im.height, 40)
+                    for x in (1, im.width - 2)])
+        for xy in seeds:
+            px = im.getpixel(xy)
+            if all(abs(a - b) <= 26 for a, b in zip(px, fondo)):
+                ImageDraw.floodfill(im, xy, PIZARRA_FONDO, thresh=26)
+        im = im.resize((PIZARRA_OUT, PIZARRA_OUT), Image.LANCZOS)
+        im.save(out("assets", "pizarra", slug + ".webp"),
+                "WEBP", quality=84, method=6)
+    print("pizarra: %d retratos con fondo solido" % len(ROSTER))
+
+
 def build_shots():
     for src, slug in SHOTS:
         p = os.path.join(CAPS, src + ".png")
@@ -754,6 +794,7 @@ def auditar_album():
 if __name__ == "__main__":
     build_brand()
     build_roster()
+    build_pizarra()
     build_roster_json()
     equipos = build_equipos_json()
     build_escudos(equipos)
