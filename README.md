@@ -73,7 +73,7 @@ captura se queda debajo como respaldo.
 |---|---|---|---|---|
 | `assets/video/hero.mp4` | hero | juego de mitad de cancha — es fondo detrás del wordmark | 4,7 s | `1500:844:400:280` |
 | `assets/video/gol.mp4` | El gol | vaselina de Il Divino, palo, adentro y confeti | 4,2 s | `1728:972:288:138` |
-| `assets/video/firma.mp4` | firmas | El Martillazo | 3,0 s | `1400:788:452:250` |
+| `assets/video/firma.mp4` | firmas | El Martillazo: el rayo y dos rivales aplastados | 2,7 s | `1400:788:452:250` |
 | `assets/video/cajas.mp4` | cajas sorpresa | cuatro tramos: cae una caja, cancha inclinada, Pierluigi comprado y el colectivo | 14,7 s | `1728:972:288:138` |
 
 El de cajas es el único **concatenado**: cuatro tramos de ~3,7 s de momentos distintos del
@@ -124,9 +124,13 @@ Dos cosas que hubo que sacarle, y que van a volver a aparecer en cualquier captu
 Las dos se van con `crop=2304:1348:0:0`. Y conviene sacarla de la **grabación**, no de un
 screenshot del reproductor: el JPG que llegó tenía la barra de controles encima.
 
-### ⚠️ Lo que hay que mirar ANTES de cortar (captura del 12-ago-2026)
+### ⚠️ Lo que hay que mirar ANTES de cortar (capturas del 12-ago-2026)
 
-Los timestamps que llegan «del 5:12 al 5:20» casi nunca son la toma. En esa captura:
+Los cuatro clips salen de **dos** grabaciones distintas del 12-ago: `16-44-43` (7:10) da el
+hero, el gol y las cajas; `18-29-07` (3:54) da la firma. Cuando llega un timestamp hay que
+preguntar de cuál, porque los dos archivos empiezan en 00:00 y los rangos se parecen.
+
+Y los timestamps que llegan «del 5:12 al 5:20» casi nunca son la toma. En esas capturas:
 
 - **La cámara se mueve adentro del rango.** El colectivo estaba pedido de 5:12 a 5:20 y
   recién entra en cuadro a los **5:14,2**. Sacar una tira de contacto del rango (un frame
@@ -141,6 +145,10 @@ Los timestamps que llegan «del 5:12 al 5:20» casi nunca son la toma. En esa ca
   el gol no: el frame 0 del clip nuevo es un plano lejano con media tribuna, y la foto que
   ya estaba — desde atrás del arco, con el arquero — cuenta mejor la sección. Lo mismo con
   la foto de la caja sorpresa: en esta grabación la caja siempre queda chica y lejos.
+- **La firma cortada trae OTRA firma de fondo.** En el clip del Martillazo se ve una torre
+  blanca a la derecha: es «La Cerca», que alguien tiró un segundo antes. Es gameplay real
+  y el epígrafe habla del martillo, así que queda — pero conviene saberlo antes de que
+  alguien pregunte qué es esa escalera.
 
 ### El crop del hero bajó a `1500:844:400:280`
 
