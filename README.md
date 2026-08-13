@@ -590,6 +590,14 @@ FULBITO, que existe desde M85. Al tocar el menú del juego, actualizar la secci�
 álbum 28 vs 50; esta lista sigue siendo a mano porque son siete renglones con copy
 propio, pero el chequeo es: contar los ítems del array y contar los `<li>` del menú.)
 
+**Y no alcanza con contar los renglones: el TEXTO de cada uno también envejece.** El
+13-ago-2026 la web decía *"Copa Fulbito · 8 equipos — cuartos, semifinal y final"* y hacía
+rato que la COPA v2 son **16**, con fase de grupos antes del cuadro (`Copa.cs`:
+`NEq = 16, NGrupos = 4, PorGrupo = 4, Fechas = 3`). Además se juega de a dos
+(`MenuCopa.cs`, fila JUGADORES), y la web decía "1 mando o teclado". Cuando dudes de un
+número del copy, el número está en una constante del juego — buscalo ahí, no en el
+plan ni en el commit viejo que lo escribió.
+
 ## Legal
 
 Proyecto personal, sin fines comerciales. No está afiliado ni autorizado por ningún club,
