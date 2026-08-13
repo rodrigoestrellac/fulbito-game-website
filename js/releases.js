@@ -6,7 +6,7 @@
 
 const REPO = 'rodrigoestrellac/fulbito-game-website';
 
-/* Espejo estático del release M174. Actualizar al publicar uno nuevo.
+/* Espejo estático del release M180. Actualizar al publicar uno nuevo.
    Los bytes salen del release real (`gh release view --json assets`, stat sin
    redondeo): si no coinciden con el asset, la web muestra un tamaño equivocado
    justo cuando la API falla — o sea, justo cuando nadie lo va a poder verificar.
@@ -15,11 +15,11 @@ const REPO = 'rodrigoestrellac/fulbito-game-website';
    atrás y un tamaño que no era el del archivo. Es el paso del checklist que más
    fácil se saltea porque vive en OTRO repo. */
 const FALLBACK = {
-  tag: 'M174',
+  tag: 'M180',
   archivos: {
-    winSetup: { nombre: 'FulbitoSetup-M174.exe', bytes: 172162157 },
-    winZip:   { nombre: 'Fulbito-M174-windows.zip', bytes: 215183973 },
-    mac:      { nombre: 'Fulbito-M174-mac.zip', bytes: 225065978 },
+    winSetup: { nombre: 'FulbitoSetup-M180.exe', bytes: 174306214 },
+    winZip:   { nombre: 'Fulbito-M180-windows.zip', bytes: 220008691 },
+    mac:      { nombre: 'Fulbito-M180-mac.zip', bytes: 229929621 },
     checksums:{ nombre: 'CHECKSUMS.txt', bytes: 315 },
   },
 };
