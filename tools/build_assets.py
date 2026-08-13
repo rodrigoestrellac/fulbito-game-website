@@ -111,6 +111,11 @@ APROBADOS = {
     "titan", "payasito", "valdanito", "muneco", "jefecito",
     "maestro", "pinturicchio", "divino", "reyromano",
     "pato", "mono", "casillero", "dado", "doblev", "pinocho",
+    # 13-ago-2026 — TRENCINHO, que entra a EL SCRATCH en el lugar de PEPITO.
+    # Chequeo de marcas con zoom al torso sobre `trencinho_check_front.png`:
+    # camiseta bordo LISA (no es el magenta de Meshy, es un kit pintado), sin
+    # escudo ni sponsor ni numero; pantalon blanco con vivo bordo.
+    "trencinho",
 }
 
 # el archivo de captura cuando NO se llama como el id del juego
@@ -426,6 +431,39 @@ def build_escudos(equipos):
     print("escudos: %d" % len(equipos))
 
 
+SALTO = chr(10)
+
+# ⚠️ LA TARJETA DE CADA EQUIPO ES A MANO Y SE DESFASA EN SILENCIO. El 13-ago-2026
+# la web mostraba CUATRO formaciones viejas, un nombre viejo (BOKE JRS, que en el
+# juego ya era ATLETICO XENEIZE) y LA CANTERA con "Manuelito al arco" cuando su
+# arquero es PINOCHO desde siempre. Nada de eso rompe nada: la pagina se ve
+# perfecta, sólo miente. Por eso se compara contra `equipos.json`, que sí sale
+# del juego.
+def _tarjeta_desfasada(html, eq):
+    with open(os.path.join(WEB, "assets", "equipos", "equipos.json"),
+              encoding="utf-8") as f:
+        datos = json.load(f)
+    forma = datos["formaciones"][eq["form"]]["name"]
+    nombres = {i: n for i, _c, _s, n in ROSTER_JUEGO}
+    gk = " ".join(w[:1].upper() + w[1:].lower()
+                  for w in nombres.get(eq["gk"], eq["gk"]).split(" "))
+    i = html.find("assets/equipos/%s.webp" % eq["slug"])
+    ini = html.rfind('<li class="equipo', 0, i)
+    li = html[ini:html.find("</li>", i)]
+    fallas = []
+    for que, espera in (("nombre", ">%s</h3>" % eq["nombre"]),
+                        ("concepto", ">%s</p>" % eq["concepto"]),
+                        ("formacion", "<b>%s</b>" % forma),
+                        ("arquero", "%s al arco" % gk),
+                        ("barras", "<b>%d</b>" % eq["vel"])):
+        if espera not in li:
+            fallas.append(
+                ("TARJETA DESFASADA (%s) en %s: falta %r"
+                 % (que, eq["nombre"], espera))
+                + SALTO + "   -> el juego manda; corregi el <li> en index.html.")
+    return fallas
+
+
 def auditar_equipos(equipos):
     """Mismo contrato que `auditar_album`: las listas que tienen que decir lo
     mismo, comparadas — y si no, se grita. Devuelve False si hay problemas."""
@@ -462,6 +500,8 @@ def auditar_equipos(equipos):
         if ("assets/equipos/%s.webp" % eq["slug"]) not in html:
             problemas.append("SIN TARJETA EN index.html: %s (%s)"
                              % (eq["slug"], eq["nombre"]))
+        else:
+            problemas += _tarjeta_desfasada(html, eq)
     # ¿algun escudo huerfano en el juego que el catalogo no usa?
     import glob as _glob
     en_disco = {os.path.basename(p)[:-4]

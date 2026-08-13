@@ -194,6 +194,16 @@ ya está en el HTML, que además ya está descargada. Un `.jpg` aparte sería un
 ⚠️ **El still del hero sale del mismo clip** (`captures/web_hero_still.png`, con el mismo
 crop) para que no se vea el salto de encuadre cuando entra el video.
 
+⚠️ **Y el still HAY QUE REGENERARLO EN `game-unity/captures/`, no en `assets/img/`.**
+`assets/img/cancha-noche.webp` lo escribe `build_shots()` desde ese PNG en cada corrida
+del build. El 12-ago-2026 se cambió el hero editando sólo el `.webp`, y el primer
+`build_assets.py` que corrió después (13-ago) lo pisó con el encuadre viejo sin decir
+nada. El comando es el que está arriba, y después el build:
+
+```
+ffmpeg -y -ss 9.5 -i "<grabacion>" -frames:v 1 -vf "crop=1500:844:400:280"        game-unity/captures/web_hero_still.png
+```
+
 ## ⚠️ Chequeo de marcas — OBLIGATORIO antes de publicar cualquier imagen o video
 
 Nada donde se lea una marca registrada puede publicarse. El caso testigo fue `rc3b`
@@ -384,6 +394,14 @@ entera del juego, con el mismo contrato que el álbum:
   formación real y los retratos del álbum parados en sus slots.
 - `auditar_equipos()` grita si un equipo no tiene tarjeta en el HTML, si un id del
   catálogo no tiene retrato aprobado, o si hay escudos huérfanos.
+- **Y grita si la tarjeta MIENTE** (`_tarjeta_desfasada`): compara nombre, concepto,
+  formación, arquero y la barra VEL del `<li>` contra `equipos.json`. Esto no existía
+  hasta el 13-ago-2026, y por eso el sitio publicó durante semanas **cuatro formaciones
+  viejas** (POTRERO, MILLONETAS, LA VIEJA SEÑORA, LES PARISIENS), un equipo con el
+  **nombre viejo** (BOKE JRS, que en el juego ya era ATLÉTICO XENEIZE) y LA CANTERA con
+  *"Manuelito al arco"* cuando su arquero es PINOCHO. Ninguno de esos errores rompe
+  nada: la página se ve perfecta, sólo dice cosas falsas. **El texto de una tarjeta
+  envejece igual que un número, y a mano no se nota.**
 
 Para un equipo nuevo en el juego: correr `build_assets.py`, mirar el escudo nuevo con
 zoom, sumarlo a `ESCUDOS_APROBADOS`, y agregar su tarjeta en `index.html` (el build

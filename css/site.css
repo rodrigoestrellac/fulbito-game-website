@@ -1090,6 +1090,9 @@ code {
   color: var(--oro-claro);
 }
 
+/* el link al gameplay largo, abajo del texto de la banda del gol */
+.ver-entero { margin-top: var(--s4); font-size: .95rem; color: var(--cal-tenue); }
+
 /* los sueltos de la sección de descarga, que vivían como style="" en el HTML */
 .bajar__checksums { margin-top: var(--s4); }
 .subtitulo-suelto { margin-top: var(--s7); }

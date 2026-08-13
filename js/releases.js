@@ -185,6 +185,13 @@ function medirDescargas() {
       return;
     }
 
+    /* el gameplay largo se va del sitio: es la unica salida que vale la pena
+       medir, porque compite con el boton de bajar y hay que saber si suma. */
+    if (ev.target.closest?.('a[href*="youtu.be"], a[href*="youtube.com"]')) {
+      gtag('event', 'ver_gameplay', { desde: 'gol' });
+      return;
+    }
+
     const a = ev.target.closest?.('a[href*="/releases/"]');
     if (!a) return;
     const archivo = decodeURIComponent(a.href.split('/').pop() || '');
