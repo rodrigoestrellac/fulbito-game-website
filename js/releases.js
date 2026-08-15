@@ -6,20 +6,23 @@
 
 const REPO = 'rodrigoestrellac/fulbito-game-website';
 
-/* Espejo estático del release M183. Actualizar al publicar uno nuevo.
+/* Espejo estático del release M191. Actualizar al publicar uno nuevo.
    Los bytes salen del release real (`gh release view --json assets`, stat sin
    redondeo): si no coinciden con el asset, la web muestra un tamaño equivocado
    justo cuando la API falla — o sea, justo cuando nadie lo va a poder verificar.
    ⚠️ Se quedó en M133 durante DOS releases (M155 y M174 se publicaron sin tocarlo),
    así que cualquiera que cayera con la API caída veía una versión de tres semanas
    atrás y un tamaño que no era el del archivo. Es el paso del checklist que más
-   fácil se saltea porque vive en OTRO repo. */
+   fácil se saltea porque vive en OTRO repo.
+   ⚠️ Y VOLVIÓ A PASAR: se quedó en M183 durante M186 y M190. Van cuatro releases de
+   cinco en los que este archivo se olvidó. Si alguna vez se automatiza algo del
+   proceso de publicación, que sea esto. */
 const FALLBACK = {
-  tag: 'M183',
+  tag: 'M191',
   archivos: {
-    winSetup: { nombre: 'FulbitoSetup-M183.exe', bytes: 177548740 },
-    winZip:   { nombre: 'Fulbito-M183-windows.zip', bytes: 224653878 },
-    mac:      { nombre: 'Fulbito-M183-mac.zip', bytes: 234574859 },
+    winSetup: { nombre: 'FulbitoSetup-M191.exe', bytes: 180173289 },
+    winZip:   { nombre: 'Fulbito-M191-windows.zip', bytes: 228911200 },
+    mac:      { nombre: 'Fulbito-M191-mac.zip', bytes: 239039160 },
     checksums:{ nombre: 'CHECKSUMS.txt', bytes: 315 },
   },
 };
