@@ -6,7 +6,7 @@
 
 const REPO = 'rodrigoestrellac/fulbito-game-website';
 
-/* Espejo estático del release M191. Actualizar al publicar uno nuevo.
+/* Espejo estático del release M193. Actualizar al publicar uno nuevo.
    Los bytes salen del release real (`gh release view --json assets`, stat sin
    redondeo): si no coinciden con el asset, la web muestra un tamaño equivocado
    justo cuando la API falla — o sea, justo cuando nadie lo va a poder verificar.
@@ -18,12 +18,17 @@ const REPO = 'rodrigoestrellac/fulbito-game-website';
    cinco en los que este archivo se olvidó. Si alguna vez se automatiza algo del
    proceso de publicación, que sea esto. */
 const FALLBACK = {
-  tag: 'M191',
+  tag: 'M193',
   archivos: {
-    winSetup: { nombre: 'FulbitoSetup-M191.exe', bytes: 180173289 },
-    winZip:   { nombre: 'Fulbito-M191-windows.zip', bytes: 228911200 },
-    mac:      { nombre: 'Fulbito-M191-mac.zip', bytes: 239039160 },
-    checksums:{ nombre: 'CHECKSUMS.txt', bytes: 315 },
+    winSetup: { nombre: 'FulbitoSetup-M193.exe', bytes: 180222689 },
+    winZip:   { nombre: 'Fulbito-M193-windows.zip', bytes: 228917889 },
+    mac:      { nombre: 'Fulbito-M193-mac.zip', bytes: 239045946 },
+    /* ⚠️ ANDROID YA ESTÁ ACÁ, y antes no estaba a propósito: hasta M193 ningún
+       release traía el .apk y el espejo habría apuntado a un archivo inexistente.
+       Ahora existe, así que corresponde. Los bytes salen de la API del release
+       (`gh release view M193 --json assets`), sin redondear. */
+    android:  { nombre: 'Fulbito-M193-android.apk', bytes: 233257988 },
+    checksums:{ nombre: 'CHECKSUMS.txt', bytes: 407 },
   },
 };
 
@@ -117,7 +122,7 @@ function pintar(release) {
       { k: 'winSetup', so: 'Windows', que: 'Instalador. Se instala solo, sin permisos de administrador.' },
       { k: 'winZip', so: 'Windows', que: 'Portable. Lo descomprimís y ejecutás <em>Fulbito.exe</em>. Sirve si la PC no te deja instalar nada.' },
       { k: 'mac', so: 'macOS', que: '<em>Beta</em> — se empaquetó desde Windows y no lo probó nadie en un Mac de verdad. Si no te abre, contame.' },
-      { k: 'android', so: 'Android', que: 'Se juega con los dedos. Al abrir el archivo, el teléfono te va a pedir permiso para instalar «apps de orígenes desconocidos»: es el mismo aviso que da Windows con el instalador. Le das permiso y listo.' },
+      { k: 'android', so: 'Android', que: 'Se juega con los dedos. <em>Recién salido</em> — el control táctil se probó en un solo teléfono, así que si algo se siente raro contame. Al abrir el archivo, el teléfono te va a pedir permiso para instalar «apps de orígenes desconocidos»: es el mismo aviso que da Windows con el instalador. Le das permiso y listo.' },
     ];
     lista.innerHTML = filas.filter((f) => archivos[f.k]).map((f) => {
       const a = archivos[f.k];
@@ -180,7 +185,11 @@ async function cargar() {
     const data = releases.find((rel) => !rel.draft && !rel.prerelease);
     if (!data) return;
     const archivos = clasificar(data.assets || []);
-    if (!archivos.winSetup && !archivos.winZip && !archivos.mac) return; // release sin binarios: queda el fallback
+    /* ⚠️ `android` VA EN ESTA LISTA. Sin él, un release que trajera SÓLO el .apk se
+       descartaba entero y ni siquiera aparecía la fila de Android — la guarda decía
+       "release sin binarios" mirando tres plataformas de las cuatro. Es el mismo
+       descuido que tener el .apk clasificado y no ofrecido. */
+    if (!archivos.winSetup && !archivos.winZip && !archivos.mac && !archivos.android) return;
     pintar({ tag: data.tag_name, archivos });
   } catch (e) {
     console.info('[releases] queda el release estático:', e.message);
