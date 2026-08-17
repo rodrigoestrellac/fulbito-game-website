@@ -45,6 +45,11 @@ function clasificar(assets) {
     winSetup: buscar(/setup.*\.exe$/i),
     winZip: buscar(/windows.*\.zip$/i),
     mac: buscar(/mac.*\.zip$/i),
+    /* Android: `Fulbito-<TAG>-android.apk` (PLAN_ANDROID §3.E.1). ⚠️ NO está en
+       FALLBACK a propósito: hasta que un release traiga el .apk de verdad, el
+       espejo estático apuntaría a un archivo que no existe y daría 404 justo
+       cuando la API de GitHub falla. La fila se dibuja sola el día que aparezca. */
+    android: buscar(/android.*\.apk$/i),
     checksums: buscar(/^checksums.*\.txt$/i),
   };
 }
@@ -52,6 +57,10 @@ function clasificar(assets) {
 function detectarSO() {
   const ua = navigator.userAgent;
   const plat = navigator.userAgentData?.platform || navigator.platform || '';
+  /* ⚠️ Android se pregunta PRIMERO: su user-agent dice «Linux» y además «Android»,
+     y varios navegadores de celular mienten con el resto. Si quedara después del
+     test de Mac/Windows, un teléfono podría llevarse el .exe. */
+  if (/Android/i.test(ua)) return 'android';
   if (/Mac|iPhone|iPad|iPod/i.test(plat + ua)) return 'mac';
   if (/Win/i.test(plat + ua)) return 'win';
   return 'otro';
@@ -64,9 +73,15 @@ function pintar(release) {
   document.querySelectorAll('[data-rel="version"]').forEach((el) => { el.textContent = tag; });
 
   /* ── CTA principal: el archivo que le sirve a quien está mirando ── */
-  const principal = so === 'mac'
-    ? { a: archivos.mac, txt: 'Descargar para macOS' }
-    : { a: archivos.winSetup || archivos.winZip, txt: 'Descargar para Windows' };
+  /* ⚠️ Si entrás desde un Android y HAY apk, el botón grande es el apk: quien
+     abre la página desde el teléfono quiere jugar en el teléfono. Si todavía no
+     hay apk en el release, cae al camino de siempre y no se le ofrece un .exe
+     que no puede usar (por eso el `&& archivos.android`). */
+  const principal = so === 'android' && archivos.android
+    ? { a: archivos.android, txt: 'Descargar para Android' }
+    : so === 'mac'
+      ? { a: archivos.mac, txt: 'Descargar para macOS' }
+      : { a: archivos.winSetup || archivos.winZip, txt: 'Descargar para Windows' };
 
   document.querySelectorAll('[data-rel="cta"]').forEach((el) => {
     if (!principal.a) return;
@@ -102,6 +117,7 @@ function pintar(release) {
       { k: 'winSetup', so: 'Windows', que: 'Instalador. Se instala solo, sin permisos de administrador.' },
       { k: 'winZip', so: 'Windows', que: 'Portable. Lo descomprimís y ejecutás <em>Fulbito.exe</em>. Sirve si la PC no te deja instalar nada.' },
       { k: 'mac', so: 'macOS', que: '<em>Beta</em> — se empaquetó desde Windows y no lo probó nadie en un Mac de verdad. Si no te abre, contame.' },
+      { k: 'android', so: 'Android', que: 'Se juega con los dedos. Al abrir el archivo, el teléfono te va a pedir permiso para instalar «apps de orígenes desconocidos»: es el mismo aviso que da Windows con el instalador. Le das permiso y listo.' },
     ];
     lista.innerHTML = filas.filter((f) => archivos[f.k]).map((f) => {
       const a = archivos[f.k];

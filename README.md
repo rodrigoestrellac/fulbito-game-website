@@ -74,11 +74,11 @@ captura se queda debajo como respaldo.
 | `assets/video/hero.mp4` | hero | juego de mitad de cancha — es fondo detrás del wordmark | 4,7 s | `1500:844:400:280` |
 | `assets/video/gol.mp4` | El gol | vaselina de Il Divino, palo, adentro y confeti | 4,2 s | `1728:972:288:138` |
 | `assets/video/firma.mp4` | firmas | El Martillazo: el rayo y dos rivales aplastados | 2,7 s | `1400:788:452:250` |
-| `assets/video/cajas.mp4` | cajas sorpresa | cuatro tramos: cae una caja, cancha inclinada, Pierluigi comprado y el colectivo | 14,7 s | `1728:972:288:138` |
+| `assets/video/cajas.mp4` | cajas sorpresa | cuatro tramos: cae una caja, cancha inclinada, Calvino comprado y el colectivo | 14,7 s | `1728:972:288:138` |
 
 El de cajas es el único **concatenado**: cuatro tramos de ~3,7 s de momentos distintos del
 mismo partido, pegados con `-f concat -c copy`. Va con el crop ancho porque ahí el
-**cartel del juego es el contenido**: sin «¡PIERLUIGI SE PUSO LA CAMISETA!» el tramo del
+**cartel del juego es el contenido**: sin «¡CALVINO SE PUSO LA CAMISETA!» el tramo del
 árbitro es un muñequito amarillo cualquiera. Ojo que el cartel muestra lo último que pasó,
 no el efecto: en el tramo del colectivo dice «¡SUPER TIRO!» y cosas así. Es charla del
 juego, no un error.
