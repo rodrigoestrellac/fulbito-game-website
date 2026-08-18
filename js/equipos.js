@@ -1,6 +1,6 @@
 /* equipos.js — el catálogo se vuelve pizarra de DT.
    Mismo contrato progresivo que roster.js: sin JS queda la grilla estática
-   completa del HTML (los 27 con escudo, concepto, formación y barras), y esto
+   completa del HTML (los 31 con escudo, concepto, formación y barras), y esto
    sólo AGREGA la ficha que se abre al tocar una tarjeta. Los datos salen de
    assets/equipos/equipos.json, que build_assets.py deriva del juego —
    incluidos los SLOTS de cada formación, que es lo que permite parar a los
@@ -10,9 +10,11 @@ const menosMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').ma
 
 /* «SCALONETA 22» → «Scaloneta 22» — para los nombres de jugador y el aria.
    El NOMBRE del equipo se muestra como grita el juego (mayúsculas): es el
-   marcador, no un párrafo. */
+   marcador, no un párrafo.
+   La letra que sigue a un apóstrofo también sube (D'Artagnan). */
 const componer = (s) => s.toLowerCase().replace(/\S+/g, (w) =>
-  /\d/.test(w) ? w.toUpperCase() : w.charAt(0).toUpperCase() + w.slice(1));
+  /\d/.test(w) ? w.toUpperCase()
+                : w.replace(/(^|['’])(\S)/g, (_, a, c) => a + c.toUpperCase()));
 
 async function montarEquipos() {
   const grilla = document.querySelector('.equipos');

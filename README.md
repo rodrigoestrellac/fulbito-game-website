@@ -326,8 +326,19 @@ rompería enlaces y SEO sin que nadie lo pida. Los 28 publicados quedan congelad
 derivación deja de coincidir, el script lo dice y sigue publicando el viejo. Renombrar
 una URL tiene que ser una decisión, no un efecto secundario.
 
-**Estado: los 52** (48 de campo + 4 arqueros). Los 22 que entraron el 3-ago pasaron el
-chequeo de marcas con zoom al torso: todos con el kit magenta liso de Meshy, sin escudo
+**Estado: los 85** (71 de campo + 14 arqueros), al 18-ago-2026. Los DIECISÉIS de
+M194/M194b/M195/M195b-c entraron con el mismo chequeo: kit magenta liso de Meshy,
+short blanco, sin escudo ni sponsor. Los cuatro arqueros nuevos llevan el guante
+rojo/negro de Meshy, con un garabato claro en el nudillo que no es una marca
+legible — y que igual queda FUERA del recorte del busto, que corta arriba de los
+hombros.
+
+⚠️ **Los slugs ya no llevan apóstrofo** (18-ago, D'ARTAGNAN → `dartagnan`): el slug
+es a la vez nombre de archivo y fragmento del deep-link `#cromo/<slug>`, y una
+comilla obliga a escaparlo en los tres lugares. Ninguno de los 28 congelados tenía,
+así que no renombró nada publicado.
+
+Los 22 que entraron el 3-ago pasaron el chequeo de marcas con zoom al torso: todos con el kit magenta liso de Meshy, sin escudo
 ni sponsor. El único que asustaba era **El Faraón** por las rayas azul/oro — pero es el
 **nemes**, el tocado de faraón, no una camiseta. Iceman y El General (M111, 5-ago)
 pasaron el mismo chequeo: kit magenta liso los dos.
@@ -374,7 +385,7 @@ python tools/build_assets.py
 
 ## Los equipos — el catálogo, la pizarra y los escudos (12-ago-2026)
 
-Desde M153 el juego se juega POR EQUIPOS: un catálogo de 27 con nombre, concepto,
+Desde M153 el juego se juega POR EQUIPOS: un catálogo de 31 (27 hasta M195b) con nombre, concepto,
 formación, arquero y barras VEL/FUE/PRE. La sección LOS EQUIPOS del sitio se deriva
 entera del juego, con el mismo contrato que el álbum:
 
@@ -406,6 +417,21 @@ entera del juego, con el mismo contrato que el álbum:
 Para un equipo nuevo en el juego: correr `build_assets.py`, mirar el escudo nuevo con
 zoom, sumarlo a `ESCUDOS_APROBADOS`, y agregar su tarjeta en `index.html` (el build
 dice exactamente qué falta).
+
+**Corrida del 18-ago-2026 (M195c): 31/31 exactos** contra `PocEquipos.SimEquipos`
+(`tools/verificar_barras.py`). Vale la pena volver a correrlo cada vez que entra
+gente al pool: las barras son z-scores contra los jugadores DE CAMPO, así que al
+pasar de 55 a 71 se movieron **las 31**, incluidas las de equipos que nadie tocó.
+No es un bug, es la definición de la barra — pero significa que el `<li>` de CADA
+tarjeta queda viejo, y de eso avisa `_tarjeta_desfasada`.
+
+Los cuatro escudos de M195b/c pasaron el chequeo: `beatles` (cuatro siluetas
+mop-top alrededor de una pelota — dibuja la BANDA, no el escudo del club de la
+ciudad), `leones` (tres cabezas de león doradas, heráldica inglesa genérica, mismo
+criterio que `culebra` con el biscione), `bleus` (el gallo galo con la banda
+tricolor, emblema nacional, sin hexágono ni siglas) y `artilleros` (DOS cañones
+cruzados con balas: el escudo real de los Gunners es UN cañón solo y lleva el
+nombre escrito).
 
 ## La pelota y el ícono
 

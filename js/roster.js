@@ -51,6 +51,13 @@ const FIRMAS_DESC = {
   'EL ARAÑAZO': 'Tres garras que tajean DOS veces: la primera tanda voltea, y al que se corrió lo espera la segunda medio segundo después.',
   'LA PINTURA': 'Vuelca un balde de pintura unos metros adelante y la mancha queda ocho segundos en el pasto: el que la pisa, patina.',
   'IL MIRACOLO': 'La única firma que no le hace nada a nadie: levanta a los compañeros caídos en seis metros y les deja un envión. Divino.',
+  'EL EXPRESO': 'Se sube a una locomotora y sale tres segundos y medio a un tercio más de lo que corre: voltea todo lo que tenga adelante, pero no dobla — el que se corre al costado se salva.',
+  'LA ATALAYA': 'Planta una torre que se queda ocho segundos tirando una flecha por segundo al rival de pie más cercano en cinco metros y medio. Cada flechazo deja tirado casi dos segundos.',
+  'EL SUSTO': 'Levanta los brazos y ruge: los rivales a cinco metros salen en desbandada dos segundos y pico, pálidos y corriendo más rápido que nunca. El que llevaba la pelota, la suelta.',
+  'LOS FANTASMAS': 'Salen tres señuelos idénticos y él se mezcla entre ellos: casi dos segundos y medio en los que el rival no sabe a cuál seguir.',
+  'EL INTOCABLE': 'Cuatro segundos y medio en los que no le pueden hacer una falta: le entran y sigue como si nada. No voltea a nadie — a una liana o un hacha se cae igual que cualquiera.',
+  'LA REMONTADA': 'La única que sólo se puede tirar si vas perdiendo: seis segundos de envión para TODO el equipo, un rayo rojo a cada compañero, un veintidós por ciento más de velocidad y un veinte por ciento más de pegada.',
+  'EN GARDE': 'Saca el florete: la estocada se lleva puesto al rival más cercano en tres metros, y quedan dos segundos y pico de guardia en los que el que le tira una entrada termina en el piso — y tampoco le pueden robar.',
   'ARQUERO': 'Ataja. Que no es poco: en Fulbito los arqueros vuelan de verdad.',
 };
 
@@ -73,9 +80,11 @@ const punteroFino = window.matchMedia('(hover: hover) and (pointer: fine)').matc
 
 /* «EL VIKINGO» → «El Vikingo» — el JSON trae los nombres como los grita el HUD
    del juego (mayúsculas); acá se componen como en el resto de la página.
-   Una palabra con dígitos queda toda en mayúsculas: CR007, no Cr007. */
+   Una palabra con dígitos queda toda en mayúsculas: CR007, no Cr007.
+   Y la letra que sigue a un apóstrofo también sube: D'Artagnan, no D'artagnan. */
 const componer = (s) => s.toLowerCase().replace(/\S+/g, (w) =>
-  /\d/.test(w) ? w.toUpperCase() : w.charAt(0).toUpperCase() + w.slice(1));
+  /\d/.test(w) ? w.toUpperCase()
+                : w.replace(/(^|['’])(\S)/g, (_, a, c) => a + c.toUpperCase()));
 
 async function montarAlbum() {
   const album = document.querySelector('.album');

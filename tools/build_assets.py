@@ -116,6 +116,18 @@ APROBADOS = {
     # camiseta bordo LISA (no es el magenta de Meshy, es un kit pintado), sin
     # escudo ni sponsor ni numero; pantalon blanco con vivo bordo.
     "trencinho",
+    # 18-ago-2026 — los DIECISEIS que entraron con M194/M194b/M195/M195b-c: los
+    # once de M194, los cuatro de THE RED BEATLES y los tres arqueros nuevos
+    # (barbab, julito, chauve) mas aquaman. Chequeo de marcas hecho sobre los
+    # `_check_front.png` recien rendereados (contact sheet + zoom al torso y a
+    # los guantes): los dieciseis llevan el kit magenta liso de Meshy, short
+    # blanco, sin escudo, sin sponsor y sin numero. Los cuatro arqueros usan el
+    # guante rojo/negro de Meshy: el garabato claro del nudillo es ruido de la
+    # textura, no una marca legible — y ademas cae FUERA del recorte del busto,
+    # que corta arriba de los hombros.
+    "mamut", "torre", "monstro", "patricio", "colorado", "relojero", "capitan",
+    "nino", "titi", "dartagnan", "ashley", "lili",
+    "barbab", "julito", "chauve", "aquaman",
 }
 
 # el archivo de captura cuando NO se llama como el id del juego
@@ -148,8 +160,15 @@ def _sin_acentos(s):
 
 
 def slug_de(nombre):
-    """`EL VIKINGO` -> `el-vikingo`. Reproduce EXACTO los 28 slugs ya publicados."""
-    s = _sin_acentos(nombre).lower().strip()
+    """`EL VIKINGO` -> `el-vikingo`. Reproduce EXACTO los 28 slugs ya publicados.
+
+    ⚠️ Se sacan los apóstrofos (18-ago-2026, D'ARTAGNAN): el slug es a la vez
+    NOMBRE DE ARCHIVO y fragmento de URL del deep-link `#cromo/<slug>`, y un
+    `d'artagnan.webp` obliga a escapar la comilla en cada uno de los tres
+    lugares (disco, href, comparación en JS). Ninguno de los 28 congelados
+    tiene apóstrofo, así que esto no renombra nada publicado.
+    """
+    s = _sin_acentos(nombre).lower().strip().replace("'", "").replace("’", "")
     return "-".join(p for p in s.replace("/", " ").split(" ") if p)
 
 
@@ -317,6 +336,16 @@ ESCUDOS_APROBADOS = {
     "galacticos", "jogobonito", "rompehuesos", "vikingos", "ultimotango",
     "potrero", "indomables", "millonetas", "tikitaka", "culebra", "diavolo",
     "viejasenora", "teatro", "parisiens", "cantera", "azzurri",
+    # 18-ago-2026 — los CUATRO de M195b/c. Mirados con zoom: ninguno reproduce
+    # un escudo registrado ni lleva texto. beatles = cuatro siluetas mop-top
+    # alrededor de una pelota (dibuja la BANDA, no el escudo del club de la
+    # ciudad); leones = tres cabezas de leon doradas sobre azul, heraldica
+    # inglesa generica (mismo criterio que `culebra` con el biscione); bleus =
+    # el gallo galo sobre azul con la banda tricolor, emblema nacional, sin
+    # hexagono ni siglas; artilleros = DOS canones cruzados con balas de canon,
+    # heraldica de artilleria — el escudo real de los Gunners es UN canon solo
+    # y lleva el nombre escrito.
+    "beatles", "leones", "artilleros", "bleus",
 }
 
 ESCUDO_OUT = 256    # los PNG fuente son 256×256; se convierten sin escalar
