@@ -128,6 +128,11 @@ APROBADOS = {
     "mamut", "torre", "monstro", "patricio", "colorado", "relojero", "capitan",
     "nino", "titi", "dartagnan", "ashley", "lili",
     "barbab", "julito", "chauve", "aquaman",
+    # 19-ago-2026 — los CINCO de M196. Mismo chequeo sobre los
+    # `_check_front.png` recien rendereados (cuerpo entero + zoom al torso):
+    # kit magenta liso de Meshy, short blanco, sin escudo, sin sponsor y sin
+    # numero los cinco.
+    "bombardero", "elefante", "hummus", "kaiser", "cruyff",
 }
 
 # el archivo de captura cuando NO se llama como el id del juego
@@ -346,6 +351,19 @@ ESCUDOS_APROBADOS = {
     # heraldica de artilleria — el escudo real de los Gunners es UN canon solo
     # y lleva el nombre escrito.
     "beatles", "leones", "artilleros", "bleus",
+    # 19-ago-2026 — los CUATRO de M196. Los cuatro dibujan HERALDICA
+    # NACIONAL O REGIONAL, que es dominio publico, y ninguno lleva texto ni la
+    # marca de la federacion: mannschaft = el aguila federal con la banda
+    # negro/rojo/oro (no el aguila del DFB, que va con siglas); naranja = el
+    # leon rampante naranja sobre azul (armas de los Paises Bajos, no el
+    # escudo de la KNVB); bavaros = la corona sobre los rombos blanquiazules
+    # (la BANDERA DE BAVIERA, mismo criterio que `culebra` con el biscione).
+    # ⚠️ El mas al limite es `aristocratas`: cetro + rosa blanca sobre azul y
+    # oro toma el VOCABULARIO heraldico del club de Londres, pero no su leon
+    # rampante ni el disco, y va sin nombre. Se aprueba con el mismo criterio
+    # que `boke` (azul/oro con ancla y estrellas) y `millonetas` (banda roja
+    # sin monograma) — si alguna vez se afina la regla, empezar por este.
+    "mannschaft", "naranja", "aristocratas", "bavaros",
 }
 
 ESCUDO_OUT = 256    # los PNG fuente son 256×256; se convierten sin escalar

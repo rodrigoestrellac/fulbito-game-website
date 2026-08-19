@@ -58,6 +58,9 @@ const FIRMAS_DESC = {
   'EL INTOCABLE': 'Cuatro segundos y medio en los que no le pueden hacer una falta: le entran y sigue como si nada. No voltea a nadie — a una liana o un hacha se cae igual que cualquiera.',
   'LA REMONTADA': 'La única que sólo se puede tirar si vas perdiendo: seis segundos de envión para TODO el equipo, un rayo rojo a cada compañero, un veintidós por ciento más de velocidad y un veinte por ciento más de pegada.',
   'EN GARDE': 'Saca el florete: la estocada se lleva puesto al rival más cercano en tres metros, y quedan dos segundos y pico de guardia en los que el que le tira una entrada termina en el piso — y tampoco le pueden robar.',
+  'LA ASPIRADORA': 'Tres segundos de imán: la pelota suelta que le pase a tres metros y medio se curva sola hacia él. No corre a buscarla — se para en el carril del pase y espera.',
+  'EL CORTOCIRCUITO': 'Un chispazo que llega a doce metros y APAGA las firmas rivales que estén prendidas — gigante, turbo, pitbull, guardia, lo que sea. Y de paso le vacía media barra al medidor del otro equipo.',
+  'LA CRUYFF': 'El giro de 1974: frena, la esconde y sale para el otro lado a un tercio más de velocidad. El que lo marcaba sigue de largo casi un segundo, mirando dónde quedó.',
   'ARQUERO': 'Ataja. Que no es poco: en Fulbito los arqueros vuelan de verdad.',
 };
 

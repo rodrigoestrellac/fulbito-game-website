@@ -326,7 +326,11 @@ rompería enlaces y SEO sin que nadie lo pida. Los 28 publicados quedan congelad
 derivación deja de coincidir, el script lo dice y sigue publicando el viejo. Renombrar
 una URL tiene que ser una decisión, no un efecto secundario.
 
-**Estado: los 85** (71 de campo + 14 arqueros), al 18-ago-2026. Los DIECISÉIS de
+**Estado: los 90** (76 de campo + 14 arqueros), al 19-ago-2026 (M196). Los cinco
+de M196 pasaron el mismo chequeo: kit magenta liso, short blanco, sin escudo ni
+sponsor.
+
+Antes, al 18-ago: los 85. Los DIECISÉIS de
 M194/M194b/M195/M195b-c entraron con el mismo chequeo: kit magenta liso de Meshy,
 short blanco, sin escudo ni sponsor. Los cuatro arqueros nuevos llevan el guante
 rojo/negro de Meshy, con un garabato claro en el nudillo que no es una marca
@@ -385,7 +389,7 @@ python tools/build_assets.py
 
 ## Los equipos — el catálogo, la pizarra y los escudos (12-ago-2026)
 
-Desde M153 el juego se juega POR EQUIPOS: un catálogo de 31 (27 hasta M195b) con nombre, concepto,
+Desde M153 el juego se juega POR EQUIPOS: un catálogo de 35 (27 hasta M195b, 31 hasta M196) con nombre, concepto,
 formación, arquero y barras VEL/FUE/PRE. La sección LOS EQUIPOS del sitio se deriva
 entera del juego, con el mismo contrato que el álbum:
 
@@ -418,7 +422,7 @@ Para un equipo nuevo en el juego: correr `build_assets.py`, mirar el escudo nuev
 zoom, sumarlo a `ESCUDOS_APROBADOS`, y agregar su tarjeta en `index.html` (el build
 dice exactamente qué falta).
 
-**Corrida del 18-ago-2026 (M195c): 31/31 exactos** contra `PocEquipos.SimEquipos`
+**Corrida del 19-ago-2026 (M196): 35/35 exactos** (y 31/31 el 18-ago) contra `PocEquipos.SimEquipos`
 (`tools/verificar_barras.py`). Vale la pena volver a correrlo cada vez que entra
 gente al pool: las barras son z-scores contra los jugadores DE CAMPO, así que al
 pasar de 55 a 71 se movieron **las 31**, incluidas las de equipos que nadie tocó.
@@ -432,6 +436,21 @@ criterio que `culebra` con el biscione), `bleus` (el gallo galo con la banda
 tricolor, emblema nacional, sin hexágono ni siglas) y `artilleros` (DOS cañones
 cruzados con balas: el escudo real de los Gunners es UN cañón solo y lleva el
 nombre escrito).
+
+⚠️ **El `concepto` de un equipo también se re-escribe, y casi siempre para SACAR
+una marca.** El 19-ago el juego cambió cuatro y la web venía publicando los
+viejos: «el United de los 2000» → «los diablos de los 2000»; «la MNM: Messi, Ney
+y Mbappé» → «la MNM: la Pulga, Ney y la Tortuga»; «Anfield: dos atrás…» → «dos
+atrás…»; «Vieira y Thuram atrás» → «Patricio y Lili atrás». O sea: los nombres
+reales que el juego se sacó de encima seguían **publicados en el sitio**. Por eso
+las 35 tarjetas se REGENERAN desde `equipos.json` en cada pasada, en vez de tocar
+sólo las que el build señala.
+
+Los cuatro escudos de M196 (`mannschaft`, `naranja`, `bavaros`, `aristocratas`)
+dibujan heráldica nacional o regional — águila federal, león rampante neerlandés,
+rombos de Baviera — que es dominio público y no la marca de la federación. El más
+al límite es `aristocratas`: toma el vocabulario (cetro, rosa blanca, azul y oro)
+del club de Londres pero no su león ni el disco, y va sin nombre.
 
 ## La pelota y el ícono
 
