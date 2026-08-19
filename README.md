@@ -661,6 +661,38 @@ rato que la COPA v2 son **16**, con fase de grupos antes del cuadro (`Copa.cs`:
 número del copy, el número está en una constante del juego — buscalo ahí, no en el
 plan ni en el commit viejo que lo escribió.
 
+**19-ago-2026 — reescrita entera, y hacía rato que mentía.** Seguían siete renglones,
+así que el chequeo de CONTAR daba verde mientras cinco de los siete decían otra cosa
+que el juego:
+
+- **M155 fusionó los tres modos de partido en AMISTOSO** y la web todavía los listaba
+  por separado («Partido 7v7», «2 jugadores · juntos vs CPU», «2 jugadores · uno contra
+  otro»). Ahora el modo lo decide la pantalla ELEGIR LADOS, que es una fila sola.
+- **Faltaba AMISTOSO ONLINE · 1v1** (PLAN_ONLINE F5, en el juego desde M186).
+- **Faltaba PENALES · TANDA** (M189), y «Penales · potrero» ya no existe con ese nombre
+  ni con esa mecánica: desde M187 el potrero corre en la escena `Match`, y desde M189 es
+  **vos y el arquero** — `MatchDirector` deja `azules = 1, rojos = 0`. La web decía «vas
+  cambiando de jugador para probarlos a todos», que era el potrero de M5; **no hay a
+  quién cambiar**, hay un solo jugador de campo. La misma frase estaba en la bajada del
+  ÁLBUM y también se corrigió.
+- **Cuatro jugadores en la misma PC** desde M191 (`SlotsVivos`): la web decía dos, ahí y
+  en la meta description.
+- El gancho del CTA decía *«Los siete están desde el primer día»* — falso desde que
+  entró el online, y además es una nota de producción de las que prohíbe la sección de
+  arriba.
+
+⚠️ **El chequeo bueno no es contar: es leer el array al lado de la lista.** Los labels de
+la web salen de `Items` en `MenuDirector.cs`, en su orden; lo que hace cada modo sale del
+despacho de abajo (`scene == "potrero"`, `"tanda"`, `"vs"`…) y de los `const` del juego,
+no del nombre de la fila.
+
+**PENDIENTE (19-ago):** M196 agrupó el catálogo en TRES LIGAS (`Equipos.LigaNombre` =
+EQUIPOS · SELECCIONES · COMBINADOS FULBITO) y el selector elige en dos pasos —liga y
+después equipo—, en el amistoso y, desde M197, también en la Copa. La sección LOS EQUIPOS
+no lo cuenta y `assets/img/selector-equipos.webp` es la captura del selector viejo. No se
+tocó porque además hay que RE-CAPTURAR la pantalla, y porque nada de esto está todavía en
+un release descargable (el último es M193).
+
 ## Legal
 
 Proyecto personal, sin fines comerciales. No está afiliado ni autorizado por ningún club,
