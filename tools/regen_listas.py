@@ -15,9 +15,12 @@ cuatro formaciones viejas, un equipo con el nombre viejo, EL CEREBRO con la firm
 tenia antes de M194, y cuatro conceptos de los que el juego ya se habia despegado
 JUSTAMENTE para sacar un nombre real.
 
-Y hay un modo de falla peor, que es el que obliga a regenerar TODO y no solo lo que
-cambio: **las barras VEL/FUE/PRE son z-scores contra el pool de campo**. Un jugador
-nuevo en el juego mueve las 37 tarjetas, incluidas las de equipos que nadie toco.
+⚠️ HASTA M213 habia un modo de falla peor, y conviene saber que se fue: las barras eran
+z-scores contra el pool, o sea SUMA CERO — un jugador nuevo movia las 37 tarjetas,
+incluidas las de equipos que nadie toco. Desde M213 la escala es absoluta (anclas fijas
+en `Equipos.cs`), asi que una tarjeta solo cambia si cambio ESE equipo. Regenerar todo
+sigue siendo lo correcto —es barato y no depende de acordarse de nada— pero ya no es
+obligatorio por este motivo.
 
 `_tarjeta_desfasada` (en build_assets.py) es el detector; esto es la cura.
 
@@ -97,7 +100,8 @@ def tarjeta_equipo(eq, formas, nombres):
         '<dd><i style="--v:%d"></i><b>%d</b></dd></div>' % (largo, corto, v, v)
         for largo, corto, v in (("Velocidad", "VEL", eq["vel"]),
                                 ("Fuerza", "FUE", eq["fue"]),
-                                ("Precisión", "PRE", eq["pre"])))
+                                ("Precisión", "PRE", eq["pre"]),
+                                ("Defensa", "DEF", eq["def"])))
     return (
         '            <li class="equipo rev">' + NL +
         '              <img class="equipo__escudo" src="assets/equipos/%s.webp"'

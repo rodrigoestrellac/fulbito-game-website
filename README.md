@@ -430,16 +430,25 @@ python tools/build_assets.py
 
 Desde M153 el juego se juega POR EQUIPOS: un catálogo de 37 (27 hasta M195b, 31 hasta M196,
 35 hasta M206) con nombre, concepto,
-formación, arquero y barras VEL/FUE/PRE. La sección LOS EQUIPOS del sitio se deriva
+formación, arquero y barras VEL/FUE/PRE/DEF. La sección LOS EQUIPOS del sitio se deriva
 entera del juego, con el mismo contrato que el álbum:
 
 - **`assets/equipos/equipos.json`**: `build_assets.py` parsea `Equipos.Catalogo`,
   `EscudoId`, `AbrevId` y `MatchTuning.Formations` (con los SLOTS reales de cada
   esquema — de ahí sale la mini-cancha de la ficha, no de un dibujito).
-- **Las barras se RECALCULAN** con la réplica exacta de `Equipos.Barra()` (z contra el
-  pool de campo, σ/√6, escala 15, clamp 10–95). Verificada contra la salida real de
-  `PocEquipos.SimEquipos`: 27/27 exactos. Si dudás, corré `tools/verificar_barras.py`
-  con un log fresco de SimEquipos — un DIFF ahí significa que la réplica quedó vieja.
+- **Las barras se RECALCULAN** con la réplica exacta de `Equipos.Barra()`. Verificada
+  contra la salida real de `PocEquipos.SimEquipos`; si dudás, corré
+  `tools/verificar_barras.py` con un log fresco — un DIFF ahí significa que la réplica
+  quedó vieja.
+  ⚠️ **M213 cambió la fórmula entera y son CUATRO barras.** Entró DEFENSA (`marca` pura,
+  el noveno atributo) porque las tres viejas eran tres formas de medir atacar, y se fue
+  el z-score: ahora cada eje se mapea contra un rango FIJO (`AnclaLo`/`AnclaHi`, clamp
+  5–99). Las anclas y los diales se **leen** de los `.cs`, nunca se copian.
+  ⚠️⚠️ **Y la réplica va en `float32`.** El juego es C# con `float` de 32 bits de punta
+  a punta; hacer la cuenta en `double` daba 35/37 — EL SCRATCH y LA CANTERA caían del
+  otro lado del `.5` al redondear. Eso no se ve como un error, se ve como un punto de
+  barra. Si algún día se toca `_eje` o `barras_del_catalogo`, cada constante va envuelta
+  en `f32()`: numpy promueve a float64 en cuanto se mezcla con un float de Python.
 - **Escudos**: `Resources/Escudos/*.png` → `assets/equipos/*.webp`. Mismo mecanismo de
   chequeo de marcas que el álbum: cada slug tiene que estar en `ESCUDOS_APROBADOS` o el
   build termina en error. Son las parodias de `gen_escudos.py`; la regla es que el
@@ -486,11 +495,14 @@ de la camiseta sí, la marca no.
 
 **Corrida del 25-ago-2026 (M210): 37/37 exactos** (35/35 el 19-ago, 31/31 el 18-ago)
 contra `PocEquipos.SimEquipos`
-(`tools/verificar_barras.py`). Vale la pena volver a correrlo cada vez que entra
-gente al pool: las barras son z-scores contra los jugadores DE CAMPO, así que al
-pasar de 55 a 71 se movieron **las 31**, incluidas las de equipos que nadie tocó.
-No es un bug, es la definición de la barra — pero significa que el `<li>` de CADA
-tarjeta queda viejo, y de eso avisa `_tarjeta_desfasada`.
+(`tools/verificar_barras.py`). **Corrida del 26-ago-2026 (M213): 37/37 exactos en las
+CUATRO barras.**
+
+⚠️ Hasta M213 había que correrlo cada vez que entraba gente al pool, porque las barras
+eran z-scores: al pasar de 55 a 71 jugadores se movieron **las 31**, incluidas las de
+equipos que nadie tocó. Eso se terminó con la escala absoluta. Lo que sigue en pie es
+correrlo cuando cambie la FÓRMULA —los pesos de un eje, las anclas, `ArcadeMul`,
+`PaceTopMul`—, que es cuando la réplica de Python puede quedar vieja en silencio.
 
 Los cuatro escudos de M195b/c pasaron el chequeo: `beatles` (cuatro siluetas
 mop-top alrededor de una pelota — dibuja la BANDA, no el escudo del club de la
@@ -529,9 +541,10 @@ python tools/regen_listas.py     # 2) los <li> de las tres grillas, desde los JS
 python tools/build_assets.py     # 3) tiene que dar VERDE
 ```
 
-⚠️ **Se regeneran LAS TRES ENTERAS, no sólo lo que el build señala.** Las barras
-VEL/FUE/PRE son z-scores contra el pool DE CAMPO: un jugador nuevo mueve las 37 tarjetas,
-incluidas las de equipos que nadie tocó. `regen_listas.py` reescribe sólo lo que hay
+⚠️ **Se regeneran LAS TRES ENTERAS**, que es barato y no depende de acordarse de nada.
+(Hasta M213 era además obligatorio: las barras eran z-scores y un jugador nuevo movía
+las 37 tarjetas. Con la escala absoluta, una tarjeta sólo cambia si cambió ESE equipo.)
+`regen_listas.py` reescribe sólo lo que hay
 entre `<ul>` y `</ul>`; el copy editorial (bajadas, contadores, secciones) sigue siendo a
 mano y hay que revisarlo aparte — es el que envejece sin que nada grite.
 

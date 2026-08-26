@@ -26,6 +26,7 @@ import json
 import os
 import re
 import sys
+import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  # p/ importar build_icono
@@ -237,18 +238,38 @@ ROSTER = [(cap, slug) for _id, cap, slug, _n in ROSTER_JUEGO]
 # MatchDirector.cs (`"id" => "LA FIRMA (F)"`) — la unica lista del juego que
 # nombra la firma de CADA id (la web decia que El Kuni tenia "El Fenomeno" y en
 # el juego su firma es "EL KUNI": exactamente el bug que esto elimina).
+# ⚠️ M213 — NUEVE, NO OCHO. `marca` es el primer atributo defensivo del juego y
+# entro porque Rodrigo pregunto *"¿por que un equipo de marca va a ser peor?"*: los
+# ocho de antes eran de ataque o de fisico, asi que a un defensor se lo describia por
+# RESTA. Ademas pesa en `DoTackle`, que hasta M213 calculaba el forcejeo solo con los
+# atributos DE LA VICTIMA.
 STAT_KEYS = ("ritmo", "pegada", "comba", "control",
-             "fuerza", "precision", "pase", "gambeta")
+             "fuerza", "precision", "pase", "gambeta", "marca")
 
 
 def stats_del_juego():
     """{id: {stat: multiplicador}} + {id: zurdo} desde los P(...) del juego."""
     txt = open(MATCHTUNING, encoding="utf-8").read()
-    # la compresion del techo de velocidad (M65) se aplica en la fabrica P():
-    # el multiplicador ESCRITO no es el que juega — hay que replicarla aca o
-    # la web publicaria numeros que el juego ya no usa
+    # ⚠️ LA TABLA QUE SE LEE NO ES LA QUE JUEGA, y ahora por DOS motivos: la fabrica
+    # `P()` transforma los numeros escritos antes de guardarlos, asi que replicar eso
+    # aca no es prolijidad — sin esto la web publica numeros que el juego no usa.
+    #   1. M65, `PaceTopMul`: lo que esta por encima de `PaceKnee` se comprime hacia la
+    #      rodilla. Es monotona, o sea que no crea empates ni invierte el orden.
+    #   2. M213, `ArcadeMul`: los OTROS OCHO se comprimen hacia 1.0 con
+    #      `v' = 1 + (v-1)·mul`. `pace` NO pasa por aca — tiene su propia compresion y
+    #      aplicarle las dos lo comprimiria dos veces.
+    # Los dos diales se LEEN del juego. Hardcodear 0.35 o 0.60 aca es la forma exacta
+    # en que esta replica queda vieja en silencio: el juego cambia el dial, la web sigue
+    # publicando la escala anterior y nada grita.
     knee = float(re.search(r"PaceKnee = ([\d.]+)f", txt).group(1))
     topmul = float(re.search(r"PaceTopMul = ([\d.]+)f", txt).group(1))
+    arcmul = float(re.search(r"ArcadeMul = ([\d.]+)f", txt).group(1))
+
+    arcmul = np.float32(arcmul)
+    knee, topmul = np.float32(knee), np.float32(topmul)
+
+    def arc(v):
+        return np.float32(1.0) + (np.float32(v) - np.float32(1.0)) * arcmul
     stats, zurdos = {}, {}
     for m in re.finditer(
             r'P\("([a-z0-9_]+)",\s*([\d.]+)f,\s*([\d.]+)f,\s*([\d.]+)f,'
@@ -260,10 +281,13 @@ def stats_del_juego():
             k = re.search(nombre + r":\s*([\d.]+)f", extra)
             return float(k.group(1)) if k else default
 
+        pa = np.float32(pa)
         if pa > knee:
             pa = knee + (pa - knee) * topmul
-        stats[i] = dict(zip(STAT_KEYS, (pa, po, cu, co, kw("st"), kw("shp"),
-                                        kw("psp"), kw("dr"))))
+        stats[i] = dict(zip(STAT_KEYS,
+                            (pa,) + tuple(arc(v) for v in
+                                          (po, cu, co, kw("st"), kw("shp"),
+                                           kw("psp"), kw("dr"), kw("mk")))))
         zurdos[i] = "zur: true" in extra
     return stats, zurdos
 
@@ -310,7 +334,7 @@ def build_roster_json():
     return jugadores
 # ── equipos.json: el catálogo de equipos, derivado del juego (M153…M173) ─────
 # Desde M153 el juego no se arma jugador por jugador: se ELIGE un equipo del
-# catálogo (`Equipos.cs`), con formación, arquero, escudo y barras VEL/FUE/PRE.
+# catálogo (`Equipos.cs`), con formación, arquero, escudo y barras VEL/FUE/PRE/DEF.
 # La web lo deriva de ahí por la misma razón que el álbum: una copia a mano se
 # desincroniza en silencio. Se parsean CUATRO cosas del juego:
 #   1. `Equipos.Catalogo`  — nombre, concepto, formación, gk y los 6 de campo
@@ -492,34 +516,91 @@ def equipos_del_juego():
     return equipos, ligas
 
 
+# ============================================================================
+# LAS CUATRO BARRAS — replica de `Equipos.Eje` + `Equipos.Barra` (M213)
+# ============================================================================
+# ⚠️ ERAN TRES Y AHORA SON CUATRO. Entro DEFENSA, y no es una barra mas: las tres
+# viejas eran VELOCIDAD / FUERZA / PRECISION, o sea tres formas de medir ATACAR, asi
+# que un plantel de marca no tenia donde sumar y salia ultimo. Una web que siga
+# iterando `for e in range(3)` no muestra una barra de menos: muestra el catalogo
+# ordenado por una idea que el juego ya no tiene.
+#
+# ⚠️ Los cuatro ejes reparten los NUEVE atributos sin dejar ninguno afuera y SIN USAR
+# NINGUNO DOS VECES. Por eso DEFENSA es `marca` PURA: mezclarle `fuerza` la haria
+# contar en dos barras y un equipo fuerte se veria defensivo sin serlo.
+EJES = ("vel", "fue", "pre", "def")
+
+# ⚠️⚠️ TODA ESTA CUENTA VA EN float32, Y NO ES PEDANTERIA. El juego es C# con `float`
+# de 32 bits de punta a punta —los literales `0.60f`, los campos de `Prof`, la suma de
+# los seis, la division y la escala— y esta replica en `double` daba 35/37: EL SCRATCH
+# y LA CANTERA caian del otro lado del `.5` al redondear. O sea que la diferencia no se
+# ve como un error, se ve como **un punto de barra**, que es exactamente el tipo de
+# mentira que `verificar_barras.py` existe para cazar. Con f32 dan 37/37 exactos.
+#
+# ⚠️ `np.float32(x)` en cada constante NO es decorativo: numpy promueve a float64 en
+# cuanto se mezcla con un float de Python, y ahi vuelve el problema sin avisar.
+f32 = np.float32
+
+
 def _eje(s, e):
-    """Los TRES ejes con los MISMOS pesos que `Equipos.Eje` (claves en
-    castellano porque `stats_del_juego` ya traduce pace→ritmo, etc.)."""
+    """Los mismos pesos que `Equipos.Eje` (claves en castellano porque
+    `stats_del_juego` ya traduce pace→ritmo, etc.), en float32."""
     if e == 0:                                    # VELOCIDAD
-        return 0.60 * s["ritmo"] + 0.40 * s["gambeta"]
+        return f32(0.60) * s["ritmo"] + f32(0.40) * s["gambeta"]
     if e == 1:                                    # FUERZA
-        return 0.50 * s["pegada"] + 0.50 * s["fuerza"]
-    return (0.30 * s["precision"] + 0.25 * s["pase"]      # PRECISIÓN
-            + 0.25 * s["control"] + 0.20 * s["comba"])
+        return f32(0.50) * s["pegada"] + f32(0.50) * s["fuerza"]
+    if e == 3:                                    # DEFENSA — `marca` pura
+        return s["marca"]
+    return (f32(0.30) * s["precision"] + f32(0.25) * s["pase"]      # PRECISIÓN
+            + f32(0.25) * s["control"] + f32(0.20) * s["comba"])
 
 
 def barras_del_catalogo(equipos, stats):
-    """Réplica de `Equipos.Calibrar` + `Barra`: μ/σ del pool DE CAMPO
-    (BluePoolIds — los arqueros NO entran, igual que en el juego)."""
-    import math
-    pool = _lista_cs(_sin_comentarios(open(MATCHTUNING, encoding="utf-8")
-                                      .read()), "BluePoolIds")
-    mu, sd = [], []
-    for e in range(3):
-        vals = [_eje(stats[i], e) for i in pool]
-        m = sum(vals) / len(vals)
-        mu.append(m)
-        sd.append(math.sqrt(sum((v - m) ** 2 for v in vals) / len(vals)))
+    """Replica de `Equipos.Barra`: ESCALA ABSOLUTA contra las anclas del juego.
+
+    ⚠️⚠️ M213 — SE FUE EL z-SCORE, y para esta web es la mejor noticia del hito. El
+    z-score era suma cero: se media contra la media del pool, asi que **agregar un
+    jugador movia las barras de los 37 equipos** y la pagina quedaba vieja por un
+    cambio que no la tocaba. Ahora cada eje se mapea contra un rango fijo, o sea que
+    una tarjeta solo cambia si cambio ESE equipo. La nota de `regen_listas.py` sobre
+    "un jugador nuevo mueve las 37" describe el mundo anterior a esto.
+
+    ⚠️ Las anclas se LEEN de `Equipos.cs`, no se copian. Son el unico numero de esta
+    replica que el juego puede mover sin que nada mas cambie de forma — y si se
+    copiaran, la web publicaria la escala vieja sin un solo error. Lo mismo el piso y
+    el techo del clamp.
+    """
+    txt = _sin_comentarios(open(EQUIPOS_CS, encoding="utf-8").read())
+
+    def anclas(nombre):
+        b = re.search(nombre + r"\s*=\s*\{([^}]*)\}", txt).group(1)
+        return [float(v) for v in re.findall(r"([\d.]+)f", b)]
+
+    lo, hi = anclas("AnclaLo"), anclas("AnclaHi")
+    piso, techo = (int(v) for v in
+                   re.search(r"Piso = (\d+), Techo = (\d+)", txt).groups())
+    if not (len(lo) == len(hi) == len(EJES)):
+        print("!! las anclas de Equipos.cs son %d/%d y los ejes son %d — la replica "
+              "quedo vieja" % (len(lo), len(hi), len(EJES)))
+        sys.exit(1)
+    lo = [f32(v) for v in lo]
+    hi = [f32(v) for v in hi]
     for eq in equipos:
-        for e, k in enumerate(("vel", "fue", "pre")):
-            t = sum(_eje(stats[i], e) for i in eq["ids"]) / len(eq["ids"])
-            z = (t - mu[e]) / (sd[e] / math.sqrt(len(eq["ids"])))
-            eq[k] = max(10, min(95, round(50 + z * 15)))
+        for e, k in enumerate(EJES):
+            # se acumula de a uno y recien despues se divide, como `Equipos.Barra`:
+            # sumar en otro orden en float32 puede dar otro ultimo bit
+            t = f32(0.0)
+            for i in eq["ids"]:
+                t = t + _eje(stats[i], e)
+            t = t / f32(len(eq["ids"]))
+            u = (t - lo[e]) / (hi[e] - lo[e])
+            eq[k] = max(piso, min(techo, round(float(u * f32(100.0)))))
+            # el mismo aviso que la assertion de PocEquipos: si un equipo toca el
+            # piso o el techo, la escala del juego se quedo corta — y la web estaria
+            # dibujando una barra llena que en realidad es "no sabemos cuanto mas".
+            if eq[k] <= piso or eq[k] >= techo:
+                print("  OJO: %s CLAMPEA en %s=%d — las anclas de Equipos.Barra se "
+                      "quedaron cortas" % (eq["nombre"], k.upper(), eq[k]))
     return equipos
 
 
@@ -534,7 +615,7 @@ def build_equipos_json():
             "ligas": ligas,
             "equipos": [{k: eq[k] for k in
                          ("slug", "nombre", "abrev", "concepto", "form",
-                          "gk", "ids", "vel", "fue", "pre", "liga")}
+                          "gk", "ids", "vel", "fue", "pre", "def", "liga")}
                         for eq in equipos]}
     with open(out("assets", "equipos", "equipos.json"), "w",
               encoding="utf-8") as f:
@@ -802,7 +883,12 @@ def _tarjeta_desfasada(html, eq):
                         ("concepto", ">%s</p>" % eq["concepto"]),
                         ("formacion", "<b>%s</b>" % forma),
                         ("arquero", "%s al arco" % gk),
-                        ("barras", "<b>%d</b>" % eq["vel"])):
+                        # ⚠️ se chequean VEL y DEF, no una sola: DEF entro en M213 y
+                        # una tarjeta con las tres viejas correctas y sin la cuarta
+                        # pasaba el chequeo entera.
+                        ("barras", "<b>%d</b>" % eq["vel"]),
+                        ("barra DEF", 'title="Defensa">DEF</abbr></dt>'
+                                      '<dd><i style="--v:%d">' % eq["def"])):
         if espera not in li:
             fallas.append(
                 ("TARJETA DESFASADA (%s) en %s: falta %r"

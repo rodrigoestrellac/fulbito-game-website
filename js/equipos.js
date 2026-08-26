@@ -117,7 +117,10 @@ async function montarEquipos() {
     const parados = [jugadorHTML(e.gk, f.slots[0], true)]
       .concat(e.ids.map((id, k) => jugadorHTML(id, f.slots[k + 1], false)))
       .join('');
-    const barras = [['Velocidad', e.vel], ['Fuerza', e.fue], ['Precisión', e.pre]]
+    // M213 — CUATRO. DEFENSA entró porque las tres viejas eran tres formas de
+    // medir atacar y un plantel de marca no tenía dónde sumar.
+    const barras = [['Velocidad', e.vel], ['Fuerza', e.fue],
+                    ['Precisión', e.pre], ['Defensa', e.def]]
       .map(([rotulo, v]) => `
         <div class="ficha__stat">
           <dt>${rotulo}</dt>

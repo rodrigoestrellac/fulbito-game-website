@@ -76,6 +76,9 @@ const STATS_ROTULOS = [
   ['ritmo', 'Ritmo'], ['pegada', 'Pegada'], ['comba', 'Comba'],
   ['control', 'Control'], ['fuerza', 'Fuerza'], ['precision', 'Precisión'],
   ['pase', 'Pase'], ['gambeta', 'Gambeta'],
+  // M213 — el NOVENO, y el primero defensivo del juego: hasta acá los ocho eran de
+  // ataque o de físico, así que a un defensor se lo describía por resta.
+  ['marca', 'Marca'],
 ];
 
 /* los dos recién llegados (M111) llevan el moño de NUEVO. Editorial: cuando
