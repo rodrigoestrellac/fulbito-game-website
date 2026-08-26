@@ -237,6 +237,14 @@ Antes de commitear una imagen o un video nuevo:
 3. **Nunca** publicar `captures/kitroster.png` ni derivados.
 4. En el copy, alt-texts y **nombres de archivo**: sólo los apodos in-game
    (EL VIKINGO, IL CAPITANO, EL MOTORCITO…), nunca los apellidos reales.
+5. **Y tampoco decirlo sin nombrarlo.** No alcanza con no escribir el apellido: el copy
+   no puede afirmar que los planteles son de jugadores reales. Los subtítulos de las
+   ligas decían *"el nombre es inventado, el plantel es el de verdad"* y *"los países,
+   armados con los que de verdad juegan ahí"* — dos renglones afirmando justo lo que
+   los otros cuatro puntos evitan (Rodrigo, 26-ago-2026: *"no digas que el plantel es de
+   verdad"*). Ahora las tres líneas van sobre el mismo eje —**de qué se trata cada
+   grupo**, no quién lo integra— y por eso las TRES cambiaron y no sólo las dos que
+   sobraban: si una dice "los inventados" y las otras callan, el contraste lo dice igual.
 
 La textura de `rc3b` se limpió el 30-jul-2026 y Rober entró al álbum. Se verificó con
 zoom sobre el render, no sobre la palabra de nadie: la limpieza de una textura no exime

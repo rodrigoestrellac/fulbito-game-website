@@ -66,14 +66,27 @@ def miles(n):
 # ============================================================================
 # EL CATALOGO — agrupado por liga (M197 en el juego, 25-ago-2026 en la web)
 # ============================================================================
-# El criterio de cada liga, en una linea. Es EDITORIAL —el juego lo tiene solo como
-# comentario en `Equipos.cs`— pero no es inventado: sale de ahi, del bloque "EL CRITERIO
-# ES DE ORIGEN, NO DE CALIDAD NI DE ESTILO". Si manana entra una liga nueva, `li_equipos`
-# TERMINA CON ERROR en vez de publicar el titulo pelado.
+# La linea de cada liga. Es EDITORIAL —el juego agrupa pero no explica— y arranca del
+# criterio que si esta escrito en `Equipos.cs`: "EL CRITERIO ES DE ORIGEN, NO DE CALIDAD
+# NI DE ESTILO" (clubes / paises / inventados). Si manana entra una liga nueva,
+# `bloques_ligas` TERMINA CON ERROR en vez de publicar el titulo pelado.
+#
+# ⚠️⚠️ NINGUNA DE LAS TRES PUEDE DECIR QUE LOS PLANTELES SON DE JUGADORES REALES.
+# Rodrigo, 26-ago-2026, sobre la primera version: *"no digas que el plantel es de verdad.
+# Busca otra forma de poner esos subtitulos que no haga referencia a que son jugadores de
+# verdad"*. Decian "el nombre es inventado, el plantel es el de verdad" y "los paises,
+# armados con los que de verdad juegan ahi" — o sea que el sitio afirmaba en dos renglones
+# justo lo que el resto del proyecto evita decir (ver README § Chequeo de marcas: en el
+# copy van SOLO los apodos in-game).
+#
+# ⚠️ Y NO ALCANZA CON ARREGLAR ESOS DOS: si las tres no comparten eje, el contraste lo
+# dice igual. "Los inventados" para COMBINADOS, con las otras dos calladas, implica que
+# las otras dos no lo son. Por eso las tres van sobre el MISMO eje —de que se trata cada
+# grupo— y ninguna habla de quien es quien: de club / de pais / por una idea.
 LIGA_QUE = {
-    "EQUIPOS": "los clubes: el nombre es inventado, el plantel es el de verdad",
-    "SELECCIONES": "los países, armados con los que de verdad juegan ahí",
-    "COMBINADOS FULBITO": "los inventados: se arman por una idea, no por un escudo",
+    "EQUIPOS": "de club: cada uno con su escudo, sus colores y su manera de jugar",
+    "SELECCIONES": "de país: la camiseta nacional y el estilo que le va",
+    "COMBINADOS FULBITO": "por una idea: los seis zurdos, los que te pegan, los que no paran",
 }
 
 
