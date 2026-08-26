@@ -1273,7 +1273,7 @@ def auditar_album():
     Generar el .webp no alcanza: si no hay `<li>` en el HTML, la figurita no existe
     para nadie. Es la misma leccion de `BluePoolIds` vs. los cuerpos de la escena.
     """
-    problemas = []
+    problemas, notas = [], []
     if SIN_APROBAR:
         problemas.append(
             "SIN CHEQUEO DE MARCAS (%d): %s\n"
@@ -1281,12 +1281,21 @@ def auditar_album():
             "      CAMISETA (escudos de clubes, sponsors) y si esta limpia sumalo a\n"
             "      APROBADOS. Ver README seccion 'Chequeo de marcas'."
             % (len(SIN_APROBAR), ", ".join(SIN_APROBAR)))
+    # LOS CHOQUES DE SLUG NO SON UNA FALLA: SON UNA NOTA. Estuvieron en `problemas`
+    # hasta el 26-ago-2026 y eso dejaba el build ROJO PARA SIEMPRE — `SLUGS_CONGELADOS`
+    # existe justamente para que la derivacion NO coincida, asi que cada congelado
+    # garantiza un choque en cada corrida. Un build que siempre termina en rojo deja de
+    # ser una senal: el que lo mira aprende a ignorar la salida, y el dia que hay un
+    # problema de verdad queda enterrado entre seis avisos que ya sabe que no importan.
+    # Se siguen imprimiendo —la informacion sirve— pero ya no tumban la corrida.
     for i, congelado, derivado in SLUG_CHOQUES:
-        problemas.append(
-            "SLUG PUBLICADO QUE CAMBIARIA: '%s' esta publicado como '%s' y de\n"
-            "   `NombreDe` ahora sale '%s'. Se publica el viejo para no romper la URL.\n"
-            "   Si el cambio es a proposito, actualiza SLUGS_CONGELADOS Y el index.html."
-            % (i, congelado, derivado))
+        notas.append(
+            "SLUG CONGELADO: '%s' se publica como '%s' y de `NombreDe` ahora sale "
+            "'%s'." % (i, congelado, derivado)
+            + SALTO + "   Se publica el viejo A PROPOSITO, para no romper la URL. Si"
+            + SALTO + "   querés que la URL siga al nombre: sacalo de SLUGS_CONGELADOS"
+            + SALTO + "   y meté el viejo en ALIAS_SLUG (js/roster.js), que sostiene"
+            + SALTO + "   los links que ya andan dando vueltas.")
     # ¿estan todos en la grilla del sitio?
     html = open(os.path.join(WEB, "index.html"), encoding="utf-8").read()
     faltan_html = [s for _i, _c, s, _n in ROSTER_JUEGO
@@ -1304,7 +1313,10 @@ def auditar_album():
             print(" - " + p)
         print("=" * 70)
         return False
-    print("album: %d jugadores, todos aprobados y en el index" % len(ROSTER_JUEGO))
+    for n in notas:
+        print(" · " + n)
+    print("album: %d jugadores, todos aprobados y en el index (%d slug congelado)"
+          % (len(ROSTER_JUEGO), len(notas)))
     return True
 
 

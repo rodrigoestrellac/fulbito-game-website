@@ -72,6 +72,32 @@ const FIRMAS_DESC = {
   'ARQUERO': 'Ataja. Que no es poco: en Fulbito los arqueros vuelan de verdad.',
 };
 
+/* ⚠️ URLs VIEJAS QUE SIGUEN VIVAS (26-ago-2026).
+   El slug se deriva de `NombreDe`, así que cuando el juego le cambia el apodo a un
+   jugador, su URL cambia sola — y el `#cromo/<slug>` que alguien compartió deja de
+   abrir nada. Hasta hoy eso se frenaba congelando el slug viejo (`SLUGS_CONGELADOS`
+   en build_assets.py), que evita romper links pero deja la URL diciendo un nombre que
+   ya no existe, y esa lista sólo crece.
+
+   Con los 16 renombres de hoy Rodrigo eligió la otra salida: **la URL sigue al nombre
+   y los links viejos se sostienen acá**. Se puede porque el deep-link es un FRAGMENTO
+   —lo resuelve este JS, no el servidor—, así que no hacen falta redirects: alcanza con
+   traducir el slug viejo antes de buscarlo.
+
+   Un alias no se saca nunca: el día que se saque, el link que arreglaba se rompe. */
+const ALIAS_SLUG = {
+  lea: 'ojos-de-cielo',
+  nico: 'nicoleon',
+  carlitos: 'el-apache',
+  arjen: 'pela-pileta',
+  ruud: 'van-the-man',
+  cr007: 'agente-cr007',
+  sergio: 'el-gladiador',
+  lami: 'el-enano-magico',
+  pavelito: 'el-caballo-checo',
+  patricio: 'el-pulpo',
+};
+
 const STATS_ROTULOS = [
   ['ritmo', 'Ritmo'], ['pegada', 'Pegada'], ['comba', 'Comba'],
   ['control', 'Control'], ['fuerza', 'Fuerza'], ['precision', 'Precisión'],
@@ -359,7 +385,8 @@ async function montarAlbum() {
 
   // si alguien llega con #cromo/<slug> (le compartieron una figurita), la
   // ficha se abre sola sobre el álbum
-  const pedido = (location.hash.match(/^#cromo\/([a-z0-9-]+)$/) || [])[1];
+  const crudo = (location.hash.match(/^#cromo\/([a-z0-9-]+)$/) || [])[1];
+  const pedido = ALIAS_SLUG[crudo] || crudo;
   if (pedido && porSlug.has(pedido)) {
     tarjetas.get(pedido)?.scrollIntoView({ block: 'center' });
     abrirFicha(pedido);

@@ -915,6 +915,37 @@ deletrear**: la mitad de esos números están escritos en letras («Treinta y si
 equipos»), que es justamente por qué se desfasan — un `35` al lado de una grilla de 37 se
 ve raro, «treinta y cinco» no se ve raro nunca.
 
+## Cuando el juego renombra a un jugador: `ALIAS_SLUG` (26-ago-2026)
+
+El slug sale de `NombreDe`, así que un renombre en el juego **le cambia la URL al
+cromo**. Hasta hoy la única defensa era `SLUGS_CONGELADOS`: publicar el slug viejo para
+no romper el `#cromo/<slug>` que alguien compartió. Funciona, pero deja la URL diciendo
+un nombre que ya no existe (`/dinho` para SONRISINHO) y esa lista sólo crece.
+
+Con los 16 renombres de M215 Rodrigo eligió la otra salida, y ahora hay las dos:
+
+| | URL | link viejo |
+|---|---|---|
+| `SLUGS_CONGELADOS` | se queda vieja | anda (es la misma) |
+| **`ALIAS_SLUG`** (js/roster.js) | **sigue al nombre** | **anda, y se normaliza a la nueva** |
+
+Se puede porque el deep-link es un **fragmento**: lo resuelve `roster.js`, no el
+servidor, así que no hacen falta redirects — alcanza con traducir el slug viejo antes de
+buscarlo. Probado punta a punta: entrar por `#cromo/lea` abre OJOS DE CIELO y la barra
+de direcciones queda en `#cromo/ojos-de-cielo`.
+
+⚠️ **Un alias no se saca nunca.** El día que se saque, el link que arreglaba se rompe.
+
+⚠️ Al renombrar hay que **borrar los `.webp` huérfanos** de `assets/roster/` y
+`assets/pizarra/` — el build escribe los nuevos y los viejos quedan sin que nadie los
+nombre.
+
+⚠️ **Los choques de slug ya no tumban el build**, y esto importa: estuvieron en
+`problemas` hasta hoy, y como `SLUGS_CONGELADOS` existe *para* que la derivación no
+coincida, cada congelado garantizaba un rojo en cada corrida. Un build siempre rojo deja
+de ser una señal — el que lo mira aprende a ignorar la salida, y el día que hay un
+problema de verdad queda enterrado. Ahora se imprimen como notas.
+
 ## ⚠️ Un chequeo que no encuentra nada NO está diciendo que todo está bien
 
 El bug de `verificar_barras.py` en M213 vale como regla general, porque no es un
