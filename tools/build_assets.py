@@ -133,6 +133,12 @@ APROBADOS = {
     # kit magenta liso de Meshy, short blanco, sin escudo, sin sponsor y sin
     # numero los cinco.
     "bombardero", "elefante", "hummus", "kaiser", "cruyff",
+    # 25-ago-2026 — EL GUAJE, el unico que entro al pool despues de M196 (va en
+    # LA FURIA). Mismo chequeo sobre `guaje_check_front.png` recien rendereado
+    # (cuerpo entero + zoom al torso a 900 px): camiseta bordo LISA —kit
+    # pintado, como el de trencinho, no el magenta de Meshy—, short blanco, sin
+    # escudo, sin sponsor y sin numero.
+    "guaje",
 }
 
 # el archivo de captura cuando NO se llama como el id del juego
@@ -325,6 +331,49 @@ EQUIPOS_CS = os.path.join(RAIZ, "game-unity", "FulbitoPenales", "Assets",
                           "Scripts", "Equipos.cs")
 ESCUDOS_SRC = os.path.join(RAIZ, "game-unity", "FulbitoPenales", "Assets",
                            "Resources", "Escudos")
+ESTADIOS_CS = os.path.join(RAIZ, "game-unity", "FulbitoPenales", "Assets",
+                           "Scripts", "Estadios.cs")
+
+# El chequeo de marcas de las CAPTURAS DE SEDE, misma mecánica que los escudos.
+# Acá el riesgo es distinto y peor: tres de los ocho estadios llegaron con el
+# NOMBRE DE UN ESTADIO REAL pintado en la fachada, en los palcos, en murales y
+# en la pantalla, y se despersonalizaron a mano en el repo del juego
+# (`assets-src/bodegon_fbx.py`, `monumento_fbx.py`). O sea que acá no alcanza
+# con mirar las camisetas: hay que LEER EL ESTADIO — fachada, cartel del
+# acceso, pantalla y carteles perimetrales — antes de publicar la foto.
+SEDES_APROBADAS = {
+    # 25-ago-2026 — las OCHO, miradas a 1280x720 y con zoom a cada superficie
+    # que lleva texto. Re-miradas el mismo día al cambiar la vista de `_aerea` a
+    # `_web`: los dos encuadres que más cambiaron son el del Bodegón (ahora entra
+    # por la boca de la herradura y se ve la cancha y los contenedores) y el de
+    # Old Road (ahora se ve la cancha por encima de la tribuna baja); en los dos
+    # lo único legible sigue siendo props nuestros. Lo que se lee en las fotos es todo del juego:
+    # `FULBITO STADIUM` en la fachada de LA CATEDRAL, `STADIO DELLE CURVE` en la
+    # marquesina del italiano, `BODEGÓN XENEIZE` sobre los palcos, `EL MONUMENTO`
+    # y `PUERTA LA HINCHADA` en el anillo de M188; los carteles perimetrales y
+    # los trapos de la hinchada dicen FULBITO / LA BANDA / AGUANTE / VAMOS, que
+    # son props nuestros. Ningún nombre de estadio real, ningún sponsor.
+    # ⚠️ La pantalla del italiano muestra `CASA 2-1 OSPITI`, que es el marcador
+    # clavado del modelo: no es una marca, pero conviene saber que está ahí
+    # antes de que alguien pregunte por qué el resultado no cambia.
+    "catedral", "coliseo", "municipal", "stadioitaliano", "oldroad",
+    "bodegonxeneize", "elmonumento", "maracuya",
+}
+# de qué toma cada sede su foto.
+# ⚠️ `_web` Y NO `_aerea` (25-ago-2026). Las `_tv` y `_aerea_cruce` están
+# encuadradas sobre la cancha —que es igual en las ocho— y ahí las sedes se
+# vuelven indistinguibles. Pero la `_aerea` tampoco servía: es el ARRANQUE DEL
+# VUELO DE LA CEREMONIA, o sea el MISMO acimut para las ocho, y con un ángulo
+# fijo el Bodegón (que es una herradura) se veía por la espalda y Old Road (que
+# tiene UNA tribuna alta con techo) salía sin cancha. Rodrigo, mirando las ocho:
+# *"la visual del Bodegón Xeneize debería ser desde el otro lado"*, *"en Old Road
+# no se ve la cancha"*.
+# La `_web` la agregó `PocEstadios.CapturarSedes` en M211 y elige el lado y la
+# altura MIDIENDO: entra por el sector más bajo del estadio y se eleva lo que
+# haga falta para pasar por encima de ese borde. Se regenera con
+#   Unity.exe -batchmode -quit -projectPath <proj> #             -executeMethod PocEstadios.CapturarSedes
+SEDE_VISTA = "_web"
+SEDE_MAX_W = 1280
 
 # El chequeo de marcas de los ESCUDOS, misma mecánica que APROBADOS: el slug
 # tiene que estar acá o el script termina con error. Son las parodias de
@@ -364,6 +413,15 @@ ESCUDOS_APROBADOS = {
     # que `boke` (azul/oro con ancla y estrellas) y `millonetas` (banda roja
     # sin monograma) — si alguna vez se afina la regla, empezar por este.
     "mannschaft", "naranja", "aristocratas", "bavaros",
+    # 25-ago-2026 — los DOS de M206/M210. Mirados con zoom, ninguno lleva texto
+    # ni reproduce un escudo registrado: `furia` = un toro dorado embistiendo
+    # sobre rojo con banda roja y oro (el toro es iconografia nacional espanola,
+    # no el escudo de la RFEF, que va con corona y siglas); `colchoneros` =
+    # rayas rojas y blancas con banda azul y un CANDADO al medio — o sea el
+    # colchon y el candado, que son los dos apodos, y no el oso con el madrono
+    # del club real. Mismo criterio que `boke` y `millonetas`: colores de la
+    # camiseta si, marca no.
+    "furia", "colchoneros",
 }
 
 ESCUDO_OUT = 256    # los PNG fuente son 256×256; se convierten sin escalar
@@ -401,22 +459,37 @@ def equipos_del_juego():
             "form": int(re.search(r"form = (\d+)", chunk).group(1)),
             "gk": re.search(r'gk = "([a-z0-9_]+)"', chunk).group(1),
             "concepto": re.search(r'concepto = "([^"]+)"', chunk).group(1),
+            # M177 — la cancha del equipo, como CONSTANTE (`sede = Estadios.Coliseo`).
+            # Se resuelve contra `Estadios.cs` mas abajo; se guarda el nombre crudo
+            # para que un `sede` que no exista se vea como lo que es.
+            "sede_const": re.search(r"sede\s*=\s*Estadios\.(\w+)",
+                                    chunk).group(1),
             "ids": re.findall(r'"([a-z0-9_]+)"',
                               chunk.split("ids = new[]")[1]),
         })
+    # M197 — LAS LIGAS. Un arreglo paralelo más, como `EscudoId`: `Validar()` en el
+    # juego le chequea el largo contra el catálogo, y acá se chequea igual (abajo).
+    # ⚠️ EL ORDEN DE `LigaNombre` NO ES ALFABÉTICO NI POR TAMAÑO: es el orden en que
+    # el selector del juego cicla las ligas, y por eso es el orden de la web.
+    ligas = re.findall(r'"([^"]+)"',
+                       re.search(r"LigaNombre\s*=\s*[^{]*\{(.*?)\};", txt,
+                                 re.S).group(1))
+    liga_de = re.findall(r"Liga(Clubes|Selecciones|Combinados)",
+                         re.search(r"LigaDe\s*=\s*\{(.*?)\};", txt, re.S).group(1))
+    orden = {"Clubes": 0, "Selecciones": 1, "Combinados": 2}
     escudos = re.findall(r'"([a-z0-9_]+)"',
                          re.search(r"EscudoId\s*=\s*\{(.*?)\};", txt,
                                    re.S).group(1))
     abrevs = re.findall(r'"([A-Z0-9]{2,3})"',
                         re.search(r"AbrevId\s*=\s*\{(.*?)\};", txt,
                                   re.S).group(1))
-    if not (len(equipos) == len(escudos) == len(abrevs)):
-        print("!! equipos.json ROTO — catálogo %d / escudos %d / abrevs %d"
-              % (len(equipos), len(escudos), len(abrevs)))
+    if not (len(equipos) == len(escudos) == len(abrevs) == len(liga_de)):
+        print("!! equipos.json ROTO — catálogo %d / escudos %d / abrevs %d / ligas %d"
+              % (len(equipos), len(escudos), len(abrevs), len(liga_de)))
         sys.exit(1)
-    for eq, esc, ab in zip(equipos, escudos, abrevs):
-        eq["slug"], eq["abrev"] = esc, ab
-    return equipos
+    for eq, esc, ab, lg in zip(equipos, escudos, abrevs, liga_de):
+        eq["slug"], eq["abrev"], eq["liga"] = esc, ab, orden[lg]
+    return equipos, ligas
 
 
 def _eje(s, e):
@@ -452,17 +525,25 @@ def barras_del_catalogo(equipos, stats):
 
 def build_equipos_json():
     stats, _zurdos = stats_del_juego()
-    equipos = barras_del_catalogo(equipos_del_juego(), stats)
+    catalogo, ligas = equipos_del_juego()
+    equipos = barras_del_catalogo(catalogo, stats)
+    # ⚠️ `equipos` SIGUE EN EL ORDEN DEL CATÁLOGO y eso no se toca: `copa.json` guarda
+    # los ÍNDICES de los 16 sorteados, y el número de la pizarra es el del catálogo.
+    # Agrupar por liga es cosa del RENDER (regen_listas.py), no del dato.
     data = {"formaciones": formaciones_del_juego(),
+            "ligas": ligas,
             "equipos": [{k: eq[k] for k in
                          ("slug", "nombre", "abrev", "concepto", "form",
-                          "gk", "ids", "vel", "fue", "pre")}
+                          "gk", "ids", "vel", "fue", "pre", "liga")}
                         for eq in equipos]}
     with open(out("assets", "equipos", "equipos.json"), "w",
               encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, separators=(",", ":"))
-    print("equipos.json: %d equipos, %d formaciones"
-          % (len(equipos), len(data["formaciones"])))
+    print("equipos.json: %d equipos en %d ligas (%s), %d formaciones"
+          % (len(equipos), len(ligas),
+             " ".join("%s %d" % (n, sum(1 for e in equipos if e["liga"] == i))
+                      for i, n in enumerate(ligas)),
+             len(data["formaciones"])))
     return equipos
 
 
@@ -476,6 +557,225 @@ def build_escudos(equipos):
             out("assets", "equipos", eq["slug"] + ".webp"),
             "WEBP", quality=90, method=6)
     print("escudos: %d" % len(equipos))
+
+
+# ============================================================================
+# LAS SEDES (M177/M207) — los ocho estadios, derivados igual que el catálogo
+# ============================================================================
+# Mismo contrato que los equipos y el álbum: la lista SALE DEL JUEGO y las
+# tarjetas se regeneran desde el JSON (`tools/regen_listas.py`). Acá hay tres
+# números que a mano envejecen sin que nada grite, y los tres ya cambiaron una
+# vez cada uno:
+#
+#   · el AFORO no es capacidad de folleto, es la gente que el sembrador pone de
+#     verdad y que `AuditarSedes` cuenta colgando de la sede (4 vértices = 1
+#     persona). EL MONUMENTO pasó de 30 163 a 34 483 sin tocar el modelo.
+#   · quién juega DE LOCAL en cada una sale de `Equipo.sede`, y un equipo nuevo
+#     se reparte solo (LOS COLCHONEROS entró al Coliseo en M206).
+#   · dónde se juega LA FINAL no está escrito en ningún lado: es `MasGrande`,
+#     o sea la sede jugable con más aforo. Se mudó dos veces —Catedral →
+#     delle Curve (M176) → MARACUYÁ (M207)— y las dos veces por un número, no
+#     por una decisión escrita. Publicar "la final se juega en X" a mano es
+#     exactamente la trampa que `DeRonda` tenía en el juego y que se borró.
+def sedes_del_juego(equipos):
+    txt = _sin_comentarios(open(ESTADIOS_CS, encoding="utf-8").read())
+    # `public const int Catedral = 0, Coliseo = 1, ...` — el nombre de la
+    # constante NO es el `id` (Italiano vs StadioItaliano), así que hace falta
+    # el mapa para resolver el `sede = Estadios.X` de cada equipo.
+    consts = {}
+    m = re.search(r"public const int (Catedral\s*=.*?);", txt, re.S)
+    for nom, val in re.findall(r"(\w+)\s*=\s*(\d+)", m.group(1)):
+        consts[nom] = int(val)
+    bloque = re.search(r"Sede\[\]\s+Todos\s*=\s*\{(.*?)\n    \};",
+                       txt, re.S).group(1)
+    sedes = []
+    for s in re.finditer(r"new Sede\s*\{(.*?)\}", bloque, re.S):
+        c = s.group(1)
+        sedes.append({
+            "nombre": re.search(r'nombre = "([^"]+)"', c).group(1),
+            "id": re.search(r'id = "(\w+)"', c).group(1),
+            "concepto": re.search(r'concepto = "([^"]+)"', c).group(1),
+            "aforo": int(re.search(r"aforo = (\d+)", c).group(1)),
+            "lista": re.search(r"lista = (true|false)", c).group(1) == "true",
+        })
+    for sd in sedes:
+        sd["slug"] = sd["id"].lower()
+        sd["equipos"] = []
+    for eq in equipos:
+        i = consts.get(eq["sede_const"])
+        if i is None or i >= len(sedes):
+            print("!! %s tiene sede %r y no existe en Estadios.cs"
+                  % (eq["nombre"], eq["sede_const"]))
+            sys.exit(1)
+        eq["sede"] = i
+        sedes[i]["equipos"].append(eq["nombre"])
+    # `MasGrande` / `MasChica`: la final y el potrero. Replicados tal cual —
+    # recorren en orden y se quedan con el PRIMERO que supera, así que un
+    # empate de aforo lo gana el de índice más bajo, igual que el juego.
+    jugables = [i for i, s in enumerate(sedes) if s["lista"]]
+    final = max(jugables, key=lambda i: (sedes[i]["aforo"], -i))
+    potrero = min(jugables, key=lambda i: (sedes[i]["aforo"], i))
+    for i, sd in enumerate(sedes):
+        sd["final"] = (i == final)
+        sd["potrero"] = (i == potrero)
+    return sedes
+
+
+def build_sedes(equipos):
+    """El JSON + las ocho fotos. Devuelve las sedes (jugables y apagadas)."""
+    sedes = sedes_del_juego(equipos)
+    for sd in sedes:
+        p = os.path.join(CAPS, "sede_%s%s.png" % (sd["slug"], SEDE_VISTA))
+        if not os.path.exists(p):
+            print("  FALTA", p)
+            continue
+        im = Image.open(p).convert("RGB")
+        if im.width > SEDE_MAX_W:
+            im = im.resize((SEDE_MAX_W,
+                            round(im.height * SEDE_MAX_W / im.width)),
+                           Image.LANCZOS)
+        im.save(out("assets", "sedes", sd["slug"] + ".webp"),
+                "WEBP", quality=82, method=6)
+    with open(out("assets", "sedes", "sedes.json"), "w", encoding="utf-8") as f:
+        json.dump([{k: sd[k] for k in ("slug", "nombre", "concepto", "aforo",
+                                       "lista", "equipos", "final", "potrero")}
+                   for sd in sedes], f, ensure_ascii=False,
+                  separators=(",", ":"))
+    print("sedes.json: %d sedes (%d jugables), final en %s"
+          % (len(sedes), sum(1 for s in sedes if s["lista"]),
+             next(s["nombre"] for s in sedes if s["final"])))
+    return sedes
+
+
+def auditar_sedes(sedes):
+    """Mismo contrato que `auditar_equipos`: la tarjeta tiene que existir y
+    tiene que decir lo que dice el juego."""
+    html = open(os.path.join(WEB, "index.html"), encoding="utf-8").read()
+    problemas = []
+    sin_aprobar = [s["slug"] for s in sedes if s["slug"] not in SEDES_APROBADAS]
+    if sin_aprobar:
+        problemas.append(
+            "CAPTURAS DE SEDE SIN CHEQUEO DE MARCAS (%d): %s\n"
+            "   -> abri game-unity/captures/sede_<slug>%s.png y LEE EL ESTADIO\n"
+            "      (fachada, accesos, pantalla, carteles): ningun nombre de\n"
+            "      estadio real ni sponsor. Recien ahi sumalo a SEDES_APROBADAS."
+            % (len(sin_aprobar), ", ".join(sin_aprobar), SEDE_VISTA))
+    for sd in sedes:
+        if not sd["lista"]:
+            # una sede apagada no se publica, y eso no es un error: es contenido
+            # que el jugador no puede elegir.
+            if "assets/sedes/%s.webp" % sd["slug"] in html:
+                problemas.append("SEDE APAGADA PUBLICADA: %s (lista = false)"
+                                 % sd["nombre"])
+            continue
+        i = html.find("assets/sedes/%s.webp" % sd["slug"])
+        if i < 0:
+            problemas.append("SIN TARJETA EN index.html: %s (%s)"
+                             % (sd["slug"], sd["nombre"]))
+            continue
+        li = html[html.rfind('<li class="sede', 0, i):html.find("</li>", i)]
+        for que, espera in (("nombre", ">%s</h3>" % sd["nombre"]),
+                            ("concepto", ">%s</p>" % sd["concepto"]),
+                            ("aforo", "<b>%s</b>" % _miles(sd["aforo"]))):
+            if espera not in li:
+                problemas.append(
+                    ("TARJETA DE SEDE DESFASADA (%s) en %s: falta %r"
+                     % (que, sd["nombre"], espera)) + SALTO
+                    + "   -> el juego manda; corre tools/regen_listas.py.")
+        if not sd["equipos"]:
+            problemas.append(
+                "SEDE SIN DUENO: %s no es la cancha de ningun equipo\n"
+                "   -> en el juego eso es contenido muerto (nunca sale en un\n"
+                "      amistoso) y lo avisa PocEquipos.SimEquipos." % sd["nombre"])
+    if problemas:
+        print("\n" + "=" * 70)
+        print("SEDES INCOMPLETAS")
+        print("=" * 70)
+        for p in problemas:
+            print(" - " + p)
+        print("=" * 70)
+        return False
+    print("sedes: %d publicadas, todas aprobadas y en el index"
+          % sum(1 for s in sedes if s["lista"]))
+    return True
+
+
+def _miles(n):
+    """42427 -> '42.427'. El punto es el separador de miles en es-AR."""
+    return "{:,}".format(n).replace(",", ".")
+
+
+# ============================================================================
+# LOS CONTADORES DEL COPY — la última lista a mano que nadie comparaba
+# ============================================================================
+# Las grillas tienen auditoría desde hace semanas, pero los NÚMEROS SUELTOS del
+# copy no tenían ninguna, y el 25-ago-2026 se encontró el zócalo del hero
+# diciendo "90 jugadores en 35 equipos" con el juego en 91 y 37 — publicado, en
+# la PRIMERA pantalla, y sobrevivió a tres pasadas de las otras auditorías.
+#
+# ⚠️ LA MITAD ESTÁN ESCRITOS EN LETRAS ("Treinta y siete equipos", "¿Los otros
+# cuarenta y siete?"), que es justamente por qué se desfasan: un `35` se ve raro
+# al lado de una grilla de 37, y "treinta y cinco" no se ve raro nunca. Por eso
+# el chequeo también sabe deletrear.
+_UNI = ["cero", "uno", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho",
+        "nueve", "diez", "once", "doce", "trece", "catorce", "quince",
+        "dieciséis", "diecisiete", "dieciocho", "diecinueve", "veinte",
+        "veintiuno", "veintidós", "veintitrés", "veinticuatro", "veinticinco",
+        "veintiséis", "veintisiete", "veintiocho", "veintinueve"]
+_DEC = {30: "treinta", 40: "cuarenta", 50: "cincuenta", 60: "sesenta",
+        70: "setenta", 80: "ochenta", 90: "noventa"}
+
+
+def en_letras(n):
+    if n < 30:
+        return _UNI[n]
+    if n == 100:
+        return "cien"
+    d, u = n // 10 * 10, n % 10
+    return _DEC[d] if u == 0 else "%s y %s" % (_DEC[d], _UNI[u])
+
+
+def auditar_contadores(equipos, sedes, jugadores, ligas):
+    html = open(os.path.join(WEB, "index.html"), encoding="utf-8").read()
+    nj = len(jugadores)
+    ne = len(equipos)
+    ns = sum(1 for s in sedes if s["lista"])
+    campo = sum(1 for j in jugadores if not j["gk"])
+    poderes = len({j["firma"] for j in jugadores if not j["gk"]})
+    # (qué es, el texto que TIENE que estar, dónde vive)
+    esperados = [
+        ("zócalo del hero", "<b>%d</b> jugadores en <b>%d</b> equipos" % (nj, ne)),
+        ("contador del álbum",
+         "<b>%d</b> de campo <span aria-hidden=\"true\">·</span> <b>%d</b> arqueros"
+         % (campo, nj - campo)),
+        ("título del álbum", ">%s</h2>" % en_letras(nj).capitalize()),
+        ("volanta de equipos", ">%s equipos</p>" % en_letras(ne).capitalize()),
+        ("volanta de poderes", ">%s poderes</p>" % en_letras(poderes).capitalize()),
+        ("volanta de sedes", ">%s canchas</p>" % en_letras(ns).capitalize()),
+        # los tres poderes con tarjeta grande son a mano; el resto es el resto
+        ("los poderes que faltan", "¿Los otros %s?" % en_letras(poderes - 3)),
+        ("meta description", "%d jugadores, %d equipos, %d canchas, %d poderes"
+                             % (nj, ne, ns, poderes)),
+    ]
+    # el título de cada liga lleva SU cuenta al lado, y ése es el contador que más
+    # fácil se desfasa: un equipo nuevo entra a UNA liga y las otras dos no cambian
+    for i, liga in enumerate(ligas):
+        n = sum(1 for e in equipos if e["liga"] == i)
+        esperados.append(("título de la liga %s" % liga,
+                          '>%s <span class="liga__n">%d</span></h3>' % (liga, n)))
+    faltan = [(q, t) for q, t in esperados if t not in html]
+    if faltan:
+        print("\n" + "=" * 70)
+        print("CONTADORES DESFASADOS EN EL COPY")
+        print("=" * 70)
+        for q, t in faltan:
+            print(" - %s: falta %r" % (q, t))
+        print("   -> son a mano (copy editorial); el juego manda.")
+        print("=" * 70)
+        return False
+    print("contadores: %d jugadores · %d equipos en %d ligas · %d canchas · %d poderes,"
+          " todos al dia" % (nj, ne, len(ligas), ns, poderes))
+    return True
 
 
 SALTO = chr(10)
@@ -642,6 +942,20 @@ SHOTS = [
     # que no le cabe la advertencia de arriba. Es 700px y se muestra a mitad
     # de columna, donde alcanza y sobra.
     ("m172_caja_tv", "caja-sorpresa"),
+    # La pantalla ELEGIR EQUIPOS (25-ago-2026). NO va recortada a 16:9 como las
+    # otras: es un menu y recortarlo se come la fila de arriba y la de abajo.
+    # Entra por SHOTS —y no como .webp suelto en assets/img, que es como estuvo
+    # hasta hoy— por la misma razon que el still del hero: un binario que el
+    # build no regenera es un binario que nadie puede rehacer sin adivinar de
+    # donde salio.
+    # ⚠️ Sale de un screenshot del juego y hay que RECORTARLE DOS COSAS antes de
+    # dejarlo en captures/, las dos del 12-ago y las dos volvieron a aparecer:
+    #   · el sello de build de abajo a la derecha (es una nota de produccion);
+    #   · la barra de ayuda del MENU PRINCIPAL, que se filtra abajo de la del
+    #     selector y se lee como un error de render.
+    # En la captura de M210 (2478x1534) las dos se van con crop 2478x1476 desde
+    # 0,0: la barra dorada del selector termina en y=1474 exacto.
+    ("web_selector_still", "selector-equipos"),
 ]
 # ⚠️ Solo van las capturas que el sitio USA. Hasta el 30-jul-2026 esta lista
 # generaba tambien `menu`, `atajada` y `partido`, que no estan referenciadas en
@@ -885,9 +1199,16 @@ if __name__ == "__main__":
     build_roster_json()
     equipos = build_equipos_json()
     build_escudos(equipos)
+    sedes = build_sedes(equipos)
     build_shots()
     ok = auditar_album()
     ok = auditar_equipos(equipos) and ok
+    ok = auditar_sedes(sedes) and ok
+    with open(out("assets", "roster", "roster.json"), encoding="utf-8") as f:
+        ok = auditar_contadores(equipos, sedes, json.load(f),
+                                json.load(open(out("assets", "equipos",
+                                                   "equipos.json"),
+                                               encoding="utf-8"))["ligas"]) and ok
     print("listo")
     # ⚠️ sale con error DESPUES de generar todo: los assets quedan igual, pero el
     # que corrio esto se entera. Un album incompleto que termina en verde es

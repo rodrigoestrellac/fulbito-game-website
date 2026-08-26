@@ -17,7 +17,12 @@ const componer = (s) => s.toLowerCase().replace(/\S+/g, (w) =>
                 : w.replace(/(^|['’])(\S)/g, (_, a, c) => a + c.toUpperCase()));
 
 async function montarEquipos() {
-  const grilla = document.querySelector('.equipos');
+  // ⚠️ querySelectorAll: desde el 25-ago el catálogo está partido en TRES grillas,
+  // una por liga (EQUIPOS · SELECCIONES · COMBINADOS FULBITO). Con querySelector
+  // se cableaban sólo las 15 de la primera y las otras 22 quedaban sin pizarra —
+  // y sin error en consola, que es el modo de falla que importa.
+  const grillas = [...document.querySelectorAll('.equipos')];
+  const grilla = grillas[0];
   if (!grilla || !window.fetch || typeof HTMLDialogElement === 'undefined') return;
 
   let data, roster;
@@ -34,7 +39,7 @@ async function montarEquipos() {
   const porSlug = new Map(data.equipos.map((e, n) => [e.slug, { ...e, n: n + 1 }]));
   const tarjetas = new Map(); // slug -> <li>
 
-  grilla.querySelectorAll('.equipo').forEach((li) => {
+  grillas.forEach((g) => g.querySelectorAll('.equipo').forEach((li) => {
     const src = li.querySelector('img')?.getAttribute('src') || '';
     const slug = (src.match(/equipos\/([a-z0-9-]+)\.webp$/) || [])[1];
     const e = porSlug.get(slug);
@@ -48,7 +53,7 @@ async function montarEquipos() {
     while (li.firstChild) btn.appendChild(li.firstChild);
     li.appendChild(btn);
     btn.addEventListener('click', () => abrirPizarra(slug));
-  });
+  }));
 
   /* ── la ficha: la pizarra táctica del equipo ──────────────────────────── */
   const ficha = document.createElement('dialog');

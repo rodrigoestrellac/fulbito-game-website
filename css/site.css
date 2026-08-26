@@ -912,8 +912,33 @@ code {
    personaje es el catálogo entero, no una tarjeta. El gesto grande está en la
    ficha (la pizarra del DT, más abajo). Todo lo que se ve sin JS está en el
    HTML, barras incluidas (los --v vienen inline del build). */
+/* ── El catálogo, partido en las tres ligas del juego ───────────────────────
+   Hasta el 25-ago-2026 eran 37 escudos en una grilla sola. El juego los agrupa
+   desde M197 —EQUIPOS · SELECCIONES · COMBINADOS FULBITO— y el selector elige en
+   dos pasos, así que la grilla plana ya no describía lo que el jugador hace.
+   El orden de las ligas es el del juego, no alfabético ni por tamaño. */
+.ligas { display: grid; gap: var(--s8); margin-top: var(--s6); }
+.liga__titulo {
+  display: flex; align-items: baseline; gap: var(--s3);
+  margin: 0; font-family: var(--display); font-weight: 700;
+  font-size: 1.05rem; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--oro);
+}
+/* la regla se come el ancho que sobra: separa el grupo sin dibujar una caja */
+.liga__titulo::after {
+  content: ""; flex: 1; height: 1px; background: rgba(201, 169, 78, .22);
+}
+.liga__n {
+  order: 1;   /* después de la regla, contra el margen derecho */
+  font-size: .8rem; letter-spacing: .1em; color: var(--cal-tenue);
+  font-variant-numeric: tabular-nums;
+}
+.liga__que {
+  margin: 6px 0 0; font-family: var(--tiza); font-size: 1.3rem;
+  line-height: 1.2; color: var(--oro-claro);
+}
 .equipos {
-  list-style: none; padding: 0; margin: var(--s6) 0 0;
+  list-style: none; padding: 0; margin: var(--s4) 0 0;
   display: grid; gap: var(--s3);
   grid-template-columns: repeat(auto-fill, minmax(196px, 1fr));
 }
@@ -976,6 +1001,98 @@ code {
    esto cada tarjeta alineaba las barras donde le quedaba */
 .equipo__abrir > .equipo__barras, .equipo > .equipo__barras { margin-top: auto; padding-top: var(--s3); }
 .equipo__concepto + .equipo__meta { margin-bottom: var(--s3); }
+
+/* ── Las sedes: los ocho estadios ────────────────────────────────────────────
+   Misma tarjeta que .equipo (mismo degradé, mismo borde, mismo levante al
+   pasar) pero apaisada, porque acá el contenido es la FOTO: las ocho canchas
+   se distinguen por silueta —bandejas, techo, esquinas— y eso necesita ancho.
+
+   Las tarjetas vienen ORDENADAS POR AFORO desde regen_listas.py y la reglita de
+   abajo del número es ese aforo contra el de la más grande. Es la misma técnica
+   que las barras de los equipos (un --v inline, cero JS): sin ella los números
+   se leen todos parecidos, y el punto de tener ocho canchas es justamente que
+   EL MUNICIPAL entra nueve veces adentro de MARACUYÁ. */
+.sedes {
+  list-style: none; padding: 0; margin: var(--s6) 0 0;
+  display: grid; gap: var(--s4);
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+}
+.sede {
+  position: relative; display: flex; flex-direction: column; overflow: hidden;
+  background: linear-gradient(180deg, rgba(201, 169, 78, .07), rgba(13, 27, 15, .55) 52%);
+  border: 1px solid var(--glass-borde); border-radius: var(--r-md);
+  transition: transform .25s var(--ease), border-color .25s, box-shadow .25s;
+}
+/* misma trampa que .equipo: el transition de arriba le gana al de .rev y la
+   tarjeta aparecería de golpe. Se resuelve con especificidad doble. */
+.sede.rev { transition: opacity .7s var(--ease), transform .7s var(--ease); }
+.sede.rev.dentro { transition: transform .25s var(--ease), border-color .25s, box-shadow .25s; }
+.sede:hover, .sede:focus-within {
+  transform: translateY(-4px); border-color: rgba(201, 169, 78, .5);
+  box-shadow: var(--sombra-card), var(--brillo-oro);
+}
+.sede__foto {
+  width: 100%; aspect-ratio: 16 / 9; object-fit: cover;
+  border-bottom: 1px solid var(--glass-borde);
+  background: #131a17;   /* el cielo nocturno de las capturas, mientras carga */
+}
+/* la chapa va SOBRE la foto y no arriba del nombre: es una condición del
+   estadio (dónde se juega la final, dónde el potrero), no parte de su nombre.
+   Sólo la llevan dos de las ocho, y las dos salen de un dato — MasGrande y
+   MasChica, que se derivan del aforo y ya se mudaron de estadio dos veces. */
+.sede__marca {
+  position: absolute; top: var(--s3); left: var(--s3); margin: 0;
+  padding: 5px 10px; border-radius: var(--r-sm);
+  background: var(--oro); color: var(--noche);
+  font-family: var(--display); font-weight: 700;
+  font-size: .66rem; letter-spacing: .14em; text-transform: uppercase;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .45);
+}
+.sede__nombre {
+  margin: var(--s4) var(--s4) 0; font-family: var(--display); font-weight: 700;
+  font-size: 1.15rem; letter-spacing: .08em; color: var(--cal); line-height: 1.2;
+}
+.sede__concepto {
+  margin: 4px var(--s4) 0; font-family: var(--tiza); font-size: 1.25rem;
+  line-height: 1.15; color: var(--oro-claro);
+  /* dos renglones SIEMPRE: el concepto de MARACUYA envuelve y el de OLD ROAD no,
+     y sin esto el numero y la reglita de cada tarjeta caen a alturas distintas
+     dentro de la misma fila. La reglita es una comparacion entre tarjetas: si no
+     estan a la misma altura, hay que buscarlas para compararlas. */
+  min-height: 2.3em;
+}
+.sede__aforo {
+  margin: var(--s4) var(--s4) 0; font-size: .78rem; letter-spacing: .04em;
+  color: var(--cal-tenue);
+}
+.sede__aforo b {
+  font-family: var(--display); font-weight: 700; font-size: 1.6rem;
+  font-variant-numeric: tabular-nums; color: var(--oro);
+  letter-spacing: .04em; margin-right: 6px;
+}
+.sede__aforo i {
+  display: block; margin-top: 10px; height: 3px; border-radius: 2px;
+  width: calc(var(--v) * 1%); background: var(--oro);
+  box-shadow: 0 0 10px rgba(201, 169, 78, .35);
+}
+.sede__locales {
+  /* al fondo de la tarjeta: las listas de locales miden de dos a nueve equipos
+     (OLD ROAD tiene nueve) y sin esto cada una arranca donde le queda */
+  margin: var(--s3) var(--s4) var(--s4); margin-top: auto; padding-top: var(--s3);
+  border-top: 1px solid rgba(201, 169, 78, .14);
+  font-size: .82rem; line-height: 1.5; color: var(--cal-tenue);
+}
+.sede__locales-tit {
+  display: block; margin-bottom: 4px;
+  font-family: var(--display); font-weight: 500;
+  font-size: .62rem; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--oro);
+}
+/* la reglita del aforo es información, no adorno: sin animación no se pierde
+   nada, pero con movimiento reducido tampoco tiene por qué moverse el levante */
+@media (prefers-reduced-motion: reduce) {
+  .sede:hover, .sede:focus-within { transform: none; }
+}
 
 /* ── la pizarra del DT: la ficha del equipo ──────────────────────────────────
    La mini-cancha NO es un dibujito: los siete están parados en los slots
@@ -1159,6 +1276,12 @@ code {
 @media (max-width: 700px) {
   .equipos { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
   .album { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+  /* las sedes ya caen a UNA columna acá (minmax 340 contra un env de ~350), y
+     con una sola columna no hay nada con qué alinear: los dos renglones de
+     concepto y el empujón de la lista al fondo dejan aire en el medio de la
+     tarjeta y nada más. */
+  .sede__concepto { min-height: 0; }
+  .sede__locales { margin-top: var(--s3); }
 }
 
 @media (max-width: 560px) {
@@ -1181,4 +1304,16 @@ code {
 
   .cta-inline__gancho { font-size: 1.4rem; }
   .cta-inline .btn { width: 100%; justify-content: center; }
+
+  /* Las sedes ya caen a una columna solas (minmax 340) y son ocho: en un
+     teléfono eso son ocho fotos apaisadas, que es de las secciones más caras
+     de la página. No se saca ninguna —el catálogo completo es el contenido—,
+     se achica: el padding, el número y la lista de locales, que a esta escala
+     es la parte más larga de la tarjeta. */
+  .sedes { gap: var(--s3); }
+  .sede__nombre { margin: var(--s3) var(--s3) 0; font-size: 1rem; letter-spacing: .05em; }
+  .sede__concepto { margin: 4px var(--s3) 0; font-size: 1.1rem; }
+  .sede__aforo { margin: var(--s3) var(--s3) 0; }
+  .sede__aforo b { font-size: 1.35rem; }
+  .sede__locales { margin: var(--s3); font-size: .76rem; }
 }

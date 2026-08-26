@@ -6,10 +6,18 @@
    ningún número escrito a mano, porque las listas a mano se desincronizan en
    silencio (la lección del álbum 28 vs 50). */
 
-/* Las descripciones de las jugadas firma SÍ son editoriales (el juego no las
-   tiene escritas en ningún lado). Los números que citan son los de
-   MatchTuning.cs — si una firma cambia de duración o radio, esto hay que
-   tocarlo a mano; por eso cada línea nombra el dato y no "un rato" o "cerca". */
+/* ⚠️ EL SITIO LES DICE **PODERES** Y EL DATO SE LLAMA `firma` (25-ago-2026, pedido
+   de Rodrigo: "no me gusta cómo suena jugadas firma"). El cambio es de COPY, no de
+   contrato: `roster.json` toma el campo `firma` del switch del HUD de
+   MatchDirector.cs, y las clases (.figu__firma, FIRMAS_DESC) siguen igual — el
+   renombre de la palabra visible no tiene por qué renombrar el modelo de datos.
+   ⚠️ El JUEGO todavía dice "JUGADAS FIRMA" en su pantalla de ayuda (Ayuda.cs) y
+   "medidor de firma": si eso se cambia allá, esta nota queda vieja.
+
+   Las descripciones SÍ son editoriales (el juego no las tiene escritas en ningún
+   lado). Los números que citan son los de MatchTuning.cs — si un poder cambia de
+   duración o radio, esto hay que tocarlo a mano; por eso cada línea nombra el dato
+   y no "un rato" o "cerca". */
 const FIRMAS_DESC = {
   'EL MARTILLAZO': 'Saca un martillo de la nada, lo levanta, lo baja — y todo el que esté a tres metros y medio queda dos segundos aplastado, hecho panqueque.',
   'LA EMBESTIDA': 'Arranca al doble de velocidad durante tres segundos y medio y hace panqueque a todo el que se le cruza.',
@@ -50,7 +58,7 @@ const FIRMAS_DESC = {
   'LA CAJA': 'Convierte a los rivales a cuatro metros en cajas sorpresa: dos segundos y medio encajonados hasta que el resorte escupe al payaso.',
   'EL ARAÑAZO': 'Tres garras que tajean DOS veces: la primera tanda voltea, y al que se corrió lo espera la segunda medio segundo después.',
   'LA PINTURA': 'Vuelca un balde de pintura unos metros adelante y la mancha queda ocho segundos en el pasto: el que la pisa, patina.',
-  'IL MIRACOLO': 'La única firma que no le hace nada a nadie: levanta a los compañeros caídos en seis metros y les deja un envión. Divino.',
+  'IL MIRACOLO': 'El único poder que no le hace nada a nadie: levanta a los compañeros caídos en seis metros y les deja un envión. Divino.',
   'EL EXPRESO': 'Se sube a una locomotora y sale tres segundos y medio a un tercio más de lo que corre: voltea todo lo que tenga adelante, pero no dobla — el que se corre al costado se salva.',
   'LA ATALAYA': 'Planta una torre que se queda ocho segundos tirando una flecha por segundo al rival de pie más cercano en cinco metros y medio. Cada flechazo deja tirado casi dos segundos.',
   'EL SUSTO': 'Levanta los brazos y ruge: los rivales a cinco metros salen en desbandada dos segundos y pico, pálidos y corriendo más rápido que nunca. El que llevaba la pelota, la suelta.',
@@ -59,7 +67,7 @@ const FIRMAS_DESC = {
   'LA REMONTADA': 'La única que sólo se puede tirar si vas perdiendo: seis segundos de envión para TODO el equipo, un rayo rojo a cada compañero, un veintidós por ciento más de velocidad y un veinte por ciento más de pegada.',
   'EN GARDE': 'Saca el florete: la estocada se lleva puesto al rival más cercano en tres metros, y quedan dos segundos y pico de guardia en los que el que le tira una entrada termina en el piso — y tampoco le pueden robar.',
   'LA ASPIRADORA': 'Tres segundos de imán: la pelota suelta que le pase a tres metros y medio se curva sola hacia él. No corre a buscarla — se para en el carril del pase y espera.',
-  'EL CORTOCIRCUITO': 'Un chispazo que llega a doce metros y APAGA las firmas rivales que estén prendidas — gigante, turbo, pitbull, guardia, lo que sea. Y de paso le vacía media barra al medidor del otro equipo.',
+  'EL CORTOCIRCUITO': 'Un chispazo que llega a doce metros y APAGA los poderes rivales que estén prendidos — gigante, turbo, pitbull, guardia, lo que sea. Y de paso le vacía media barra al medidor del otro equipo.',
   'LA CRUYFF': 'El giro de 1974: frena, la esconde y sale para el otro lado a un tercio más de velocidad. El que lo marcaba sigue de largo casi un segundo, mirando dónde quedó.',
   'ARQUERO': 'Ataja. Que no es poco: en Fulbito los arqueros vuelan de verdad.',
 };
@@ -190,12 +198,12 @@ async function montarAlbum() {
     return b;
   });
 
-  // las 35 firmas van en un <select>: como chips serían otra sábana
+  // los cincuenta poderes van en un <select>: como chips serían otra sábana
   const selectFirma = document.createElement('select');
   selectFirma.id = 'filtro-firma';
   selectFirma.className = 'album__firma-select';
-  selectFirma.setAttribute('aria-label', 'Filtrar por jugada firma');
-  selectFirma.innerHTML = '<option value="">Por firma…</option>' + firmas.map((f) => {
+  selectFirma.setAttribute('aria-label', 'Filtrar por poder');
+  selectFirma.innerHTML = '<option value="">Por poder…</option>' + firmas.map((f) => {
     const n = deCampo.filter((j) => j.firma === f).length;
     return `<option value="${f}">${componer(f)} (${n})</option>`;
   }).join('');

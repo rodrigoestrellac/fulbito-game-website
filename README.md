@@ -14,12 +14,14 @@ js/             releases.js (descargas, contador y eventos GA) + main.js (motion
 vendor/         three.js (sólo lo usa la pelota 3D, se carga diferido)
 assets/ball/    teamgeist.glb
 assets/img/     capturas del juego (WebP)
+assets/sedes/   los ocho estadios (WebP) + sedes.json (aforo, dueños, dónde va la final)
 assets/roster/  retratos del plantel, 480x480 (WebP) + roster.json (la ficha)
 assets/firmas/  los tres retratos grandes de las jugadas firma, 720x720
 assets/brand/   mark de la pelota, favicons, og-image, fulbito.ico
 assets/audio/   cuatro clips del relator
 assets/video/   los tres clips de gameplay (ver abajo)
 tools/          build_assets.py — regenera TODO lo binario de assets/
+                regen_listas.py — reescribe las TRES grillas del index desde los JSON
 ```
 
 ## Cómo publicar un build nuevo del juego
@@ -114,6 +116,11 @@ igual a `-r 60` como el resto, para no tener dos cadencias distintas en la misma
 recortada a 16:9 como las bandas: es un menú, y recortarlo se come justo la fila de arriba
 y la de abajo. Clase `.pantalla`, con el ancho natural y un epígrafe en tiza.
 
+⚠️ **Desde el 25-ago-2026 entra por `SHOTS`** (`captures/web_selector_still.png` →
+`selector-equipos`) y no como `.webp` suelto en `assets/img/`. Es la misma razón que el
+still del hero: un binario que el build no regenera es un binario que nadie puede rehacer
+sin adivinar de dónde salió. El recorte se hace ANTES de dejarlo en `captures/`.
+
 Dos cosas que hubo que sacarle, y que van a volver a aparecer en cualquier captura de menú:
 
 - **El sello de build** abajo a la derecha (decía `vM176`, y el sitio publica M174). Es una
@@ -123,6 +130,17 @@ Dos cosas que hubo que sacarle, y que van a volver a aparecer en cualquier captu
 
 Las dos se van con `crop=2304:1348:0:0`. Y conviene sacarla de la **grabación**, no de un
 screenshot del reproductor: el JPG que llegó tenía la barra de controles encima.
+
+**Las dos volvieron a aparecer en la captura de M210** (2478×1534, 25-ago), o sea que no
+son una casualidad de aquella toma: son cómo se ve la pantalla. Ahí el corte fue
+`2478×1476 desde 0,0` — la barra dorada del selector termina en `y = 1474` exacto, medido
+recorriendo la columna del medio, no a ojo:
+
+```python
+im = Image.open("selector equipos.jpg").convert("RGB")
+for y in range(1440, 1500): print(y, im.getpixel((1239, y)))   # el oro es (200,169,78)
+im.crop((0, 0, 2478, 1476)).save("game-unity/captures/web_selector_still.png")
+```
 
 ### ⚠️ Lo que hay que mirar ANTES de cortar (capturas del 12-ago-2026)
 
@@ -326,7 +344,20 @@ rompería enlaces y SEO sin que nadie lo pida. Los 28 publicados quedan congelad
 derivación deja de coincidir, el script lo dice y sigue publicando el viejo. Renombrar
 una URL tiene que ser una decisión, no un efecto secundario.
 
-**Estado: los 90** (76 de campo + 14 arqueros), al 19-ago-2026 (M196). Los cinco
+**Estado: los 91** (77 de campo + 14 arqueros), al 25-ago-2026 (M210). El último en
+entrar fue **EL GUAJE** (M206), que llegó porque LA FURIA necesitaba un sexto español.
+Mismo chequeo sobre su `_check_front.png` recién rendereado, con zoom al torso a 900 px:
+camiseta bordó LISA —kit pintado, como el de `trencinho`, no el magenta de Meshy—, short
+blanco, sin escudo ni sponsor.
+
+⚠️ **Y su alta cazó un bug del juego, por segunda vez con el mismo mecanismo.** El build
+se plantó con «sin firma: guaje»: `guaje` comparte el `case` de `tommy` (los dos tienen
+LA PISTOLA desde M206) pero le faltaba la entrada en el switch del HUD de
+`MatchDirector.cs`, así que **en el juego salía con el genérico «SUPER (SHIFT+tiro)»**.
+Es exactamente lo que pasó con `ashley` y `lili` el 18-ago. Al compartir un `case` hay
+que agregar la línea del HUD igual — se arregló en el repo del juego.
+
+Antes, al 19-ago-2026 (M196): los 90 (76 de campo + 14 arqueros). Los cinco
 de M196 pasaron el mismo chequeo: kit magenta liso, short blanco, sin escudo ni
 sponsor.
 
@@ -389,7 +420,8 @@ python tools/build_assets.py
 
 ## Los equipos — el catálogo, la pizarra y los escudos (12-ago-2026)
 
-Desde M153 el juego se juega POR EQUIPOS: un catálogo de 35 (27 hasta M195b, 31 hasta M196) con nombre, concepto,
+Desde M153 el juego se juega POR EQUIPOS: un catálogo de 37 (27 hasta M195b, 31 hasta M196,
+35 hasta M206) con nombre, concepto,
 formación, arquero y barras VEL/FUE/PRE. La sección LOS EQUIPOS del sitio se deriva
 entera del juego, con el mismo contrato que el álbum:
 
@@ -404,6 +436,21 @@ entera del juego, con el mismo contrato que el álbum:
   chequeo de marcas que el álbum: cada slug tiene que estar en `ESCUDOS_APROBADOS` o el
   build termina en error. Son las parodias de `gen_escudos.py`; la regla es que el
   escudo dibuja el CONCEPTO, nunca la marca de un club real.
+- **La grilla va PARTIDA EN LAS TRES LIGAS del juego** (25-ago-2026): `LigaNombre` +
+  `LigaDe` se parsean como un arreglo paralelo más —con el mismo chequeo de largo que
+  `EscudoId`— y `equipos.json` guarda `liga` por equipo y `ligas` con los nombres. El
+  orden de las ligas es el del juego (EQUIPOS · SELECCIONES · COMBINADOS FULBITO, que es
+  el que cicla el selector), **no alfabético ni por tamaño**.
+  ⚠️ **Adentro de cada liga manda el orden del catálogo, y `equipos.json` NO se reordena**:
+  el número que muestra la pizarra es el índice en `Equipos.Catalogo` y `copa.json` guarda
+  ESOS índices. Agrupar es una decisión de render, no del dato.
+  ⚠️ Y son TRES `<ul class="equipos">`, no uno: `js/equipos.js` usa `querySelectorAll`
+  desde entonces. Con `querySelector` se cableaban sólo las 15 de la primera liga y las
+  otras 22 quedaban sin pizarra — sin un solo error en consola.
+- **La línea de cada liga** (`LIGA_QUE` en `regen_listas.py`) es lo único editorial de la
+  sección, y sale del comentario "EL CRITERIO ES DE ORIGEN, NO DE CALIDAD NI DE ESTILO"
+  de `Equipos.cs`. Una liga nueva sin línea **termina el script con error**, en vez de
+  publicar el título pelado.
 - **La grilla es estática** (barras incluidas, con `--v` inline): sin JS se ve todo.
   `js/equipos.js` (module, como roster.js) sólo AGREGA la pizarra: el dialog con la
   formación real y los retratos del álbum parados en sus slots.
@@ -419,10 +466,18 @@ entera del juego, con el mismo contrato que el álbum:
   envejece igual que un número, y a mano no se nota.**
 
 Para un equipo nuevo en el juego: correr `build_assets.py`, mirar el escudo nuevo con
-zoom, sumarlo a `ESCUDOS_APROBADOS`, y agregar su tarjeta en `index.html` (el build
-dice exactamente qué falta).
+zoom, sumarlo a `ESCUDOS_APROBADOS`, correr `tools/regen_listas.py` y volver a correr el
+build hasta que dé verde (el build dice exactamente qué falta).
 
-**Corrida del 19-ago-2026 (M196): 35/35 exactos** (y 31/31 el 18-ago) contra `PocEquipos.SimEquipos`
+Los dos escudos de M206/M210 pasaron el chequeo, ninguno con texto: `furia` = un toro
+dorado embistiendo sobre rojo con banda roja y oro (iconografía nacional, no el escudo de
+la federación, que va con corona y siglas); `colchoneros` = rayas rojas y blancas con
+banda azul y un CANDADO al medio — el colchón y el candado, que son los dos apodos, y no
+el oso con el madroño del club real. Mismo criterio que `boke` y `millonetas`: los colores
+de la camiseta sí, la marca no.
+
+**Corrida del 25-ago-2026 (M210): 37/37 exactos** (35/35 el 19-ago, 31/31 el 18-ago)
+contra `PocEquipos.SimEquipos`
 (`tools/verificar_barras.py`). Vale la pena volver a correrlo cada vez que entra
 gente al pool: las barras son z-scores contra los jugadores DE CAMPO, así que al
 pasar de 55 a 71 se movieron **las 31**, incluidas las de equipos que nadie tocó.
@@ -451,6 +506,115 @@ dibujan heráldica nacional o regional — águila federal, león rampante neerl
 rombos de Baviera — que es dominio público y no la marca de la federación. El más
 al límite es `aristocratas`: toma el vocabulario (cetro, rosa blanca, azul y oro)
 del club de Londres pero no su león ni el disco, y va sin nombre.
+
+## Las tres grillas se REGENERAN, no se editan (`tools/regen_listas.py`)
+
+El álbum, el catálogo de equipos y las sedes son HTML estático a propósito: sin JS la
+página se ve entera. Pero eso las vuelve **tres listas que tienen que decir lo mismo que
+el juego**, y a mano se desincronizan en silencio — ya pasó con cuatro formaciones, un
+nombre de equipo, la firma de EL CEREBRO y cuatro conceptos de los que el juego se había
+despegado justamente para sacar un nombre real.
+
+```
+python tools/build_assets.py     # 1) los JSON y los binarios, desde game-unity
+python tools/regen_listas.py     # 2) los <li> de las tres grillas, desde los JSON
+python tools/build_assets.py     # 3) tiene que dar VERDE
+```
+
+⚠️ **Se regeneran LAS TRES ENTERAS, no sólo lo que el build señala.** Las barras
+VEL/FUE/PRE son z-scores contra el pool DE CAMPO: un jugador nuevo mueve las 37 tarjetas,
+incluidas las de equipos que nadie tocó. `regen_listas.py` reescribe sólo lo que hay
+entre `<ul>` y `</ul>`; el copy editorial (bajadas, contadores, secciones) sigue siendo a
+mano y hay que revisarlo aparte — es el que envejece sin que nada grite.
+
+## Las sedes — los ocho estadios (25-ago-2026)
+
+`Estadios.Todos` en el juego. Se deriva igual que el catálogo: `build_assets.py` parsea
+nombre, concepto y aforo, resuelve el `sede = Estadios.X` de cada equipo para saber quién
+juega de local en cada una, y escribe `assets/sedes/sedes.json` + los ocho WebP.
+
+Tres números que a mano envejecen y que ya cambiaron una vez cada uno:
+
+- **El aforo no es capacidad de folleto.** Es la gente que el sembrador pone de verdad y
+  que `AuditarSedes` cuenta colgando de la sede (4 vértices = 1 persona). EL MONUMENTO
+  pasó de 30 163 a 34 483 sin que se tocara el modelo: se sembró más denso.
+- **Quién juega de local** sale de `Equipo.sede`, así que un equipo nuevo se reparte solo.
+- **Dónde se juega LA FINAL no está escrito en ningún lado**: es `Estadios.MasGrande`, la
+  sede jugable con más aforo. Ya se mudó dos veces (Catedral → delle Curve en M176 →
+  MARACUYÁ en M207) y las dos por un número, no por una decisión. Lo mismo el POTRERO con
+  `MasChica`. Por eso las dos chapas de la sección salen del JSON y no del HTML.
+
+**Las tarjetas van ordenadas por aforo, de mayor a menor, y ese orden ES el contenido**:
+puestas así, la primera y la última cuentan esas dos reglas sin escribirlas. La reglita
+de abajo del número es el aforo contra el de la más grande, con la misma técnica que las
+barras de los equipos (un `--v` inline, cero JS): sin ella los números se leen todos
+parecidos, y el punto de tener ocho canchas es que EL MUNICIPAL entra **nueve veces**
+adentro de MARACUYÁ.
+
+⚠️ **El chequeo de marcas acá es distinto y peor que el de las camisetas.** Tres de los
+ocho estadios llegaron con el nombre de un estadio REAL pintado en la fachada, en los
+palcos, en seis murales y en la pantalla, y se despersonalizaron a mano en el repo del
+juego (`assets-src/bodegon_fbx.py`, `monumento_fbx.py`). O sea que no alcanza con mirar
+la ropa: hay que **leer el estadio** —fachada, cartel del acceso, pantalla y carteles
+perimetrales— antes de publicar la foto, y recién ahí sumar el slug a `SEDES_APROBADAS`.
+Lo que se lee en las ocho de hoy es todo del juego: `FULBITO STADIUM`, `STADIO DELLE
+CURVE`, `BODEGÓN XENEIZE`, `EL MONUMENTO`, `PUERTA LA HINCHADA`, y trapos que dicen
+FULBITO / LA BANDA / AGUANTE.
+
+### La foto: `sede_<slug>_web.png`, y el ángulo se MIDE
+
+Las `_tv` y `_aerea_cruce` están encuadradas sobre la cancha, que es igual en las ocho, y
+ahí las sedes se vuelven indistinguibles. Pero la `_aerea` tampoco servía, y el motivo
+vale la pena: **es el arranque del vuelo de la ceremonia, o sea el MISMO acimut para las
+ocho**. Rodrigo, mirando la primera versión de la sección: *"la visual del Bodegón
+Xeneize debería ser desde el otro lado"*, *"en Old Road no se ve la cancha"* — y las dos
+cosas son la misma cosa: el Bodegón es una herradura y Old Road tiene UNA tribuna alta
+con techo, así que un ángulo fijo entra por la pared en una y por el alero en la otra.
+
+`PocEstadios.CapturarSedes` (M211) agrega la `_web`, que **no elige el ángulo: lo mide**.
+
+- **El lado**: muestrea vértices de la sede en 24 sectores y entra por el más BAJO. Se
+  muestrean vértices y no `renderer.bounds` porque un bowl procedural es UN mesh y su
+  caja abarca los cuatro lados — con bounds, las tres sedes de `Bowl` habrían dado
+  siempre el mismo acimut.
+- **La altura**: por cada sector se guarda el máximo de `y/d` —la pendiente que ese
+  sector le come a la visual desde el medio de la cancha— y la cámara se eleva 25 % por
+  encima de eso. No es lo mismo que el punto más alto: *un alero de 10 m a 30 m tapa más
+  que una torre de 40 m a 200 m*. Con piso de 20° (el Municipal es tan chato que pedía 7°
+  y salía de perfil) y techo de 55° (más que eso es un cenital y se pierde la silueta).
+- **La distancia**: del radio del bowl, que es la MEDIANA de las distancias a esos puntos
+  empinados. No del bounds: los cinco FBX traen explanada, plaza o contenedores adentro
+  del modelo y la primera corrida los dejó como maquetas a 290 m.
+
+Los números de cada sede quedan en el log (`acimut · radio del bowl · borde bajo ·
+pendiente · cámara`), así que si una foto sale mal se ve POR QUÉ salió mal.
+
+### El entorno: que no floten (`PocEstadios.RehacerEntornos`)
+
+Rodrigo, mismo día: *"A la Catedral, el Municipal y al Coliseo les falta armarle los
+alrededores. Está flotando en la nada el estadio"*. Las cinco sedes de FBX traen su piso
+adentro del modelo; las que arma `Bowl` no tienen nada debajo, y LA CATEDRAL —que es FBX,
+pero de Sketchfab— tampoco: su modelo es el bowl y se acabó.
+
+`Entorno` les agrega explanada octogonal, paredón perimetral, cuatro torres de luz en las
+diagonales y arbolitos, todo bajo un hijo `Entorno`. **La regla es "la que no trae su
+propio piso", no una lista de tres**: el día que entre otra sede procedural, flota y nadie
+se entera. Dos cuidados que ya están resueltos y conviene no deshacer: el entorno NO puede
+colgar de `Gradas` (`BuildCrowd` sembraría miles de personas paradas en el
+estacionamiento) y las cámaras miden con `BoundsSinEntorno` (si no, encuadran el
+estacionamiento y el estadio sale chiquito).
+
+Se rehace sin rearmar la escena entera:
+
+```
+Unity.exe -batchmode -quit -projectPath <proj> -executeMethod PocEstadios.RehacerEntornos
+Unity.exe -batchmode -quit -projectPath <proj> -executeMethod PocEstadios.CapturarSedes
+```
+
+`auditar_sedes()` grita si falta una tarjeta, si la tarjeta miente (nombre, concepto o
+aforo), si se publicó una sede apagada (`lista = false`) o si una sede se quedó **sin
+dueño** — eso último en el juego es contenido muerto: una sede que no es la cancha de
+nadie no aparece nunca en un amistoso y se bakea igual en la escena.
 
 ## La pelota y el ícono
 
@@ -686,12 +850,49 @@ la web salen de `Items` en `MenuDirector.cs`, en su orden; lo que hace cada modo
 despacho de abajo (`scene == "potrero"`, `"tanda"`, `"vs"`…) y de los `const` del juego,
 no del nombre de la fila.
 
-**PENDIENTE (19-ago):** M196 agrupó el catálogo en TRES LIGAS (`Equipos.LigaNombre` =
-EQUIPOS · SELECCIONES · COMBINADOS FULBITO) y el selector elige en dos pasos —liga y
-después equipo—, en el amistoso y, desde M197, también en la Copa. La sección LOS EQUIPOS
-no lo cuenta y `assets/img/selector-equipos.webp` es la captura del selector viejo. No se
-tocó porque además hay que RE-CAPTURAR la pantalla, y porque nada de esto está todavía en
-un release descargable (el último es M193).
+**25-ago-2026 — el pendiente de las ligas, cerrado.** M196/M197 agrupó el catálogo en
+TRES LIGAS (`Equipos.LigaNombre` = EQUIPOS · SELECCIONES · COMBINADOS FULBITO) y el
+selector elige en dos pasos —liga y después equipo—, en el amistoso y en la Copa. Ya
+está en la bajada de LOS EQUIPOS, con el reparto real (quince · diez · doce, contado
+sobre `LigaDe`), y la captura es nueva. La fila AMISTOSO también cuenta las dos filas
+que aparecieron después: CANCHA (M177) y COPA AMISTOSA (M203, el partido que se juega
+y se termina como una final).
+
+## «Poderes», no «jugadas firma» (25-ago-2026)
+
+Rodrigo: *"no me gusta cómo suena jugadas firma. Pongámosle otro nombre"*. El sitio les
+dice **poderes** — volanta «Cincuenta poderes», título «Cada uno tiene su poder», filtro
+del álbum «Por poder…».
+
+⚠️ **Es un cambio de COPY, no de contrato.** El campo del JSON se sigue llamando `firma`
+(sale del switch del HUD de `MatchDirector.cs`), y las clases y constantes también
+(`.figu__firma`, `FIRMAS_DESC`). Renombrar el modelo de datos por un cambio de palabra
+visible sería romper la derivación para nada.
+
+⚠️ **Y el JUEGO todavía dice «JUGADAS FIRMA»** en su pantalla de ayuda (`Ayuda.cs`, y
+«medidor de firma» en los controles). Mientras eso siga así, el sitio y el juego le dicen
+distinto a la misma cosa — que es exactamente la clase de desfase que este README
+persigue en todo lo demás. Está anotado a propósito: alinear el juego es una decisión de
+Rodrigo, no un efecto secundario del copy de la web.
+
+La sección además **subió**: es la segunda, entre EL GOL y LOS EQUIPOS (*"esa parte debe
+estar bastante al principio de la web"*), y LAS SEDES va pegada abajo de LOS EQUIPOS
+(*"los estadios deben estar después de los equipos"*). Al mover una sección hay que
+recalcular el `seccion--suave`: alternan una sí y una no, y dos gradientes pegados se ven
+como un error de render.
+
+## Los contadores del copy también se auditan (`auditar_contadores`)
+
+Las tres grillas tenían auditoría; **los números sueltos del copy no tenían ninguna**, y
+el 25-ago se encontró el zócalo del hero diciendo «90 jugadores en 35 equipos» con el
+juego en 91 y 37 — publicado, en la PRIMERA pantalla, y sobrevivió a tres pasadas de las
+otras auditorías.
+
+Ahora `build_assets.py` compara contra los JSON el zócalo, el contador del álbum, las
+cuatro volantas, la frase de «los otros N poderes» y la meta description. **Y sabe
+deletrear**: la mitad de esos números están escritos en letras («Treinta y siete
+equipos»), que es justamente por qué se desfasan — un `35` al lado de una grilla de 37 se
+ve raro, «treinta y cinco» no se ve raro nunca.
 
 ## Legal
 
