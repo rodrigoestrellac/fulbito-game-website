@@ -733,6 +733,22 @@ def auditar_sedes(sedes):
     tiene que decir lo que dice el juego."""
     html = open(os.path.join(WEB, "index.html"), encoding="utf-8").read()
     problemas = []
+    # ⚠️ CERO SEDES NO ES "todo bien": es que el parseo de Estadios.cs se quedo sin
+    # matchear (le cambiaron el nombre al arreglo, o la forma del struct). Sin esto,
+    # el for de abajo no itera, no hay problemas, y la funcion firma un catalogo que
+    # nunca leyo. Es el mismo patron del regex sin anclar de verificar_barras.
+    if not sedes:
+        problemas.append(
+            "NO PARSEE NI UNA SEDE de Estadios.cs" + SALTO
+            + "   -> NO es que esten todas bien: es que el chequeo quedo ciego.")
+    # ⚠️ Y al reves: una tarjeta publicada que el juego ya no tiene. El for de abajo
+    # recorre el JUEGO, asi que una sede que se saca del catalogo se queda para
+    # siempre en la pagina sin que nadie la nombre.
+    en_html = set(re.findall(r"assets/sedes/([a-z0-9]+)\.webp", html))
+    huerfanas = en_html - {s["slug"] for s in sedes if s["lista"]}
+    if huerfanas:
+        problemas.append("TARJETAS DE SEDE SIN SEDE EN EL JUEGO: %s"
+                         % ", ".join(sorted(huerfanas)))
     sin_aprobar = [s["slug"] for s in sedes if s["slug"] not in SEDES_APROBADAS]
     if sin_aprobar:
         problemas.append(
@@ -844,6 +860,10 @@ def auditar_contadores(equipos, sedes, jugadores, ligas):
         n = sum(1 for e in equipos if e["liga"] == i)
         esperados.append(("título de la liga %s" % liga,
                           '>%s <span class="liga__n">%d</span></h3>' % (liga, n)))
+    # ⚠️ mismo criterio: si no hay nada que comparar, el que fallo es el chequeo
+    if not esperados or not html:
+        print("!! auditar_contadores no tenia nada que comparar — quedo ciego")
+        return False
     faltan = [(q, t) for q, t in esperados if t not in html]
     if faltan:
         print("\n" + "=" * 70)
@@ -875,10 +895,20 @@ def _tarjeta_desfasada(html, eq):
     nombres = {i: n for i, _c, _s, n in ROSTER_JUEGO}
     gk = " ".join(w[:1].upper() + w[1:].lower()
                   for w in nombres.get(eq["gk"], eq["gk"]).split(" "))
-    i = html.find("assets/equipos/%s.webp" % eq["slug"])
-    ini = html.rfind('<li class="equipo', 0, i)
-    li = html[ini:html.find("</li>", i)]
+    # ⚠️ SI NO ENCUENTRA LA TARJETA, ESO ES UNA FALLA — no un chequeo que se saltea.
+    # Con `find` devolviendo -1, `html[ini:-1]` es casi el documento entero y TODOS los
+    # `espera` aparecen (los pone otra tarjeta), asi que la funcion devolvia "sin
+    # fallas" justo cuando no habia mirado nada. Hoy el llamador ya filtra ese caso,
+    # pero el que se apoya en su llamador es el chequeo que un dia se apaga solo.
     fallas = []
+    i = html.find("assets/equipos/%s.webp" % eq["slug"])
+    ini = html.rfind('<li class="equipo', 0, i) if i >= 0 else -1
+    fin = html.find("</li>", i) if i >= 0 else -1
+    if i < 0 or ini < 0 or fin < 0:
+        return [("TARJETA ILEGIBLE en %s: no encontre su <li> completo en index.html"
+                 % eq["nombre"]) + SALTO
+                + "   -> NO es que la tarjeta este bien; es que el chequeo no pudo mirarla."]
+    li = html[ini:fin]
     for que, espera in (("nombre", ">%s</h3>" % eq["nombre"]),
                         ("concepto", ">%s</p>" % eq["concepto"]),
                         ("formacion", "<b>%s</b>" % forma),

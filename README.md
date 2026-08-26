@@ -915,6 +915,30 @@ deletrear**: la mitad de esos números están escritos en letras («Treinta y si
 equipos»), que es justamente por qué se desfasan — un `35` al lado de una grilla de 37 se
 ve raro, «treinta y cinco» no se ve raro nunca.
 
+## ⚠️ Un chequeo que no encuentra nada NO está diciendo que todo está bien
+
+El bug de `verificar_barras.py` en M213 vale como regla general, porque no es un
+descuido: es una forma que se repite. El regex pedía `VEL/FUE/PRE` y, como `re.match` no
+ancla el final, siguió matcheando cuando el juego agregó `DEF` — o sea que **habría dado
+37/37 sin comparar la barra nueva ni una vez**. El chequeo que existe para cazar réplicas
+viejas se apagó solo justo en el hito que lo necesitaba.
+
+El patrón es *"cuento muestras, no encuentro ninguna, imprimo OK"*. Después de encontrarlo
+se barrieron las auditorías de acá y aparecieron tres lugares más, los tres arreglados:
+
+| dónde | qué pasaba |
+|---|---|
+| `_tarjeta_desfasada` | con la tarjeta ausente, `html[ini:-1]` es casi el documento entero y **todos** los `espera` aparecen (los pone otra tarjeta). Devolvía "sin fallas" sin haber mirado nada. |
+| `auditar_sedes` | cero sedes parseadas = cero iteraciones = cero problemas = verde. Y no había chequeo de tarjetas **huérfanas**: el `for` recorre el juego, así que una sede sacada del catálogo se quedaba publicada para siempre. |
+| `auditar_contadores` | si la lista de esperados o el HTML venían vacíos, `faltan` daba vacío y firmaba. |
+
+La regla, para el que agregue una auditoría: **la muestra vacía es una falla, no un
+skip**, y el mensaje tiene que decir *"el chequeo quedó ciego"* y no callarse. Un chequeo
+que se saltea en silencio es peor que no tenerlo, porque firma lo que no miró.
+
+Y los guards se prueban EN NEGATIVO antes de darlos por buenos —forzando el caso que
+tienen que cazar—, porque un guard que nunca se vio disparar tampoco está verificado.
+
 ## Legal
 
 Proyecto personal, sin fines comerciales. No está afiliado ni autorizado por ningún club,
