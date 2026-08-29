@@ -22,7 +22,7 @@ const FIRMAS_DESC = {
   'EL MARTILLAZO': 'Saca un martillo de la nada, lo levanta, lo baja — y todo el que esté a tres metros y medio queda dos segundos aplastado, hecho panqueque.',
   'LA EMBESTIDA': 'Arranca al doble de velocidad durante tres segundos y medio y hace panqueque a todo el que se le cruza.',
   'LA MURALLA': 'Levanta una pared de cinco metros y la deja seis segundos. No te da la pelota: te da tiempo.',
-  'EL GIGANTE': 'Se agranda una vez y media durante tres segundos y medio, y con rozarte te voltea.',
+  'EL GIGANTE': 'Se agranda una vez y media durante poco más de dos segundos, y con rozarte te voltea.',
   'LA PAUSA': 'Cuatro segundos de pausa: los rivales pasan a cámara lenta y un compañero pica catorce metros al arco.',
   'EL CAÑONAZO': 'Saca un cañón pirata y dispara la pelota en llamas. Adentro de los dieciséis metros, no hay arquero.',
   'EL MISIL': 'Se carga un lanzamisiles al hombro y la pelota sale con ojiva. Cerca del arco no hay forma de atajarla.',
@@ -63,7 +63,7 @@ const FIRMAS_DESC = {
   'LA ATALAYA': 'Planta una torre que se queda ocho segundos tirando una flecha por segundo al rival de pie más cercano en cinco metros y medio. Cada flechazo deja tirado casi dos segundos.',
   'EL SUSTO': 'Levanta los brazos y ruge: los rivales a cinco metros salen en desbandada dos segundos y pico, pálidos y corriendo más rápido que nunca. El que llevaba la pelota, la suelta.',
   'LOS FANTASMAS': 'Salen tres señuelos idénticos y él se mezcla entre ellos: casi dos segundos y medio en los que el rival no sabe a cuál seguir.',
-  'EL INTOCABLE': 'Cuatro segundos y medio en los que no le pueden hacer una falta: le entran y sigue como si nada. No voltea a nadie — a una liana o un hacha se cae igual que cualquiera.',
+  'EL INTOCABLE': 'Tres segundos en los que no le pueden hacer una falta: le entran y sigue como si nada. No voltea a nadie — a una liana o un hacha se cae igual que cualquiera.',
   'LA REMONTADA': 'La única que sólo se puede tirar si vas perdiendo: seis segundos de envión para TODO el equipo, un rayo rojo a cada compañero, un veintidós por ciento más de velocidad y un veinte por ciento más de pegada.',
   'EN GARDE': 'Saca el florete: la estocada se lleva puesto al rival más cercano en tres metros, y quedan dos segundos y pico de guardia en los que el que le tira una entrada termina en el piso — y tampoco le pueden robar.',
   'LA ASPIRADORA': 'Tres segundos de imán: la pelota suelta que le pase a tres metros y medio se curva sola hacia él. No corre a buscarla — se para en el carril del pase y espera.',
@@ -107,12 +107,21 @@ const STATS_ROTULOS = [
   ['marca', 'Marca'],
 ];
 
-/* los dos recién llegados (M111) llevan el moño de NUEVO. Editorial: cuando
-   dejen de ser noticia, se vacía la lista y listo. */
+/* Los recién llegados llevan el moño de NUEVO. Editorial: cuando dejen de ser
+   noticia, se vacía la lista y listo.
+   ⚠️ ES «NUEVO PARA EL QUE BAJA EL JUEGO», o sea: los que entraron DESDE EL ÚLTIMO
+   RELEASE PUBLICADO, no desde el último hito. Esta lista se quedó marcando a los de
+   M164/M173 mientras entraban veintidós jugadores más, así que el moño terminaba
+   señalando a los viejos y los recién llegados pasaban sin distintivo — que es peor
+   que no tener moño. Al publicar un release: recalcular contra el roster.json del
+   release anterior y reemplazar la lista entera. */
 const NUEVOS = [
-  'titan', 'payasito', 'valdanito', 'muneco', 'jefecito',        // M164
-  'maestro', 'pinturicchio', 'divino', 'reyromano',              // M173
-  'pato', 'mono', 'casillero', 'dado', 'doblev', 'pinocho',      // arqueros M159/M173
+  // los dieciocho de campo de M194 / M195 / M196 / M206
+  'mamut', 'torre', 'monstro', 'patricio', 'colorado', 'relojero', 'capitan',
+  'nino', 'titi', 'dartagnan', 'ashley', 'lili', 'bombardero', 'elefante',
+  'hummus', 'kaiser', 'cruyff', 'guaje',
+  // y los cuatro arqueros
+  'barbab', 'julito', 'chauve', 'aquaman',
 ];
 
 const menosMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').matches;

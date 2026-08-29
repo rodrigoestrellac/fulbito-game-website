@@ -6,7 +6,7 @@
 
 const REPO = 'rodrigoestrellac/fulbito-game-website';
 
-/* Espejo estático del release M193. Actualizar al publicar uno nuevo.
+/* Espejo estático del release M227. Actualizar al publicar uno nuevo.
    Los bytes salen del release real (`gh release view --json assets`, stat sin
    redondeo): si no coinciden con el asset, la web muestra un tamaño equivocado
    justo cuando la API falla — o sea, justo cuando nadie lo va a poder verificar.
@@ -18,16 +18,16 @@ const REPO = 'rodrigoestrellac/fulbito-game-website';
    cinco en los que este archivo se olvidó. Si alguna vez se automatiza algo del
    proceso de publicación, que sea esto. */
 const FALLBACK = {
-  tag: 'M193',
+  tag: 'M227',
   archivos: {
-    winSetup: { nombre: 'FulbitoSetup-M193.exe', bytes: 180222689 },
-    winZip:   { nombre: 'Fulbito-M193-windows.zip', bytes: 228917889 },
-    mac:      { nombre: 'Fulbito-M193-mac.zip', bytes: 239045946 },
+    winSetup: { nombre: 'FulbitoSetup-M227.exe', bytes: 241607447 },
+    winZip:   { nombre: 'Fulbito-M227-windows.zip', bytes: 305788205 },
+    mac:      { nombre: 'Fulbito-M227-mac.zip', bytes: 315917178 },
     /* ⚠️ ANDROID YA ESTÁ ACÁ, y antes no estaba a propósito: hasta M193 ningún
        release traía el .apk y el espejo habría apuntado a un archivo inexistente.
        Ahora existe, así que corresponde. Los bytes salen de la API del release
-       (`gh release view M193 --json assets`), sin redondear. */
-    android:  { nombre: 'Fulbito-M193-android.apk', bytes: 233257988 },
+       (`gh release view <TAG> --json assets`), sin redondear. */
+    android:  { nombre: 'Fulbito-M227-android.apk', bytes: 306798224 },
     checksums:{ nombre: 'CHECKSUMS.txt', bytes: 407 },
   },
 };
@@ -50,10 +50,11 @@ function clasificar(assets) {
     winSetup: buscar(/setup.*\.exe$/i),
     winZip: buscar(/windows.*\.zip$/i),
     mac: buscar(/mac.*\.zip$/i),
-    /* Android: `Fulbito-<TAG>-android.apk` (PLAN_ANDROID §3.E.1). ⚠️ NO está en
-       FALLBACK a propósito: hasta que un release traiga el .apk de verdad, el
-       espejo estático apuntaría a un archivo que no existe y daría 404 justo
-       cuando la API de GitHub falla. La fila se dibuja sola el día que aparezca. */
+    /* Android: `Fulbito-<TAG>-android.apk` (PLAN_ANDROID §3.E.1). La fila se dibuja
+       sola cuando el release trae el archivo. ⚠️ Hasta M193 NO estaba en `FALLBACK`
+       a propósito —ningún release traía el .apk, y el espejo estático habría
+       apuntado a un 404 justo cuando la API de GitHub falla—; desde M193 sí está,
+       y hay que mantenerlo al día como los otros tres. */
     android: buscar(/android.*\.apk$/i),
     checksums: buscar(/^checksums.*\.txt$/i),
   };
