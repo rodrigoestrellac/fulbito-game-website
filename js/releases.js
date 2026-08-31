@@ -27,15 +27,14 @@ const FALLBACK = {
        release traía el .apk y el espejo habría apuntado a un archivo inexistente.
        Ahora existe, así que corresponde. Los bytes salen de la API del release
        (`gh release view <TAG> --json assets`), sin redondear.
-       ⚠️⚠️ M229 NO TRAE APK y por eso esta línea va COMENTADA, no actualizada. El
-       release se armó sin compilar Android: `pack_release.ps1` detectó que el .apk
-       de `builds/android` era el de M227 y lo salteó (antes lo habría copiado con
-       la etiqueta nueva — el bug del zip de Mac de M89). Si el espejo apuntara a
-       `Fulbito-M229-android.apk` daría 404 justo cuando la API de GitHub falla,
-       que es la única vez que este objeto se usa. Cuando se compile uno, se
-       descomenta con los bytes reales. */
-    /* android:  { nombre: 'Fulbito-M229-android.apk', bytes: 0 }, */
-    checksums:{ nombre: 'CHECKSUMS.txt', bytes: 315 },
+       ⚠️ El apk de M229 se compiló DESPUÉS de armar el resto del release, así que
+       esta línea estuvo comentada un rato: `pack_release.ps1` había detectado que
+       el .apk de `builds/android` todavía era el de M227 y lo salteó en vez de
+       copiarlo con la etiqueta nueva (el bug del zip de Mac de M89). Apuntar el
+       espejo a un archivo que el release no tiene es un 404 servido justo cuando
+       la API de GitHub falla, que es la única vez que este objeto se usa. */
+    android:  { nombre: 'Fulbito-M229-android.apk', bytes: 307089165 },
+    checksums:{ nombre: 'CHECKSUMS.txt', bytes: 407 },
   },
 };
 
