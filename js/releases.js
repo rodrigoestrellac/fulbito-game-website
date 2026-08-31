@@ -18,17 +18,24 @@ const REPO = 'rodrigoestrellac/fulbito-game-website';
    cinco en los que este archivo se olvidó. Si alguna vez se automatiza algo del
    proceso de publicación, que sea esto. */
 const FALLBACK = {
-  tag: 'M227',
+  tag: 'M229',
   archivos: {
-    winSetup: { nombre: 'FulbitoSetup-M227.exe', bytes: 241607447 },
-    winZip:   { nombre: 'Fulbito-M227-windows.zip', bytes: 305788205 },
-    mac:      { nombre: 'Fulbito-M227-mac.zip', bytes: 315917178 },
+    winSetup: { nombre: 'FulbitoSetup-M229.exe', bytes: 241779827 },
+    winZip:   { nombre: 'Fulbito-M229-windows.zip', bytes: 306057508 },
+    mac:      { nombre: 'Fulbito-M229-mac.zip', bytes: 316197453 },
     /* ⚠️ ANDROID YA ESTÁ ACÁ, y antes no estaba a propósito: hasta M193 ningún
        release traía el .apk y el espejo habría apuntado a un archivo inexistente.
        Ahora existe, así que corresponde. Los bytes salen de la API del release
-       (`gh release view <TAG> --json assets`), sin redondear. */
-    android:  { nombre: 'Fulbito-M227-android.apk', bytes: 306798224 },
-    checksums:{ nombre: 'CHECKSUMS.txt', bytes: 407 },
+       (`gh release view <TAG> --json assets`), sin redondear.
+       ⚠️⚠️ M229 NO TRAE APK y por eso esta línea va COMENTADA, no actualizada. El
+       release se armó sin compilar Android: `pack_release.ps1` detectó que el .apk
+       de `builds/android` era el de M227 y lo salteó (antes lo habría copiado con
+       la etiqueta nueva — el bug del zip de Mac de M89). Si el espejo apuntara a
+       `Fulbito-M229-android.apk` daría 404 justo cuando la API de GitHub falla,
+       que es la única vez que este objeto se usa. Cuando se compile uno, se
+       descomenta con los bytes reales. */
+    /* android:  { nombre: 'Fulbito-M229-android.apk', bytes: 0 }, */
+    checksums:{ nombre: 'CHECKSUMS.txt', bytes: 315 },
   },
 };
 

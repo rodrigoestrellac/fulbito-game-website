@@ -446,6 +446,17 @@ ESCUDOS_APROBADOS = {
     # del club real. Mismo criterio que `boke` y `millonetas`: colores de la
     # camiseta si, marca no.
     "furia", "colchoneros",
+    # 31-ago-2026 — `loba` (M229). Mirado con zoom: un LOBO dorado de perfil,
+    # parado y aullando, sobre escudo porpora con borde y banda de oro. Sin
+    # texto, sin numeros y sin monograma.
+    # ⚠️ LO QUE HAY QUE MIRAR ACA NO ES EL ANIMAL, SON LOS GEMELOS. La loba sola
+    # es iconografia de la ciudad de Roma —heraldica publica desde hace veinticinco
+    # siglos, igual que el toro de `furia` o el aguila de `mannschaft`—; la que ES
+    # el escudo del club es la ESCENA de la loba amamantando a los dos bebes. Este
+    # no la tiene: el lobo esta parado y solo, y el prompt de `gen_escudos.py` niega
+    # los gemelos con todas las letras. Mismo criterio que `colchoneros`, donde el
+    # oso quedo AFUERA por ser el emblema literal del club.
+    "loba",
 }
 
 ESCUDO_OUT = 256    # los PNG fuente son 256×256; se convierten sin escalar
