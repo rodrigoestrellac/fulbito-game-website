@@ -386,6 +386,12 @@ SEDES_APROBADAS = {
     # antes de que alguien pregunte por qué el resultado no cambia.
     "catedral", "coliseo", "municipal", "stadioitaliano", "oldroad",
     "bodegonxeneize", "elmonumento", "maracuya",
+    # 16-sep-2026 — COLISEO GALÁCTICO (M230), sobre `_aerea` (ver SEDE_VISTA_DE).
+    # Zoom a la fachada y al anillo de video: dicen `COLISEO GALÁCTICO` y `COPA
+    # FULBITO` (los pinta `assets-src/galactico_letreros.py`; el nombre es
+    # inventado, no de un estadio real). Carteles perimetrales: LA BANDA /
+    # FULBITO / AGUANTE / VAMOS. Sin sponsors.
+    "coliseogalactico",
 }
 # de qué toma cada sede su foto.
 # ⚠️ `_web` Y NO `_aerea` (25-ago-2026). Las `_tv` y `_aerea_cruce` están
@@ -401,6 +407,14 @@ SEDES_APROBADAS = {
 # haga falta para pasar por encima de ese borde. Se regenera con
 #   Unity.exe -batchmode -quit -projectPath <proj> #             -executeMethod PocEstadios.CapturarSedes
 SEDE_VISTA = "_web"
+# ⚠️ LA EXCEPCIÓN, y por qué es una sola. En COLISEO GALÁCTICO la `_web` entra por
+# el lado donde `abrir_techo()` estaciona el techo retráctil: `AcimutBajo` mide la
+# ALTURA MÁXIMA del sector, y ese lado es el más bajo, pero la losa del techo
+# estacionado queda entre la cámara y la cancha y tapa dos tercios del cuadro
+# (captura del 8-sep). La `_aerea` de la misma corrida muestra la piel de LED, las
+# bandejas y la cancha. Lo correcto a la larga es que `AcimutBajo` pese lo que
+# TAPA y no lo que mide de alto; mientras tanto, la foto se elige acá — mirándola.
+SEDE_VISTA_DE = {"coliseogalactico": "_aerea"}
 SEDE_MAX_W = 1280
 
 # El chequeo de marcas de los ESCUDOS, misma mecánica que APROBADOS: el slug
@@ -721,7 +735,8 @@ def build_sedes(equipos):
     """El JSON + las ocho fotos. Devuelve las sedes (jugables y apagadas)."""
     sedes = sedes_del_juego(equipos)
     for sd in sedes:
-        p = os.path.join(CAPS, "sede_%s%s.png" % (sd["slug"], SEDE_VISTA))
+        p = os.path.join(CAPS, "sede_%s%s.png"
+                         % (sd["slug"], SEDE_VISTA_DE.get(sd["slug"], SEDE_VISTA)))
         if not os.path.exists(p):
             print("  FALTA", p)
             continue
