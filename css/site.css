@@ -285,20 +285,9 @@ p:last-child { margin-bottom: 0; }
   padding: clamp(24px, 5vw, 64px);
   max-width: min(100%, 46ch);
 }
-/* En el celular el texto no entra encima de la foto: se desbordaba por arriba
-   y quedaba cortado y sobre la parte clara. Ahí la caja se estira hacia abajo:
-   el texto va en flujo DEBAJO de la imagen, montado apenas sobre su borde
-   inferior, y el degradé y el video se limitan a la zona de la imagen. */
 @media (max-width: 760px) {
-  .banda { background: rgb(7,14,8); }
   .banda__img { aspect-ratio: 4 / 3; }
-  .banda::after,
-  .banda > video { inset: 0 0 auto 0; height: auto; aspect-ratio: 4 / 3; }
-  .banda::after { background: linear-gradient(to top, rgb(7,14,8) 0%, rgba(7,14,8,.8) 22%, rgba(7,14,8,.4) 48%, rgba(7,14,8,.12) 80%, rgba(7,14,8,.05)); }
-  .banda__texto {
-    position: relative; inset: auto; max-width: none;
-    margin-top: -18%; padding: 0 22px 26px;
-  }
+  .banda::after { background: linear-gradient(to top, rgba(7,14,8,.96) 24%, rgba(7,14,8,.45) 70%, rgba(7,14,8,.2)); }
 }
 
 /* ── Jugadas firma ─────────────────────────────────────────────────────── */
@@ -582,6 +571,30 @@ table.specs td:first-of-type { color: var(--cal); }
 .hero__fondo > video {
   position: absolute; inset: 0; z-index: 0;
   width: 100%; height: 100%; object-fit: cover;
+}
+
+/* La banda del gol en el celular. El texto no entra encima de la foto (se
+   desbordaba por arriba), así que la caja se estira: la imagen arriba y el texto
+   debajo, sobre el oscuro. El empalme NO es un overlay con borde: la foto y el
+   clip se DESVANECEN con una máscara de curva suave hacia el fondo de la caja,
+   y el título se monta sobre la zona que ya casi se fundió.
+   ⚠️ Va DESPUÉS de la regla del video de arriba a propósito: con la misma
+   especificidad, si queda antes el `height: 100%` la pisa y el clip tapa la
+   caja entera (pasó: en el iPhone el video cubría el texto). */
+@media (max-width: 760px) {
+  .banda:not(.banda--suelta) { background: rgb(7,14,8); }
+  .banda:not(.banda--suelta)::after { display: none; }
+  .banda:not(.banda--suelta) > .banda__img,
+  .banda:not(.banda--suelta) > video {
+    -webkit-mask-image: linear-gradient(to bottom, #000 30%, rgba(0,0,0,.78) 44%, rgba(0,0,0,.5) 58%, rgba(0,0,0,.24) 72%, rgba(0,0,0,.07) 86%, transparent);
+            mask-image: linear-gradient(to bottom, #000 30%, rgba(0,0,0,.78) 44%, rgba(0,0,0,.5) 58%, rgba(0,0,0,.24) 72%, rgba(0,0,0,.07) 86%, transparent);
+  }
+  .banda:not(.banda--suelta) > video { inset: 0 0 auto 0; height: auto; aspect-ratio: 4 / 3; }
+  .banda__texto {
+    position: relative; inset: auto; max-width: none;
+    margin-top: -22%; padding: 0 22px 26px;
+  }
+  .banda__texto h2, .banda__texto .tiza { text-shadow: 0 2px 22px rgba(7,14,8,.9), 0 1px 3px rgba(7,14,8,.6); }
 }
 
 .controles-leyenda {
