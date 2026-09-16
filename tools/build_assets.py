@@ -140,6 +140,10 @@ APROBADOS = {
     # pintado, como el de trencinho, no el magenta de Meshy—, short blanco, sin
     # escudo, sin sponsor y sin numero.
     "guaje",
+    # 16-sep-2026 — EL CISNE (M233), que entra a NARANJA MECANICA, IL DIAVOLO y
+    # LA CANTERA. Zoom al torso sobre `cisne_check_front.png`: camiseta bordo
+    # lisa con vivos oscuros, short blanco, sin escudo, sin sponsor y sin numero.
+    "cisne",
 }
 
 # el archivo de captura cuando NO se llama como el id del juego
@@ -834,7 +838,11 @@ _DEC = {30: "treinta", 40: "cuarenta", 50: "cincuenta", 60: "sesenta",
         70: "setenta", 80: "ochenta", 90: "noventa"}
 
 
-def en_letras(n):
+def en_letras(n, apocope=False):
+    """`apocope` para cuando va delante del sustantivo: «cincuenta y UN poderes»,
+    no «cincuenta y uno poderes» (el auditor exigia la forma incorrecta)."""
+    if apocope and n % 10 == 1 and n != 11:
+        return en_letras(n - 1) + " y un" if n > 30 else ("un" if n == 1 else "veintiún")
     if n < 30:
         return _UNI[n]
     if n == 100:
@@ -857,9 +865,9 @@ def auditar_contadores(equipos, sedes, jugadores, ligas):
          "<b>%d</b> de campo <span aria-hidden=\"true\">·</span> <b>%d</b> arqueros"
          % (campo, nj - campo)),
         ("título del álbum", ">%s</h2>" % en_letras(nj).capitalize()),
-        ("volanta de equipos", ">%s equipos</p>" % en_letras(ne).capitalize()),
-        ("volanta de poderes", ">%s poderes</p>" % en_letras(poderes).capitalize()),
-        ("volanta de sedes", ">%s canchas</p>" % en_letras(ns).capitalize()),
+        ("volanta de equipos", ">%s equipos</p>" % en_letras(ne, True).capitalize()),
+        ("volanta de poderes", ">%s poderes</p>" % en_letras(poderes, True).capitalize()),
+        ("volanta de sedes", ">%s canchas</p>" % en_letras(ns, True).capitalize()),
         # los tres poderes con tarjeta grande son a mano; el resto es el resto
         ("los poderes que faltan", "¿Los otros %s?" % en_letras(poderes - 3)),
         ("meta description", "%d jugadores, %d equipos, %d canchas, %d poderes"

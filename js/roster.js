@@ -69,6 +69,7 @@ const FIRMAS_DESC = {
   'LA ASPIRADORA': 'Tres segundos de imán: la pelota suelta que le pase a tres metros y medio se curva sola hacia él. No corre a buscarla — se para en el carril del pase y espera.',
   'EL CORTOCIRCUITO': 'Un chispazo que llega a doce metros y APAGA los poderes rivales que estén prendidos — gigante, turbo, pitbull, guardia, lo que sea. Y de paso le vacía media barra al medidor del otro equipo.',
   'LA CRUYFF': 'El giro de 1974: frena, la esconde y sale para el otro lado a un tercio más de velocidad. El que lo marcaba sigue de largo casi un segundo, mirando dónde quedó.',
+  'LA VOLEA IMPOSIBLE': 'Se la levanta con un sombrerito, salta y le pega de volea en el aire, con el botín a un metro y medio: por encima de cualquier defensor y con la potencia del Cañonazo. Se tira desde cualquier parte de la cancha, pero el arquero la puede sacar.',
   'ARQUERO': 'Ataja. Que no es poco: en Fulbito los arqueros vuelan de verdad.',
 };
 
@@ -236,7 +237,7 @@ async function montarAlbum() {
     return b;
   });
 
-  // los cincuenta poderes van en un <select>: como chips serían otra sábana
+  // los cincuenta y un poderes van en un <select>: como chips serían otra sábana
   const selectFirma = document.createElement('select');
   selectFirma.id = 'filtro-firma';
   selectFirma.className = 'album__firma-select';
