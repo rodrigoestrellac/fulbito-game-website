@@ -128,7 +128,7 @@ function pintar(release) {
     const filas = [
       { k: 'winSetup', so: 'Windows', que: 'Instalador. Se instala solo, sin permisos de administrador.' },
       { k: 'winZip', so: 'Windows', que: 'Portable. Lo descomprimís y ejecutás <em>Fulbito.exe</em>. Sirve si la PC no te deja instalar nada.' },
-      { k: 'mac', so: 'macOS', que: '<em>Beta</em> — se empaquetó desde Windows y no lo probó nadie en un Mac de verdad. Si no te abre, contame.' },
+      { k: 'mac', so: 'macOS', que: '<em>Beta</em>. La primera vez macOS lo bloquea y hay que habilitarlo una sola vez: <a href="#paso-mac">mirá cómo</a>. Si no te abre, contame.' },
       { k: 'android', so: 'Android', que: 'Se juega con los dedos. <em>Recién salido</em> — el control táctil se probó en un solo teléfono, así que si algo se siente raro contame. Al abrir el archivo, el teléfono te va a pedir permiso para instalar «apps de orígenes desconocidos»: es el mismo aviso que da Windows con el instalador. Le das permiso y listo.' },
     ];
     lista.innerHTML = filas.filter((f) => archivos[f.k]).map((f) => {

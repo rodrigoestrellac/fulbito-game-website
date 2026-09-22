@@ -944,7 +944,7 @@
         </div>
         <div class="bajada-item">
           <span class="bajada-item__so">macOS</span>
-          <span class="bajada-item__meta"><em>Beta</em> — se empaquetó desde Windows y no lo probó nadie en un Mac de verdad. Si no te abre, contame.</span>
+          <span class="bajada-item__meta"><em>Beta</em>. La primera vez macOS lo bloquea y hay que habilitarlo una sola vez: <a href="#paso-mac">mirá cómo</a>. Si no te abre, contame.</span>
           <a class="btn btn--chico" href="https://github.com/rodrigoestrellac/fulbito-game-website/releases/latest">Descargar</a>
         </div>
         <div class="bajada-item">
@@ -967,12 +967,26 @@
             después <span class="tecla">Ejecutar de todas formas</span>. Si querés verificar que el
             archivo es el original, compará su SHA256 con el de CHECKSUMS.txt.</p>
         </li>
-        <li>
-          <h3>En Mac, descomprimilo antes de abrirlo</h3>
-          <p>Descomprimí el zip y mové Fulbito a la carpeta Aplicaciones — desde adentro del zip no
-            arranca. La primera vez macOS va a decir que no puede verificar al desarrollador: entrá a
-            <span class="tecla">Ajustes del Sistema</span> → <span class="tecla">Privacidad y seguridad</span>,
-            bajá hasta el final y tocá <span class="tecla">Abrir de todas formas</span>.</p>
+        <li id="paso-mac">
+          <h3>En Mac, la primera vez hay que habilitarlo (una sola vez)</h3>
+          <p><strong>1.</strong> Si lo bajaste con Safari, ya viene descomprimido: en
+            <span class="tecla">Descargas</span> vas a ver <em>Fulbito</em> directamente (si ves el
+            <em>.zip</em>, hacele doble clic). Arrastrá <em>Fulbito</em> a la carpeta
+            <span class="tecla">Aplicaciones</span>.</p>
+          <p><strong>2.</strong> Hacele doble clic. macOS va a decir que <em>«Fulbito» no se abrió</em>
+            porque Apple no pudo verificarlo, y no te va a dar la opción de abrirlo. Es normal: tocá
+            <span class="tecla">Listo</span>. <strong>No toques «Trasladar a la papelera»</strong>.
+            Este intento es necesario: sin él, el paso siguiente no aparece.</p>
+          <p><strong>3.</strong> Enseguida, abrí <span class="tecla">Ajustes del Sistema</span> →
+            <span class="tecla">Privacidad y seguridad</span> y bajá hasta la parte de
+            <em>Seguridad</em>. Va a haber un renglón que dice que se bloqueó «Fulbito», con el botón
+            <span class="tecla">Abrir igualmente</span>. Tocalo, poné la contraseña de la Mac (o la
+            huella) y en el cartel que sale tocá <span class="tecla">Abrir igualmente</span> otra vez.</p>
+          <p>Listo: desde ahí abre con doble clic como cualquier app. Si el botón no aparece, volvé al
+            paso 2 — macOS lo muestra sólo durante un rato después del intento. En macOS 13 o 14
+            también sirve el atajo: clic derecho sobre Fulbito → <span class="tecla">Abrir</span> →
+            <span class="tecla">Abrir</span>. Hace falta macOS 12 o más nuevo (menú de la manzanita →
+            <em>Acerca de esta Mac</em>).</p>
         </li>
         <li>
           <h3>En Android, permitile instalar el archivo</h3>

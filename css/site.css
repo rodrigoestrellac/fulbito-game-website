@@ -496,6 +496,8 @@ table.specs td:first-of-type { color: var(--cal); }
   border-left: 1px solid rgba(201, 169, 78, .2);
 }
 .pasos > li:last-child { border-left-color: transparent; padding-bottom: 0; }
+/* el link «mirá cómo» de la descarga de Mac salta acá: que no lo tape el marcador fijo */
+#paso-mac { scroll-margin-top: calc(var(--marcador-h) + 16px); }
 .pasos > li::before {
   content: counter(paso); position: absolute; left: 0; top: -2px;
   transform: translateX(-50%);
