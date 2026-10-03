@@ -6,7 +6,7 @@
 
 const REPO = 'rodrigoestrellac/fulbito-game-website';
 
-/* Espejo estático del release M234. Actualizar al publicar uno nuevo.
+/* Espejo estático del release M237k. Actualizar al publicar uno nuevo.
    Los bytes salen del release real (`gh release view --json assets`, stat sin
    redondeo): si no coinciden con el asset, la web muestra un tamaño equivocado
    justo cuando la API falla — o sea, justo cuando nadie lo va a poder verificar.
@@ -18,11 +18,11 @@ const REPO = 'rodrigoestrellac/fulbito-game-website';
    cinco en los que este archivo se olvidó. Si alguna vez se automatiza algo del
    proceso de publicación, que sea esto. */
 const FALLBACK = {
-  tag: 'M234',
+  tag: 'M237k',
   archivos: {
-    winSetup: { nombre: 'FulbitoSetup-M234.exe', bytes: 246457591 },
-    winZip:   { nombre: 'Fulbito-M234-windows.zip', bytes: 313506463 },
-    mac:      { nombre: 'Fulbito-M234-mac.zip', bytes: 323635487 },
+    winSetup: { nombre: 'FulbitoSetup-M237k.exe', bytes: 257685225 },
+    winZip:   { nombre: 'Fulbito-M237k-windows.zip', bytes: 328692297 },
+    mac:      { nombre: 'Fulbito-M237k-mac.zip', bytes: 338822948 },
     /* ⚠️ ANDROID YA ESTÁ ACÁ, y antes no estaba a propósito: hasta M193 ningún
        release traía el .apk y el espejo habría apuntado a un archivo inexistente.
        Ahora existe, así que corresponde. Los bytes salen de la API del release
@@ -33,8 +33,8 @@ const FALLBACK = {
        copiarlo con la etiqueta nueva (el bug del zip de Mac de M89). Apuntar el
        espejo a un archivo que el release no tiene es un 404 servido justo cuando
        la API de GitHub falla, que es la única vez que este objeto se usa. */
-    android:  { nombre: 'Fulbito-M234-android.apk', bytes: 314470328 },
-    checksums:{ nombre: 'CHECKSUMS.txt', bytes: 407 },
+    android:  { nombre: 'Fulbito-M237k-android.apk', bytes: 330401919 },
+    checksums:{ nombre: 'CHECKSUMS.txt', bytes: 412 },
   },
 };
 
