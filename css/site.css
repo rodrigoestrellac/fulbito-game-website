@@ -1194,32 +1194,99 @@ code {
   .pizarra { max-width: 340px; margin-inline: auto; }
 }
 
-/* ── CAJAS SORPRESA: la foto y los seis modificadores ──────────────────────── */
+/* ── CAJAS SORPRESA: el video grande + el tablero de las quince ─────────────
+   Rodrigo (5-oct): *"la parte de las cajas se ve muy mal [...] quedó demasiado extensa
+   la sección y el video chiquito"*. Eran quince renglones apilados (1.810 px de alto) al
+   lado de un video de 420 px. Ahora: el clip a tamaño TELE a la izquierda y, a la
+   derecha, un tablero de 5×3 con los ÍCONOS DEL JUEGO (los mismos `ui_caja_*` del HUD)
+   y la ficha de la caja elegida. Rota sola (main.js, `montarCajas`); al tocar una, para.
+   ⚠️ SIN JS el tablero no sirve: queda oculto y las quince fichas se ven en lista —
+   el texto está entero en el HTML igual (buscadores, lectores de pantalla). */
 .cajas {
-  display: grid; grid-template-columns: minmax(280px, 420px) 1fr;
-  gap: clamp(20px, 4vw, 48px); align-items: center; margin-top: var(--s6);
+  display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(300px, 1fr);
+  gap: clamp(20px, 3.5vw, 44px); align-items: center; margin-top: var(--s6);
 }
 /* la altura de la caja la sigue dando la <img> (el <video> es absoluto y no
    ocupa lugar en el layout): borrarla colapsaría la sección a altura cero */
 .cajas__hueco {
   position: relative; isolation: isolate; overflow: hidden;
-  border-radius: var(--r-md);
-  border: 1px solid var(--glass-borde); box-shadow: var(--sombra-card);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--glass-borde); box-shadow: var(--sombra-card), var(--brillo-oro);
 }
-.cajas__foto { width: 100%; height: auto; display: block; }
-.cajas__efectos { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
-.cajas__efectos li {
-  padding-left: var(--s3); border-left: 2px solid rgba(201, 169, 78, .35);
-  font-size: .95rem; color: var(--cal-tenue); line-height: 1.45;
+.cajas__foto { width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; display: block; }
+
+.cajas__panel { display: grid; gap: var(--s3); }
+.cajas__rotulo {
+  margin: 0; font-family: var(--display); font-size: var(--t-micro); letter-spacing: .22em;
+  text-transform: uppercase; color: var(--oro);
 }
-.cajas__efectos b {
-  display: block; font-family: var(--display); font-weight: 700;
-  font-size: .95rem; letter-spacing: .07em; text-transform: uppercase;
-  color: var(--oro-claro);
+.cajas__grilla, .cajas__rotulo { display: none; }
+.cajas__grilla { grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.cajas--vivo .cajas__rotulo { display: block; }
+.cajas--vivo .cajas__grilla { display: grid; }
+.caja-tile {
+  position: relative; aspect-ratio: 1; padding: 0; cursor: pointer;
+  border-radius: var(--r-md); border: 1px solid var(--glass-borde);
+  background: linear-gradient(160deg, rgba(45, 80, 22, .35), rgba(13, 27, 15, .9));
+  transition: transform .25s var(--ease-back), background .2s, border-color .2s, box-shadow .2s;
 }
-@media (max-width: 800px) {
+.caja-tile:hover { transform: translateY(-3px); border-color: rgba(201, 169, 78, .55); }
+.caja-tile:focus-visible { outline: 2px solid var(--oro-claro); outline-offset: 2px; }
+.caja-tile[aria-selected="true"] {
+  background: linear-gradient(160deg, var(--oro-claro), var(--oro));
+  border-color: var(--oro-claro); box-shadow: var(--brillo-oro); transform: translateY(-2px);
+}
+/* el ícono del juego es blanco sobre transparente: se usa como MÁSCARA, así toma el
+   color que se quiera (crema en reposo, noche sobre el oro elegido) */
+.caja-tile__ico, .caja-ficha__ico {
+  display: block; background: var(--cal);
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  -webkit-mask-position: center; mask-position: center;
+  -webkit-mask-size: contain; mask-size: contain;
+}
+.caja-tile__ico { position: absolute; inset: 22%; }
+.caja-tile[aria-selected="true"] .caja-tile__ico { background: var(--noche); }
+
+.cajas__fichas { display: grid; gap: 12px; }
+.caja-ficha {
+  display: grid; grid-template-columns: auto 1fr; column-gap: var(--s3); align-items: center;
+  padding: var(--s3) var(--s4); border-radius: var(--r-md);
+  background: var(--glass-bg); border: 1px solid var(--glass-borde);
+}
+.caja-ficha__ico { grid-row: span 2; width: 52px; height: 52px; background: var(--oro-claro); }
+.caja-ficha__nombre {
+  margin: 0; font-family: var(--display); font-weight: 700; font-size: 1.15rem;
+  letter-spacing: .06em; text-transform: uppercase; color: var(--oro-claro);
+}
+.caja-ficha__desc { margin: 4px 0 0; color: var(--cal-tenue); font-size: .98rem; line-height: 1.5; }
+/* con JS: las quince fichas apiladas EN LA MISMA CELDA. La celda toma la altura de la
+   más larga, así el cambio de caja no hace saltar la página. */
+.cajas--vivo .cajas__fichas { grid-template-areas: "f"; }
+.cajas--vivo .caja-ficha {
+  grid-area: f; opacity: 0; visibility: hidden; transform: translateY(6px);
+  transition: opacity .3s, transform .35s var(--ease), visibility 0s .3s;
+}
+.cajas--vivo .caja-ficha.es-actual {
+  opacity: 1; visibility: visible; transform: none;
+  transition: opacity .3s, transform .35s var(--ease), visibility 0s;
+}
+.cajas--vivo .caja-ficha__ico { width: 64px; height: 64px; }
+/* el reloj de la rotación: una rayita que se llena hasta la caja siguiente */
+.cajas__reloj { display: none; height: 2px; background: rgba(201, 169, 78, .15); border-radius: 2px; overflow: hidden; }
+.cajas--rotando .cajas__reloj { display: block; }
+.cajas__reloj i { display: block; height: 100%; width: 100%; background: var(--oro); transform-origin: left; transform: scaleX(0); }
+.cajas--rotando .cajas__reloj i { animation: cajas-reloj var(--cajas-t, 4.5s) linear infinite; }
+.cajas--pausa .cajas__reloj i { animation-play-state: paused; }
+@keyframes cajas-reloj { to { transform: scaleX(1); } }
+
+@media (max-width: 860px) {
   .cajas { grid-template-columns: 1fr; }
-  .cajas__hueco { max-width: 480px; justify-self: center; }
+  .cajas__panel { max-width: 560px; justify-self: center; width: 100%; }
+}
+@media (max-width: 420px) {
+  .cajas__grilla { gap: 6px; }
+  .caja-ficha { padding: 12px 14px; }
+  .cajas--vivo .caja-ficha__ico { width: 48px; height: 48px; }
 }
 
 /* ══ EL PULIDO (PLAN_WEB_PULIDO) ═══════════════════════════════════════

@@ -140,6 +140,75 @@ function montarVideos() {
 }
 montarVideos();
 
+/* ── Las cajas sorpresa: el tablero de las quince ─────────────────────────
+   Un tablist de verdad (flechas, Inicio/Fin, aria-selected) sobre las quince
+   fichas, que están TODAS en el HTML. Sin JS se ven en lista; con JS, una por vez
+   (`.cajas--vivo`, ver site.css).
+   La rotación sola es para el que scrollea sin tocar: avanza cada CAJAS_T, se
+   PAUSA con el mouse o el foco adentro, corre sólo con la sección a la vista, y se
+   APAGA para siempre en cuanto alguien elige una — que una ficha se le cambie a
+   quien la está leyendo es lo peor que puede hacer un carrusel. Con
+   prefers-reduced-motion no rota nunca. */
+const CAJAS_T = 4500;
+
+function montarCajas() {
+  const caja = document.querySelector('.cajas');
+  const tiles = caja ? [...caja.querySelectorAll('.caja-tile')] : [];
+  if (!tiles.length) return;
+  const fichas = tiles.map((t) => document.getElementById(t.getAttribute('aria-controls')));
+  caja.classList.add('cajas--vivo');
+  caja.style.setProperty('--cajas-t', CAJAS_T + 'ms');
+  let actual = 0, timer = null, visible = false, encima = false, tocada = false;
+
+  const elegir = (i, foco) => {
+    actual = (i + tiles.length) % tiles.length;
+    tiles.forEach((t, k) => {
+      const si = k === actual;
+      t.setAttribute('aria-selected', si ? 'true' : 'false');
+      t.tabIndex = si ? 0 : -1;
+      fichas[k].classList.toggle('es-actual', si);
+      fichas[k].hidden = false;   // la visibilidad la maneja la clase (transición)
+      fichas[k].setAttribute('aria-hidden', si ? 'false' : 'true');
+    });
+    if (foco) tiles[actual].focus();
+  };
+
+  const rotar = () => {
+    clearInterval(timer); timer = null;
+    const corre = !menosMovimiento && !tocada && visible && !encima;
+    caja.classList.toggle('cajas--rotando', !menosMovimiento && !tocada);
+    caja.classList.toggle('cajas--pausa', !corre);
+    if (corre) {
+      // reinicia la rayita para que arranque junto con el intervalo
+      const i = caja.querySelector('.cajas__reloj i');
+      if (i) { i.style.animation = 'none'; void i.offsetWidth; i.style.animation = ''; }
+      timer = setInterval(() => elegir(actual + 1, false), CAJAS_T);
+    }
+  };
+
+  const parar = () => { tocada = true; rotar(); };
+  tiles.forEach((t, k) => t.addEventListener('click', () => { parar(); elegir(k, false); }));
+  caja.querySelector('.cajas__grilla').addEventListener('keydown', (e) => {
+    const paso = { ArrowRight: 1, ArrowDown: 5, ArrowLeft: -1, ArrowUp: -5 }[e.key];
+    if (paso !== undefined) { e.preventDefault(); parar(); elegir(actual + paso, true); }
+    else if (e.key === 'Home') { e.preventDefault(); parar(); elegir(0, true); }
+    else if (e.key === 'End') { e.preventDefault(); parar(); elegir(tiles.length - 1, true); }
+  });
+  const panel = caja.querySelector('.cajas__panel');
+  panel.addEventListener('pointerenter', () => { encima = true; rotar(); });
+  panel.addEventListener('pointerleave', () => { encima = false; rotar(); });
+  panel.addEventListener('focusin', () => { encima = true; rotar(); });
+  panel.addEventListener('focusout', () => { encima = false; rotar(); });
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; rotar(); },
+                             { threshold: 0.35 }).observe(caja);
+  } else { visible = true; }
+
+  elegir(0, false);
+  rotar();
+}
+montarCajas();
+
 /* ── La pelota 3D del hero ────────────────────────────────────────────────
    three.js + el modelo son ~1,4 MB: eso NO puede pesar en el primer paint. Se
    importa despues del load y en idle, y solo si conviene:

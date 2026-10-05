@@ -247,37 +247,104 @@
         <div class="cajas__hueco" data-video="assets/video/cajas.mp4">
           <img class="cajas__foto" src="assets/img/caja-sorpresa.webp" alt="La caja sorpresa con el signo de pregunta apoyada en el círculo central, con los dos equipos alrededor" width="700" height="461" loading="lazy">
         </div>
-        <ul class="cajas__efectos">
-          <li><b>¡Se inclinó la cancha!</b> Catorce segundos en los que la pelota rueda sola
-            para el arco rival, cámara ladeada incluida.</li>
-          <li><b>¡Llegó uno más!</b> Entra un octavo jugador de verdad, sorteado del
-            plantel, veintiocho segundos con tu camiseta.</li>
-          <li><b>¡Calvino se puso la camiseta!</b> El árbitro juega para vos treinta y un
-            segundos. Mientras tanto, no cobra nada.</li>
-          <li><b>¡Estacionó el colectivo!</b> Un bondi de siete metros se cruza delante de
-            tu arco y tapa la boca entera durante once segundos.</li>
-          <li><b>¡Turbo carga!</b> Tu medidor de poder carga al triple durante
-            veintiún segundos.</li>
-          <li><b>¡Batería mojada!</b> El medidor del rival, a un tercio. Misma duración.</li>
-          <li><b>¡Hora, referí!</b> Si vas ganando, el reloj corre al triple; si vas
-            perdiendo, el árbitro agrega veinte segundos de descuento (doce si van empatados).</li>
-          <li><b>¡Roja directa!</b> Expulsan al rival que está más cerca de la pelota:
-            veintiún segundos jugando con uno menos.</li>
-          <li><b>¡El DT se metió!</b> Tu técnico sale corriendo de la banda y le mete una
-            patada voladora al que tiene la pelota. Se esquiva con un pase.</li>
-          <li><b>¡Vale doble!</b> Si tu equipo hace un gol en los próximos veintiún
-            segundos, vale dos.</li>
-          <li><b>¡Arco de Baby!</b> Aparecen pilas de cajas pegadas a los palos de tu arco
-            y te lo achican durante catorce segundos.</li>
-          <li><b>¡Se prendió el aspersor!</b> Se moja la mitad del rival: la pelota frena
-            la mitad y ellos van más lentos. Diecisiete segundos.</li>
-          <li><b>¡Pelota de playa!</b> Catorce segundos con una pelota el doble de grande,
-            que flota y se frena en el aire.</li>
-          <li><b>¡Se cortó la luz!</b> Once segundos a oscuras: el árbitro no cobra nada
-            y los dos arqueros reaccionan tarde.</li>
-          <li><b>¡Perro en la cancha!</b> Entra <b>Fulbi</b>, el perrito malvado, y durante
-            diecisiete segundos persigue y muerde a los rivales.</li>
-        </ul>
+        <div class="cajas__panel">
+          <p class="cajas__rotulo">Tocá una caja</p>
+          <div class="cajas__grilla" role="tablist" aria-label="Las quince cajas sorpresa">
+            <button class="caja-tile" type="button" role="tab" id="caja-t-pendiente" aria-controls="caja-p-pendiente" aria-selected="true" tabindex="0"><span class="caja-tile__ico" aria-hidden="true" style="-webkit-mask-image:url(assets/img/cajas/pendiente.webp);mask-image:url(assets/img/cajas/pendiente.webp)"></span><span class="visually-hidden">¡Se inclinó la cancha!</span></button>
+            <button class="caja-tile" type="button" role="tab" id="caja-t-unomas" aria-controls="caja-p-unomas" aria-selected="false" tabindex="-1"><span class="caja-tile__ico" aria-hidden="true" style="-webkit-mask-image:url(assets/img/cajas/unomas.webp);mask-image:url(assets/img/cajas/unomas.webp)"></span><span class="visually-hidden">¡Llegó uno más!</span></button>
+            <button class="caja-tile" type="button" role="tab" id="caja-t-arbitro" aria-controls="caja-p-arbitro" aria-selected="false" tabindex="-1"><span class="caja-tile__ico" aria-hidden="true" style="-webkit-mask-image:url(assets/img/cajas/arbitro.webp);mask-image:url(assets/img/cajas/arbitro.webp)"></span><span class="visually-hidden">¡Calvino se puso la camiseta!</span></button>
+            <button class="caja-tile" type="button" role="tab" id="caja-t-colectivo" aria-controls="caja-p-colectivo" aria-selected="false" tabindex="-1"><span class="caja-tile__ico" aria-hidden="true" style="-webkit-mask-image:url(assets/img/cajas/colectivo.webp);mask-image:url(assets/img/cajas/colectivo.webp)"></span><span class="visually-hidden">¡Estacionó el colectivo!</span></button>
+            <button class="caja-tile" type="button" role="tab" id="caja-t-turbo" aria-controls="caja-p-turbo" aria-selected="false" tabindex="-1"><span class="caja-tile__ico" aria-hidden="true" style="-webkit-mask-image:url(assets/img/cajas/turbo.webp);mask-image:url(assets/img/cajas/turbo.webp)"></span><span class="visually-hidden">¡Turbo carga!</span></button>
+            <button class="caja-tile" type="button" role="tab" id="caja-t-bateria" aria-controls="caja-p-bateria" aria-selected="false" tabindex="-1"><span class="caja-tile__ico" aria-hidden="true" style="-webkit-mask-image:url(assets/img/cajas/bateria.webp);mask-image:url(assets/img/cajas/bateria.webp)"></span><span class="visually-hidden">¡Batería mojada!</span></button>
+            <button class="caja-tile" type="button" role="tab" id="caja-t-hora" aria-controls="caja-p-hora" aria-selected="false" tabindex="-1"><span class="caja-tile__ico" aria-hidden="true" style="-webkit-mask-image:url(assets/img/cajas/hora.webp);mask-image:url(assets/img/cajas/hora.webp)"></span><span class="visually-hidden">¡Hora, referí!</span></button>
+            <button class="caja-tile" type="button" role="tab" id="caja-t-roja" aria-controls="caja-p-roja" aria-selected="false" tabindex="-1"><span class="caja-tile__ico" aria-hidden="true" style="-webkit-mask-image:url(assets/img/cajas/roja.webp);mask-image:url(assets/img/cajas/roja.webp)"></span><span class="visually-hidden">¡Roja directa!</span></button>
+            <button class="caja-tile" type="button" role="tab" id="caja-t-dt" aria-controls="caja-p-dt" aria-selected="false" tabindex="-1"><span class="caja-tile__ico" aria-hidden="true" style="-webkit-mask-image:url(assets/img/cajas/dt.webp);mask-image:url(assets/img/cajas/dt.webp)"></span><span class="visually-hidden">¡El DT se metió!</span></button>
+            <button class="caja-tile" type="button" role="tab" id="caja-t-doble" aria-controls="caja-p-doble" aria-selected="false" tabindex="-1"><span class="caja-tile__ico" aria-hidden="true" style="-webkit-mask-image:url(assets/img/cajas/doble.webp);mask-image:url(assets/img/cajas/doble.webp)"></span><span class="visually-hidden">¡Vale doble!</span></button>
+            <button class="caja-tile" type="button" role="tab" id="caja-t-arco" aria-controls="caja-p-arco" aria-selected="false" tabindex="-1"><span class="caja-tile__ico" aria-hidden="true" style="-webkit-mask-image:url(assets/img/cajas/arco.webp);mask-image:url(assets/img/cajas/arco.webp)"></span><span class="visually-hidden">¡Arco de Baby!</span></button>
+            <button class="caja-tile" type="button" role="tab" id="caja-t-aspersor" aria-controls="caja-p-aspersor" aria-selected="false" tabindex="-1"><span class="caja-tile__ico" aria-hidden="true" style="-webkit-mask-image:url(assets/img/cajas/aspersor.webp);mask-image:url(assets/img/cajas/aspersor.webp)"></span><span class="visually-hidden">¡Se prendió el aspersor!</span></button>
+            <button class="caja-tile" type="button" role="tab" id="caja-t-playa" aria-controls="caja-p-playa" aria-selected="false" tabindex="-1"><span class="caja-tile__ico" aria-hidden="true" style="-webkit-mask-image:url(assets/img/cajas/playa.webp);mask-image:url(assets/img/cajas/playa.webp)"></span><span class="visually-hidden">¡Pelota de playa!</span></button>
+            <button class="caja-tile" type="button" role="tab" id="caja-t-luz" aria-controls="caja-p-luz" aria-selected="false" tabindex="-1"><span class="caja-tile__ico" aria-hidden="true" style="-webkit-mask-image:url(assets/img/cajas/luz.webp);mask-image:url(assets/img/cajas/luz.webp)"></span><span class="visually-hidden">¡Se cortó la luz!</span></button>
+            <button class="caja-tile" type="button" role="tab" id="caja-t-perro" aria-controls="caja-p-perro" aria-selected="false" tabindex="-1"><span class="caja-tile__ico" aria-hidden="true" style="-webkit-mask-image:url(assets/img/cajas/perro.webp);mask-image:url(assets/img/cajas/perro.webp)"></span><span class="visually-hidden">¡Perro en la cancha!</span></button>
+          </div>
+          <div class="cajas__fichas">
+          <div class="caja-ficha" role="tabpanel" id="caja-p-pendiente" aria-labelledby="caja-t-pendiente">
+            <span class="caja-ficha__ico" aria-hidden="true" style="-webkit-mask-image:url(assets/img/cajas/pendiente.webp);mask-image:url(assets/img/cajas/pendiente.webp)"></span>
+            <h3 class="caja-ficha__nombre">¡Se inclinó la cancha!</h3>
+            <p class="caja-ficha__desc">Catorce segundos en los que la pelota rueda sola para el arco rival, cámara ladeada incluida.</p>
+          </div>
+          <div class="caja-ficha" role="tabpanel" id="caja-p-unomas" aria-labelledby="caja-t-unomas">
+            <span class="caja-ficha__ico" aria-hidden="true" style="-webkit-mask-image:url(assets/img/cajas/unomas.webp);mask-image:url(assets/img/cajas/unomas.webp)"></span>
+            <h3 class="caja-ficha__nombre">¡Llegó uno más!</h3>
+            <p class="caja-ficha__desc">Entra un octavo jugador de verdad, sorteado del plantel, veintiocho segundos con tu camiseta.</p>
+          </div>
+          <div class="caja-ficha" role="tabpanel" id="caja-p-arbitro" aria-labelledby="caja-t-arbitro">
+            <span class="caja-ficha__ico" aria-hidden="true" style="-webkit-mask-image:url(assets/img/cajas/arbitro.webp);mask-image:url(assets/img/cajas/arbitro.webp)"></span>
+            <h3 class="caja-ficha__nombre">¡Calvino se puso la camiseta!</h3>
+            <p class="caja-ficha__desc">El árbitro juega para vos treinta y un segundos. Mientras tanto, no cobra nada.</p>
+          </div>
+          <div class="caja-ficha" role="tabpanel" id="caja-p-colectivo" aria-labelledby="caja-t-colectivo">
+            <span class="caja-ficha__ico" aria-hidden="true" style="-webkit-mask-image:url(assets/img/cajas/colectivo.webp);mask-image:url(assets/img/cajas/colectivo.webp)"></span>
+            <h3 class="caja-ficha__nombre">¡Estacionó el colectivo!</h3>
+            <p class="caja-ficha__desc">Un bondi de siete metros se cruza delante de tu arco y tapa la boca entera durante once segundos.</p>
+          </div>
+          <div class="caja-ficha" role="tabpanel" id="caja-p-turbo" aria-labelledby="caja-t-turbo">
+            <span class="caja-ficha__ico" aria-hidden="true" style="-webkit-mask-image:url(assets/img/cajas/turbo.webp);mask-image:url(assets/img/cajas/turbo.webp)"></span>
+            <h3 class="caja-ficha__nombre">¡Turbo carga!</h3>
+            <p class="caja-ficha__desc">Tu medidor de poder carga al triple durante veintiún segundos.</p>
+          </div>
+          <div class="caja-ficha" role="tabpanel" id="caja-p-bateria" aria-labelledby="caja-t-bateria">
+            <span class="caja-ficha__ico" aria-hidden="true" style="-webkit-mask-image:url(assets/img/cajas/bateria.webp);mask-image:url(assets/img/cajas/bateria.webp)"></span>
+            <h3 class="caja-ficha__nombre">¡Batería mojada!</h3>
+            <p class="caja-ficha__desc">El medidor del rival, a un tercio. Misma duración.</p>
+          </div>
+          <div class="caja-ficha" role="tabpanel" id="caja-p-hora" aria-labelledby="caja-t-hora">
+            <span class="caja-ficha__ico" aria-hidden="true" style="-webkit-mask-image:url(assets/img/cajas/hora.webp);mask-image:url(assets/img/cajas/hora.webp)"></span>
+            <h3 class="caja-ficha__nombre">¡Hora, referí!</h3>
+            <p class="caja-ficha__desc">Si vas ganando, el reloj corre al triple; si vas perdiendo, el árbitro agrega veinte segundos de descuento (doce si van empatados).</p>
+          </div>
+          <div class="caja-ficha" role="tabpanel" id="caja-p-roja" aria-labelledby="caja-t-roja">
+            <span class="caja-ficha__ico" aria-hidden="true" style="-webkit-mask-image:url(assets/img/cajas/roja.webp);mask-image:url(assets/img/cajas/roja.webp)"></span>
+            <h3 class="caja-ficha__nombre">¡Roja directa!</h3>
+            <p class="caja-ficha__desc">Expulsan al rival que está más cerca de la pelota: veintiún segundos jugando con uno menos.</p>
+          </div>
+          <div class="caja-ficha" role="tabpanel" id="caja-p-dt" aria-labelledby="caja-t-dt">
+            <span class="caja-ficha__ico" aria-hidden="true" style="-webkit-mask-image:url(assets/img/cajas/dt.webp);mask-image:url(assets/img/cajas/dt.webp)"></span>
+            <h3 class="caja-ficha__nombre">¡El DT se metió!</h3>
+            <p class="caja-ficha__desc">Tu técnico sale corriendo de la banda y le mete una patada voladora al que tiene la pelota. Se esquiva con un pase.</p>
+          </div>
+          <div class="caja-ficha" role="tabpanel" id="caja-p-doble" aria-labelledby="caja-t-doble">
+            <span class="caja-ficha__ico" aria-hidden="true" style="-webkit-mask-image:url(assets/img/cajas/doble.webp);mask-image:url(assets/img/cajas/doble.webp)"></span>
+            <h3 class="caja-ficha__nombre">¡Vale doble!</h3>
+            <p class="caja-ficha__desc">Si tu equipo hace un gol en los próximos veintiún segundos, vale dos.</p>
+          </div>
+          <div class="caja-ficha" role="tabpanel" id="caja-p-arco" aria-labelledby="caja-t-arco">
+            <span class="caja-ficha__ico" aria-hidden="true" style="-webkit-mask-image:url(assets/img/cajas/arco.webp);mask-image:url(assets/img/cajas/arco.webp)"></span>
+            <h3 class="caja-ficha__nombre">¡Arco de Baby!</h3>
+            <p class="caja-ficha__desc">Aparecen pilas de cajas pegadas a los palos de tu arco y te lo achican durante catorce segundos.</p>
+          </div>
+          <div class="caja-ficha" role="tabpanel" id="caja-p-aspersor" aria-labelledby="caja-t-aspersor">
+            <span class="caja-ficha__ico" aria-hidden="true" style="-webkit-mask-image:url(assets/img/cajas/aspersor.webp);mask-image:url(assets/img/cajas/aspersor.webp)"></span>
+            <h3 class="caja-ficha__nombre">¡Se prendió el aspersor!</h3>
+            <p class="caja-ficha__desc">Se moja la mitad del rival: la pelota frena la mitad y ellos van más lentos. Diecisiete segundos.</p>
+          </div>
+          <div class="caja-ficha" role="tabpanel" id="caja-p-playa" aria-labelledby="caja-t-playa">
+            <span class="caja-ficha__ico" aria-hidden="true" style="-webkit-mask-image:url(assets/img/cajas/playa.webp);mask-image:url(assets/img/cajas/playa.webp)"></span>
+            <h3 class="caja-ficha__nombre">¡Pelota de playa!</h3>
+            <p class="caja-ficha__desc">Catorce segundos con una pelota el doble de grande, que flota y se frena en el aire.</p>
+          </div>
+          <div class="caja-ficha" role="tabpanel" id="caja-p-luz" aria-labelledby="caja-t-luz">
+            <span class="caja-ficha__ico" aria-hidden="true" style="-webkit-mask-image:url(assets/img/cajas/luz.webp);mask-image:url(assets/img/cajas/luz.webp)"></span>
+            <h3 class="caja-ficha__nombre">¡Se cortó la luz!</h3>
+            <p class="caja-ficha__desc">Once segundos a oscuras: el árbitro no cobra nada y los dos arqueros reaccionan tarde.</p>
+          </div>
+          <div class="caja-ficha" role="tabpanel" id="caja-p-perro" aria-labelledby="caja-t-perro">
+            <span class="caja-ficha__ico" aria-hidden="true" style="-webkit-mask-image:url(assets/img/cajas/perro.webp);mask-image:url(assets/img/cajas/perro.webp)"></span>
+            <h3 class="caja-ficha__nombre">¡Perro en la cancha!</h3>
+            <p class="caja-ficha__desc">Entra <b>Fulbi</b>, el perrito malvado, y durante diecisiete segundos persigue y muerde a los rivales.</p>
+          </div>
+          </div>
+          <div class="cajas__reloj" aria-hidden="true"><i></i></div>
+        </div>
       </div>
 
       <div class="citas rev">
