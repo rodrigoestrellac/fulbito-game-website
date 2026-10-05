@@ -144,6 +144,10 @@ APROBADOS = {
     # LA CANTERA. Zoom al torso sobre `cisne_check_front.png`: camiseta bordo
     # lisa con vivos oscuros, short blanco, sin escudo, sin sponsor y sin numero.
     "cisne",
+    # 5-oct-2026 — LA JOYA (M240), que entra a LA LOBA en lugar de EL FARAON. Zoom al
+    # torso sobre `joya_check_front.png`: camiseta bordo LISA con cuello oscuro, short
+    # blanco, sin escudo, sin sponsor y sin numero.
+    "joya",
 }
 
 # el archivo de captura cuando NO se llama como el id del juego
@@ -169,6 +173,17 @@ MATCHTUNING = os.path.join(RAIZ, "game-unity", "FulbitoPenales", "Assets",
                            "Scripts", "MatchTuning.cs")
 MATCHDIRECTOR = os.path.join(RAIZ, "game-unity", "FulbitoPenales", "Assets",
                              "Scripts", "MatchDirector.cs")
+
+
+# ⚠️ M240 — `MatchTuning` es `partial` desde M239: los perfiles nuevos pueden vivir en
+# `MatchTuningM240.cs` y siguientes (el de LA JOYA vive ahí). Leer sólo MatchTuning.cs
+# dejaba al jugador "sin stats". Se leen TODOS, el principal primero.
+def _leer_tuning():
+    import glob
+    carpeta = os.path.dirname(MATCHTUNING)
+    extra = sorted(f for f in glob.glob(os.path.join(carpeta, "MatchTuning*.cs"))
+                   if os.path.basename(f) != "MatchTuning.cs")
+    return chr(10).join(open(f, encoding="utf-8-sig").read() for f in [MATCHTUNING] + extra)
 
 
 def _sin_acentos(s):
@@ -208,7 +223,7 @@ def _lista_cs(txt, nombre):
 def roster_del_juego():
     """[(id, archivo_captura, slug, nombre)] del plantel APROBADO, en el orden
     del juego. Los arqueros van al final (el orden de `GkPoolIds`)."""
-    txt = open(MATCHTUNING, encoding="utf-8").read()
+    txt = _leer_tuning()
     ids = _lista_cs(txt, "BluePoolIds")
     gks = [g for g in _lista_cs(txt, "GkPoolIds") if g not in ids]
     ids += gks
@@ -253,7 +268,7 @@ STAT_KEYS = ("ritmo", "pegada", "comba", "control",
 
 def stats_del_juego():
     """{id: {stat: multiplicador}} + {id: zurdo} desde los P(...) del juego."""
-    txt = open(MATCHTUNING, encoding="utf-8").read()
+    txt = _leer_tuning()
     # ⚠️ LA TABLA QUE SE LEE NO ES LA QUE JUEGA, y ahora por DOS motivos: la fabrica
     # `P()` transforma los numeros escritos antes de guardarlos, asi que replicar eso
     # aca no es prolijidad — sin esto la web publica numeros que el juego no usa.
@@ -482,7 +497,7 @@ ESCUDO_OUT = 256    # los PNG fuente son 256×256; se convierten sin escalar
 
 def formaciones_del_juego():
     """Los 7 esquemas con sus slots (z, x) reales — GK primero."""
-    txt = _sin_comentarios(open(MATCHTUNING, encoding="utf-8").read())
+    txt = _sin_comentarios(_leer_tuning())
     bloque = re.search(r"Formations\s*=\s*\{(.*?)\n    \};", txt, re.S).group(1)
     formas = []
     for m in re.finditer(
@@ -966,7 +981,7 @@ def auditar_equipos(equipos):
     mismo, comparadas — y si no, se grita. Devuelve False si hay problemas."""
     # ⚠️ sin comentarios: `GkPoolIds` tiene uno entre el `=` y la `{` que a
     # `_lista_cs` le devuelve lista vacía — y entonces TODO arquero es "de afuera"
-    txt = _sin_comentarios(open(MATCHTUNING, encoding="utf-8").read())
+    txt = _sin_comentarios(_leer_tuning())
     pool = set(_lista_cs(txt, "BluePoolIds"))
     gks = set(_lista_cs(txt, "GkPoolIds"))
     html = open(os.path.join(WEB, "index.html"), encoding="utf-8").read()

@@ -69,6 +69,7 @@ const FIRMAS_DESC = {
   'LA ASPIRADORA': 'Tres segundos de imán: la pelota suelta que le pase a tres metros y medio se curva sola hacia él. No corre a buscarla — se para en el carril del pase y espera.',
   'EL CORTOCIRCUITO': 'Un chispazo que llega a doce metros y APAGA los poderes rivales que estén prendidos — gigante, turbo, pitbull, guardia, lo que sea. Y de paso le vacía media barra al medidor del otro equipo.',
   'LA CRUYFF': 'El giro de 1974: frena, la esconde y sale para el otro lado a un tercio más de velocidad. El que lo marcaba sigue de largo casi un segundo, mirando dónde quedó.',
+  'LA MÁSCARA': 'Se pone la máscara verde dos segundos: como El Intocable, no le pueden hacer una falta, y va largando diamantes. Si en ese rato le pega de rosca, la pelota dobla un sesenta por ciento más y se va dejando una estela de brillantes.',
   'LA VOLEA IMPOSIBLE': 'Se la levanta con un sombrerito, salta y le pega de volea en el aire, con el botín a un metro y medio: por encima de cualquier defensor y con la potencia del Cañonazo. Se tira desde cualquier parte de la cancha, pero el arquero la puede sacar.',
   'ARQUERO': 'Ataja. Que no es poco: en Fulbito los arqueros vuelan de verdad.',
 };
