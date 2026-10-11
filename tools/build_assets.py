@@ -148,6 +148,11 @@ APROBADOS = {
     # torso sobre `joya_check_front.png`: camiseta bordo LISA con cuello oscuro, short
     # blanco, sin escudo, sin sponsor y sin numero.
     "joya",
+    # 11-oct-2026 — los TRES de DEPORTIVO CIUDAD (M259). `angelito` y `merlin`: camiseta
+    # bordo LISA, short blanco, sin escudo, sin sponsor y sin numero. `gigio` (arquero):
+    # buzo fucsia liso; los guantes traen garabatos blancos en la muñequera y el dorso —
+    # mirados sobre la TEXTURA a 4x: glifos ilegibles, ni letras ni un logo reconocible.
+    "angelito", "merlin", "gigio",
 }
 
 # el archivo de captura cuando NO se llama como el id del juego
@@ -407,6 +412,11 @@ SEDES_APROBADAS = {
     # inventado, no de un estadio real). Carteles perimetrales: LA BANDA /
     # FULBITO / AGUANTE / VAMOS. Sin sponsors.
     "coliseogalactico",
+    # 11-oct-2026 — LA LÁMPARA BÁVARA (M259), sobre `_aerea` (ver SEDE_VISTA_DE): la
+    # piel de almohadillas entera, sin texto. En la `_web` (que recorta la piel) lo
+    # único legible son los trapos nuestros: FULBITO / LA BANDA / VAMOS / EL POTRERO.
+    # El nombre es inventado y el marcador dice `LA LÁMPARA BÁVARA · COPA FULBITO`.
+    "lalamparabavara",
 }
 # de qué toma cada sede su foto.
 # ⚠️ `_web` Y NO `_aerea` (25-ago-2026). Las `_tv` y `_aerea_cruce` están
@@ -429,7 +439,9 @@ SEDE_VISTA = "_web"
 # (captura del 8-sep). La `_aerea` de la misma corrida muestra la piel de LED, las
 # bandejas y la cancha. Lo correcto a la larga es que `AcimutBajo` pese lo que
 # TAPA y no lo que mide de alto; mientras tanto, la foto se elige acá — mirándola.
-SEDE_VISTA_DE = {"coliseogalactico": "_aerea"}
+# 11-oct-2026 — `lalamparabavara`: la piel es mucho más ancha que el bowl del que sale el
+# encuadre de `_web`, que la recorta por los cuatro lados; la `_aerea` la muestra entera.
+SEDE_VISTA_DE = {"coliseogalactico": "_aerea", "lalamparabavara": "_aerea"}
 SEDE_MAX_W = 1280
 
 # El chequeo de marcas de los ESCUDOS, misma mecánica que APROBADOS: el slug
@@ -490,6 +502,10 @@ ESCUDOS_APROBADOS = {
     # los gemelos con todas las letras. Mismo criterio que `colchoneros`, donde el
     # oso quedo AFUERA por ser el emblema literal del club.
     "loba",
+    # 11-oct-2026 — `ciudad` (DEPORTIVO CIUDAD, M259): un perfil de edificios blancos
+    # sobre celeste con borde y banda azul marino. Sin texto. Dibuja la CIUDAD, no el
+    # emblema del club (ni barco, ni rosa, ni aguila, ni forma redonda).
+    "ciudad",
 }
 
 ESCUDO_OUT = 256    # los PNG fuente son 256×256; se convierten sin escalar

@@ -140,8 +140,8 @@ function montarVideos() {
 }
 montarVideos();
 
-/* ── Las cajas sorpresa: el tablero de las quince ─────────────────────────
-   Un tablist de verdad (flechas, Inicio/Fin, aria-selected) sobre las quince
+/* ── Las cajas sorpresa: el tablero de las dieciséis ─────────────────────────
+   Un tablist de verdad (flechas, Inicio/Fin, aria-selected) sobre las dieciséis
    fichas, que están TODAS en el HTML. Sin JS se ven en lista; con JS, una por vez
    (`.cajas--vivo`, ver site.css).
    La rotación sola es para el que scrollea sin tocar: avanza cada CAJAS_T, se

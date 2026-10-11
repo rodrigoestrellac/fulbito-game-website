@@ -1221,7 +1221,7 @@ code {
   text-transform: uppercase; color: var(--oro);
 }
 .cajas__grilla, .cajas__rotulo { display: none; }
-.cajas__grilla { grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.cajas__grilla { grid-template-columns: repeat(4, 1fr); gap: 8px; }
 .cajas--vivo .cajas__rotulo { display: block; }
 .cajas--vivo .cajas__grilla { display: grid; }
 .caja-tile {
