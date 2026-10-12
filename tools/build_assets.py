@@ -417,6 +417,12 @@ SEDES_APROBADAS = {
     # único legible son los trapos nuestros: FULBITO / LA BANDA / VAMOS / EL POTRERO.
     # El nombre es inventado y el marcador dice `LA LÁMPARA BÁVARA · COPA FULBITO`.
     "lalamparabavara",
+    # 11-oct-2026 — CAMP CATALÀ (M259i), sobre `_aerea` (ver SEDE_VISTA_DE): el techo-anillo,
+    # la fachada ondulada con las ventanas encendidas y el anillo de LED. Lo único legible es
+    # `CAMP CATALÀ · COPA FULBITO` en el LED (lo pinta `assets-src/camp_letreros.py`; nombre
+    # inventado, y el marcador `LOCAL 2 – 1 VISITANT` del modelo se quitó). Franjas azulgranas y
+    # la bandera de cuatro barras: colores, no un escudo. Sin sponsors.
+    "campcatala",
 }
 # de qué toma cada sede su foto.
 # ⚠️ `_web` Y NO `_aerea` (25-ago-2026). Las `_tv` y `_aerea_cruce` están
@@ -441,7 +447,9 @@ SEDE_VISTA = "_web"
 # TAPA y no lo que mide de alto; mientras tanto, la foto se elige acá — mirándola.
 # 11-oct-2026 — `lalamparabavara`: la piel es mucho más ancha que el bowl del que sale el
 # encuadre de `_web`, que la recorta por los cuatro lados; la `_aerea` la muestra entera.
-SEDE_VISTA_DE = {"coliseogalactico": "_aerea", "lalamparabavara": "_aerea"}
+# 11-oct-2026 — `campcatala`: la `_web` entra por el hueco del techo y es casi toda cubierta;
+# la `_aerea` muestra el estadio entero con la fachada.
+SEDE_VISTA_DE = {"coliseogalactico": "_aerea", "lalamparabavara": "_aerea", "campcatala": "_aerea"}
 SEDE_MAX_W = 1280
 
 # El chequeo de marcas de los ESCUDOS, misma mecánica que APROBADOS: el slug
