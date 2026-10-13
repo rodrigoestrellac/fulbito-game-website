@@ -966,8 +966,8 @@ def _tarjeta_desfasada(html, eq):
         datos = json.load(f)
     forma = datos["formaciones"][eq["form"]]["name"]
     nombres = {i: n for i, _c, _s, n in ROSTER_JUEGO}
-    gk = " ".join(w[:1].upper() + w[1:].lower()
-                  for w in nombres.get(eq["gk"], eq["gk"]).split(" "))
+    from regen_listas import titulo   # la misma regla que escribe la tarjeta (import tardío: regen_listas importa este módulo)
+    gk = titulo(nombres.get(eq["gk"], eq["gk"]))
     # ⚠️ SI NO ENCUENTRA LA TARJETA, ESO ES UNA FALLA — no un chequeo que se saltea.
     # Con `find` devolviendo -1, `html[ini:-1]` es casi el documento entero y TODOS los
     # `espera` aparecen (los pone otra tarjeta), asi que la funcion devolvia "sin

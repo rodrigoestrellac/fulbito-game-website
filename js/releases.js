@@ -129,7 +129,7 @@ function pintar(release) {
       { k: 'winSetup', so: 'Windows', que: 'Instalador. Se instala solo, sin permisos de administrador.' },
       { k: 'winZip', so: 'Windows', que: 'Portable. Lo descomprimís y ejecutás <em>Fulbito.exe</em>. Sirve si la PC no te deja instalar nada.' },
       { k: 'mac', so: 'macOS', que: '<em>Beta</em>. La primera vez macOS lo bloquea y hay que habilitarlo una sola vez: <a href="#paso-mac">mirá cómo</a>. Si no te abre, contame.' },
-      { k: 'android', so: 'Android', que: 'Se juega con los dedos. <em>Recién salido</em> — el control táctil se probó en un solo teléfono, así que si algo se siente raro contame. Al abrir el archivo, el teléfono te va a pedir permiso para instalar «apps de orígenes desconocidos»: es el mismo aviso que da Windows con el instalador. Le das permiso y listo.' },
+      { k: 'android', so: 'Android', que: 'Se juega con los dedos. <em>Recién salido</em>: el control táctil se probó en un solo teléfono, así que si algo se siente raro contame. Al abrir el archivo, el teléfono te va a pedir permiso para instalar «apps de orígenes desconocidos»: es el mismo aviso que da Windows con el instalador. Le das permiso y listo.' },
     ];
     lista.innerHTML = filas.filter((f) => archivos[f.k]).map((f) => {
       const a = archivos[f.k];
@@ -166,7 +166,7 @@ async function cargar() {
        descarga del juego). Sin dato de la API el elemento queda oculto — un
        número hardcodeado acá envejecería mintiendo. */
     const total = releases.flatMap((rel) => rel.assets || [])
-      .filter((a) => /\.(exe|zip)$/i.test(a.name))
+      .filter((a) => /\.(exe|zip|apk)$/i.test(a.name))
       .reduce((s, a) => s + (a.download_count || 0), 0);
     const cont = document.querySelector('[data-rel="descargas"]');
     if (cont && total > 0) {

@@ -40,6 +40,10 @@ INDEX = os.path.join(WEB, "index.html")
 NL = "\n"
 
 
+MENORES = {"de", "del", "la", "las", "el", "los", "y", "e", "o", "a", "en"}
+SIGLAS = {"ca", "fc", "mnm", "dt"}
+
+
 def titulo(s):
     """`D'ARTAGNAN` -> `D'Artagnan`, `EN GARDE` -> `En Garde`.
 
@@ -48,7 +52,16 @@ def titulo(s):
     `componer()` en roster.js. Se escribe una sola vez para que las dos coincidan.
     """
     out = []
-    for palabra in s.split(" "):
+    palabras = s.split(" ")
+    for i, palabra in enumerate(palabras):
+        # misma regla que `componer()`: siglas en mayúscula; «de», «los», «el»… en minúscula
+        # sólo ENTRE palabras (al principio o después de un separador como «·» suben)
+        if palabra.lower() in SIGLAS:
+            out.append(palabra.upper())
+            continue
+        if i > 0 and palabra.lower() in MENORES and re.search(r"[0-9A-Za-zÁÉÍÓÚÜÑáéíóúüñ]$", palabras[i - 1]):
+            out.append(palabra.lower())
+            continue
         p = palabra[:1].upper() + palabra[1:].lower()
         p = re.sub(r"(’|')(\w)", lambda m: m.group(1) + m.group(2).upper(), p)
         out.append(p)

@@ -12,9 +12,17 @@ const menosMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)').ma
    El NOMBRE del equipo se muestra como grita el juego (mayúsculas): es el
    marcador, no un párrafo.
    La letra que sigue a un apóstrofo también sube (D'Artagnan). */
-const componer = (s) => s.toLowerCase().replace(/\S+/g, (w) =>
-  /\d/.test(w) ? w.toUpperCase()
-                : w.replace(/(^|['’])(\S)/g, (_, a, c) => a + c.toUpperCase()));
+const MENORES = new Set(['de', 'del', 'la', 'las', 'el', 'los', 'y', 'e', 'o', 'a', 'en']);
+const SIGLAS = new Set(['ca', 'fc', 'mnm', 'dt']);
+const componer = (s) => {
+  const ws = s.toLowerCase().split(' ');
+  return ws.map((w, i) => {
+    if (/\d/.test(w) || SIGLAS.has(w)) return w.toUpperCase();
+    /* misma regla que roster.js y tools/regen_listas.py */
+    if (i > 0 && MENORES.has(w) && /[a-záéíóúüñ0-9]$/i.test(ws[i - 1])) return w;
+    return w.replace(/(^|['’])(\S)/g, (_, a, c) => a + c.toUpperCase());
+  }).join(' ');
+};
 
 async function montarEquipos() {
   // ⚠️ querySelectorAll: desde el 25-ago el catálogo está partido en TRES grillas,
@@ -136,7 +144,7 @@ async function montarEquipos() {
         <div class="ficha__cuerpo ficha__cuerpo--equipo">
           <figure class="pizarra">
             <div class="pizarra__cancha">${parados}</div>
-            <figcaption class="pizarra__form">${f.name} — ${f.def} atrás, ${f.mid} al medio, ${f.fwd} arriba</figcaption>
+            <figcaption class="pizarra__form">${f.name}: ${f.def} atrás, ${f.mid} al medio, ${f.fwd} arriba</figcaption>
           </figure>
           <div class="ficha__datos">
             <img class="fichaeq__escudo" src="assets/equipos/${e.slug}.webp" alt="" width="128" height="128">

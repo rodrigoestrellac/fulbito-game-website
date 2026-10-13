@@ -19,7 +19,7 @@
    duración o radio, esto hay que tocarlo a mano; por eso cada línea nombra el dato
    y no "un rato" o "cerca". */
 const FIRMAS_DESC = {
-  'EL MARTILLAZO': 'Saca un martillo de la nada, lo levanta, lo baja — y todo el que esté a tres metros y medio queda dos segundos aplastado, hecho panqueque.',
+  'EL MARTILLAZO': 'Saca un martillo de la nada, lo levanta, lo baja, y todo el que esté a tres metros y medio queda dos segundos aplastado, hecho panqueque.',
   'LA EMBESTIDA': 'Arranca al doble de velocidad durante tres segundos y medio y hace panqueque a todo el que se le cruza.',
   'LA MURALLA': 'Levanta una pared de cinco metros y la deja seis segundos. No te da la pelota: te da tiempo.',
   'EL GIGANTE': 'Se agranda una vez y media durante poco más de dos segundos, y con rozarte te voltea.',
@@ -29,13 +29,13 @@ const FIRMAS_DESC = {
   'EL TRACTOR': 'Tres segundos lento pero imparable: baja un cambio y va volteando gente a su paso.',
   'LA TELARAÑA': 'Teje una red de cuatro metros que atrapa dos segundos y medio a todo rival que agarra adentro.',
   'EL HECHIZO': 'Deja quietos a los rivales en cinco metros a la redonda durante dos segundos, con estrellitas.',
-  'EL MAREO': 'La pedalada: al que la mira de cerca —cinco metros— le quedan dos segundos de estrellitas.',
+  'EL MAREO': 'La pedalada: al que la mira de cerca (cinco metros) le quedan dos segundos de estrellitas.',
   'LA PULGUITA': 'Se achica a la mitad y acelera una vez y media. Andá a agarrarlo.',
   'LA ROULETTE': 'Gira sobre la pelota como en Francia 98 y marea a los de alrededor. Suena La Marsellesa.',
   'LOS FLASHES': 'Sesión de fotos en plena jugada: encandila dos segundos y medio a los rivales en cuatro metros y medio.',
   'EL FENÓMENO': 'El arranque del 9 de verdad: acelera de golpe y ya le quedaste atrás.',
   'VELOCIDAD': 'El pique corto del Diez: unos segundos en los que nadie lo alcanza.',
-  'EL KUNI': 'Acelera y define: el punto que entra frío y la manda a guardar.',
+  'EL KUNI': 'Acelera y define: el punta que entra frío y la manda a guardar.',
   'LA LIANA': 'Sale disparado quince metros colgado de una liana, ida y vuelta, llevándose puesto lo que toque.',
   'EL PITBULL': 'Cinco segundos de cacería: corre más que todos y al que tiene la pelota lo caza.',
   'LA MORDIDA': 'Un mordisco a tres metros: el mordido queda cuatro segundos tirado, sobándose.',
@@ -59,15 +59,15 @@ const FIRMAS_DESC = {
   'EL ARAÑAZO': 'Tres garras que tajean DOS veces: la primera tanda voltea, y al que se corrió lo espera la segunda medio segundo después.',
   'LA PINTURA': 'Vuelca un balde de pintura unos metros adelante y la mancha queda ocho segundos en el pasto: el que la pisa, patina.',
   'IL MIRACOLO': 'El único poder que no le hace nada a nadie: levanta a los compañeros caídos en seis metros y les deja un envión. Divino.',
-  'EL EXPRESO': 'Se sube a una locomotora y sale tres segundos y medio a un tercio más de lo que corre: voltea todo lo que tenga adelante, pero no dobla — el que se corre al costado se salva.',
+  'EL EXPRESO': 'Se sube a una locomotora y sale tres segundos y medio a un tercio más de lo que corre. Voltea todo lo que tenga adelante, pero no dobla: el que se corre al costado se salva.',
   'LA ATALAYA': 'Planta una torre que se queda ocho segundos tirando una flecha por segundo al rival de pie más cercano en cinco metros y medio. Cada flechazo deja tirado casi dos segundos.',
   'EL SUSTO': 'Levanta los brazos y ruge: los rivales a cinco metros salen en desbandada dos segundos y pico, pálidos y corriendo más rápido que nunca. El que llevaba la pelota, la suelta.',
   'LOS FANTASMAS': 'Salen tres señuelos idénticos y él se mezcla entre ellos: casi dos segundos y medio en los que el rival no sabe a cuál seguir.',
-  'EL INTOCABLE': 'Tres segundos en los que no le pueden hacer una falta: le entran y sigue como si nada. No voltea a nadie — a una liana o un hacha se cae igual que cualquiera.',
+  'EL INTOCABLE': 'Tres segundos en los que no le pueden hacer una falta: le entran y sigue como si nada.',
   'LA REMONTADA': 'La única que sólo se puede tirar si vas perdiendo: seis segundos de envión para TODO el equipo, un rayo rojo a cada compañero, un veintidós por ciento más de velocidad y un veinte por ciento más de pegada.',
-  'EN GARDE': 'Saca el florete: la estocada se lleva puesto al rival más cercano en tres metros, y quedan dos segundos y pico de guardia en los que el que le tira una entrada termina en el piso — y tampoco le pueden robar.',
-  'LA ASPIRADORA': 'Tres segundos de imán: la pelota suelta que le pase a tres metros y medio se curva sola hacia él. No corre a buscarla — se para en el carril del pase y espera.',
-  'EL CORTOCIRCUITO': 'Un chispazo que llega a doce metros y APAGA los poderes rivales que estén prendidos — gigante, turbo, pitbull, guardia, lo que sea. Y de paso le vacía media barra al medidor del otro equipo.',
+  'EN GARDE': 'Saca el florete: la estocada se lleva puesto al rival más cercano en tres metros, y quedan dos segundos y pico de guardia en los que el que le tira una entrada termina en el piso. Y tampoco le pueden robar.',
+  'LA ASPIRADORA': 'Tres segundos de imán: la pelota suelta que le pase a tres metros y medio se curva sola hacia él. No corre a buscarla: se para en el carril del pase y espera.',
+  'EL CORTOCIRCUITO': 'Un chispazo que llega a doce metros y APAGA los poderes rivales que estén prendidos: gigante, turbo, pitbull, guardia, lo que sea. Y de paso le vacía media barra al medidor del otro equipo.',
   'LA CRUYFF': 'El giro de 1974: frena, la esconde y sale para el otro lado a un tercio más de velocidad. El que lo marcaba sigue de largo casi un segundo, mirando dónde quedó.',
   'LA MÁSCARA': 'Se pone la máscara verde dos segundos: como El Intocable, no le pueden hacer una falta, y va largando diamantes. Si en ese rato le pega de rosca, la pelota dobla un sesenta por ciento más y se va dejando una estela de brillantes.',
   'LA VOLEA IMPOSIBLE': 'Se la levanta con un sombrerito, salta y le pega de volea en el aire, con el botín a un metro y medio: por encima de cualquier defensor y con la potencia del Cañonazo. Se tira desde cualquier parte de la cancha, pero el arquero la puede sacar.',
@@ -134,9 +134,17 @@ const punteroFino = window.matchMedia('(hover: hover) and (pointer: fine)').matc
    del juego (mayúsculas); acá se componen como en el resto de la página.
    Una palabra con dígitos queda toda en mayúsculas: CR007, no Cr007.
    Y la letra que sigue a un apóstrofo también sube: D'Artagnan, no D'artagnan. */
-const componer = (s) => s.toLowerCase().replace(/\S+/g, (w) =>
-  /\d/.test(w) ? w.toUpperCase()
-                : w.replace(/(^|['’])(\S)/g, (_, a, c) => a + c.toUpperCase()));
+const MENORES = new Set(['de', 'del', 'la', 'las', 'el', 'los', 'y', 'e', 'o', 'a', 'en']);
+const SIGLAS = new Set(['ca', 'fc', 'mnm', 'dt']);
+const componer = (s) => {
+  const ws = s.toLowerCase().split(' ');
+  return ws.map((w, i) => {
+    if (/\d/.test(w) || SIGLAS.has(w)) return w.toUpperCase();
+    /* «de», «los», «el»… van en minúscula sólo ENTRE palabras: al principio o después de un separador («·») suben */
+    if (i > 0 && MENORES.has(w) && /[a-záéíóúüñ0-9]$/i.test(ws[i - 1])) return w;
+    return w.replace(/(^|['’])(\S)/g, (_, a, c) => a + c.toUpperCase());
+  }).join(' ');
+};
 
 async function montarAlbum() {
   const album = document.querySelector('.album');

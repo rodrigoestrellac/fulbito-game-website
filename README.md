@@ -781,7 +781,9 @@ LOS EQUIPOS y otro al final de MODOS.
 ese rango**. Y como el rango está declarado, el navegador no cae al fallback del sistema:
 dibuja tofu (▯). Pasó el 12-ago-2026 con la comilla curva `“` (U+201C) de las citas.
 
-Lo que SÍ anda y ya está usado en la página: `« »` (U+00AB/BB), `—` (U+2014), `·`, `→`.
+Lo que SÍ anda y ya está usado en la página: `« »` (U+00AB/BB), `·`, `→`. La raya `—` (U+2014) también
+renderiza, pero desde el 12-oct-2026 NO se usa en texto visible (pedido de Rodrigo): coma, dos puntos,
+punto o paréntesis.
 Antes de meter un signo nuevo, mirá el render — no alcanza con que exista en Unicode.
 
 ## ⚠️ El reveal: `.rev` va en los HIJOS de una grilla, nunca en la grilla
