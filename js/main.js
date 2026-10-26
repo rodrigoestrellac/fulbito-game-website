@@ -27,13 +27,6 @@ if ('IntersectionObserver' in window && !menosMovimiento) {
   document.querySelectorAll('.rev').forEach((el) => el.classList.add('dentro'));
 }
 
-/* los cromos entran en cascada: cada uno sabe su lugar en la fila. El delay
-   lo aplica el CSS (cromo-entra) y solo si hay motion. Las tarjetas de equipo
-   NO llevan --i a proposito: ahora cada una tiene su propio `.rev`, asi que el
-   escalonado se lo da el scroll y un delay por indice solo agregaria espera a
-   las que aparecen veinte pantallas despues. */
-document.querySelectorAll('.album .figu').forEach((el, i) => el.style.setProperty('--i', i));
-
 /* ── Marcador fijo + reloj ───────────────────────────────────────────────── */
 const marcador = document.querySelector('.marcador');
 const reloj = document.querySelector('[data-reloj]');

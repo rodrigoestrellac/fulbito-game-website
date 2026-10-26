@@ -423,6 +423,11 @@ SEDES_APROBADAS = {
     # inventado, y el marcador `LOCAL 2 – 1 VISITANT` del modelo se quitó). Franjas azulgranas y
     # la bandera de cuatro barras: colores, no un escudo. Sin sponsors.
     "campcatala",
+    # 26-oct-2026 — LA FOSSA DEL BISCIONE y L'ARENA ETERNA (M266), sobre `_web`, con zoom a cada
+    # superficie con texto. LA FOSSA: el marcador dice `LA FOSSA DEL BISCIONE · COPA FULBITO`
+    # (nombre inventado) y los trapos AGUANTE / VAMOS. L'ARENA: sólo trapos de la hinchada y la
+    # ruina de ladrillo, sin texto. Ningún nombre de estadio real, ningún sponsor.
+    "fossabiscione", "arenaeterna",
 }
 # de qué toma cada sede su foto.
 # ⚠️ `_web` Y NO `_aerea` (25-ago-2026). Las `_tv` y `_aerea_cruce` están
@@ -581,6 +586,11 @@ def equipos_del_juego():
         sys.exit(1)
     for eq, esc, ab, lg in zip(equipos, escudos, abrevs, liga_de):
         eq["slug"], eq["abrev"], eq["liga"] = esc, ab, orden[lg]
+    # 26-oct-2026 — MI GRUPO (el último del catálogo, `Equipos.Grupo`) NO va en la grilla: es el
+    # equipo que cada jugador arma en MI EQUIPO (nombre, escudo, kits, DT, titulares), así que
+    # su fila de fábrica no es lo que nadie va a ver. Lo cuenta la sección MI EQUIPO del sitio.
+    # Va al final del catálogo, así que sacarlo no corre el índice de ningún otro.
+    equipos = [e for e in equipos if e["slug"] != "grupo"]
     return equipos, ligas
 
 
@@ -840,7 +850,8 @@ def auditar_sedes(sedes):
                              % (sd["slug"], sd["nombre"]))
             continue
         li = html[html.rfind('<li class="sede', 0, i):html.find("</li>", i)]
-        for que, espera in (("nombre", ">%s</h3>" % sd["nombre"]),
+        # el apóstrofo se publica como entidad (regen_listas.esc): L'ARENA ETERNA
+        for que, espera in (("nombre", ">%s</h3>" % sd["nombre"].replace("'", "&#x27;")),
                             ("concepto", ">%s</p>" % sd["concepto"]),
                             ("aforo", "<b>%s</b>" % _miles(sd["aforo"]))):
             if espera not in li:
@@ -915,10 +926,6 @@ def auditar_contadores(equipos, sedes, jugadores, ligas):
     # (qué es, el texto que TIENE que estar, dónde vive)
     esperados = [
         ("zócalo del hero", "<b>%d</b> jugadores en <b>%d</b> equipos" % (nj, ne)),
-        ("contador del álbum",
-         "<b>%d</b> de campo <span aria-hidden=\"true\">·</span> <b>%d</b> arqueros"
-         % (campo, nj - campo)),
-        ("título del álbum", ">%s</h2>" % en_letras(nj).capitalize()),
         ("volanta de equipos", ">%s equipos</p>" % en_letras(ne, True).capitalize()),
         ("volanta de poderes", ">%s poderes</p>" % en_letras(poderes, True).capitalize()),
         ("volanta de sedes", ">%s canchas</p>" % en_letras(ns, True).capitalize()),
@@ -1200,12 +1207,15 @@ def ventana_del_busto(im):
     return (int(cx - lado / 2), int(tope), int(cx + lado / 2), int(tope + lado))
 
 
+# ⚠️ 26-oct-2026 — SIN ÁLBUM NI PIZARRA CON CARAS. El juego dejó las caras reales (M268: caras de
+# avatar) y Rodrigo sacó la sección EL PLANTEL; la pizarra muestra discos con número
+# (js/equipos.js). Quedan sólo los tres retratos grandes de LOS PODERES, que salen de los renders
+# de los FBX ACTUALES (avatar): `blender -b --factory-startup -P assets-src/render_check_front.py
+# -- haaland toro maldini`. `roster.json` sigue: son DATOS (nombres, firmas, stats) que usa la pizarra.
 def build_roster():
-    for src, slug in ROSTER:
-        recortar(src, slug, "roster", BUST_OUT)
     for src, slug in FIRMAS_BIG:
         recortar(src, slug, "firmas", FIRMA_OUT)
-    print("roster: %d retratos + %d grandes" % (len(ROSTER), len(FIRMAS_BIG)))
+    print("poderes: %d retratos grandes" % len(FIRMAS_BIG))
 
 
 # ── retratos para la pizarra: el gris del estudio se vuelve sólido ───────────
@@ -1396,14 +1406,12 @@ def auditar_album():
 if __name__ == "__main__":
     build_brand()
     build_roster()
-    build_pizarra()
     build_roster_json()
     equipos = build_equipos_json()
     build_escudos(equipos)
     sedes = build_sedes(equipos)
     build_shots()
-    ok = auditar_album()
-    ok = auditar_equipos(equipos) and ok
+    ok = auditar_equipos(equipos)
     ok = auditar_sedes(sedes) and ok
     with open(out("assets", "roster", "roster.json"), encoding="utf-8") as f:
         ok = auditar_contadores(equipos, sedes, json.load(f),

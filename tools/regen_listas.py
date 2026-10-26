@@ -273,8 +273,7 @@ def main():
     html = reemplazar(html, '<div class="ligas">', "      </div>",
                       bloques_ligas(equipos))
     html = reemplazar(html, '<ul class="sedes">', "      </ul>", li_sedes(sedes))
-    html = reemplazar(html, '<ul class="album rev">', "      </ul>",
-                      li_album(roster()))
+    # 26-oct-2026: sin álbum (se fue la sección EL PLANTEL; ver build_assets.build_roster)
     if html == antes:
         print("index.html ya estaba al dia (%d equipos, %d cromos)"
               % (len(equipos["equipos"]), len(roster())))

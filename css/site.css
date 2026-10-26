@@ -1167,12 +1167,15 @@ code {
      la raya cruza la cara del jugador y la ficha parece transparente */
   z-index: 1;
 }
-.pizarra__jug img {
-  width: 74%; aspect-ratio: 1; object-fit: cover; border-radius: 50%;
+.pizarra__disco {
+  display: grid; place-items: center; margin: 0 auto;
+  width: 56%; aspect-ratio: 1; border-radius: 50%;
   border: 2px solid var(--oro); background: #1c231c;
   box-shadow: 0 4px 10px rgba(0, 0, 0, .45);
+  font-family: var(--display); font-weight: 700; color: var(--oro-claro);
+  font-size: clamp(.9rem, 2.6vw, 1.35rem); font-variant-numeric: tabular-nums;
 }
-.pizarra__jug--gk img { border-color: var(--oro-claro); border-style: dashed; }
+.pizarra__jug--gk .pizarra__disco { border-color: var(--oro-claro); border-style: dashed; color: var(--cal); }
 .pizarra__jug figcaption {
   margin-top: 2px; font-family: var(--display); font-weight: 500;
   font-size: clamp(.5rem, 1.4vw, .66rem); letter-spacing: .05em; line-height: 1.1;

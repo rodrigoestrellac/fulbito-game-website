@@ -101,17 +101,37 @@ async function montarEquipos() {
   /* un slot (z, x) del juego → posición en la media cancha vertical.
      z va del arco propio (1.5, el arquero) a la mitad (44); x, de -10 a 10.
      Los factores dejan aire para el retrato y su nombre en los bordes. */
-  function jugadorHTML(id, slot, esGk) {
+  /* Un DISCO con el número, sin cara (Rodrigo, 26-oct: los jugadores del juego ya no son
+     las caras reales y el sitio no las muestra). El número sale igual que en la ficha de la
+     alineación del juego (CeremoniaPartido.Formacion): el 1 al arco y cada línea numerada de
+     izquierda a derecha con su tabla — 2 y 6 atrás, 5 / 8 5 / 8 5 10 al medio, 9 / 11 9 / 11 9 7
+     arriba. */
+  const DORSALES = {
+    def: [[2], [2, 6], [3, 2, 4], [3, 2, 6, 4]],
+    mid: [[5], [8, 5], [8, 5, 10], [8, 5, 10, 7]],
+    fwd: [[9], [11, 9], [11, 9, 7]],
+  };
+  function dorsales(f) {
+    const nums = [1];
+    let k = 1;
+    for (const [linea, n] of [['def', f.def], ['mid', f.mid], ['fwd', f.fwd]]) {
+      const idx = [...Array(n).keys()].map((i) => k + i)
+        .sort((a, b) => f.slots[a][1] - f.slots[b][1]);   // izquierda → derecha
+      const tabla = DORSALES[linea][n - 1] || [];
+      idx.forEach((s, i) => { nums[s] = tabla[i] ?? 12 + s; });
+      k += n;
+    }
+    return nums;
+  }
+
+  function jugadorHTML(id, slot, esGk, num) {
     const j = jug.get(id);
-    if (!j) return '';
     const x = (50 + slot[1] * 3.6).toFixed(1);
     const y = (6 + slot[0] * 1.75).toFixed(1);
-    // assets/pizarra/, no assets/roster/: son los mismos bustos pero con el
-    // gris del render reemplazado por sólido — sobre el verde de la cancha el
-    // gris se leía como un círculo semitransparente
+    const nombre = componer(j ? j.nombre : id);
     return `<figure class="pizarra__jug${esGk ? ' pizarra__jug--gk' : ''}" style="--x:${x}%;--y:${y}%">
-        <img src="assets/pizarra/${j.slug}.webp" alt="" width="120" height="120" loading="lazy">
-        <figcaption>${componer(j.nombre)}</figcaption>
+        <span class="pizarra__disco" aria-hidden="true">${num}</span>
+        <figcaption>${nombre}</figcaption>
       </figure>`;
   }
 
@@ -122,8 +142,9 @@ async function montarEquipos() {
 
     const f = data.formaciones[e.form];
     const gk = jug.get(e.gk);
-    const parados = [jugadorHTML(e.gk, f.slots[0], true)]
-      .concat(e.ids.map((id, k) => jugadorHTML(id, f.slots[k + 1], false)))
+    const nums = dorsales(f);
+    const parados = [jugadorHTML(e.gk, f.slots[0], true, 1)]
+      .concat(e.ids.map((id, k) => jugadorHTML(id, f.slots[k + 1], false, nums[k + 1])))
       .join('');
     // M213 — CUATRO. DEFENSA entró porque las tres viejas eran tres formas de
     // medir atacar y un plantel de marca no tenía dónde sumar.
