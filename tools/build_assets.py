@@ -477,6 +477,7 @@ SEDE_VISTA_DE = {"coliseogalactico": "_aerea", "lalamparabavara": "_aerea", "cam
 # juega) sigue con su vista de antes.
 SEDE_VISTA_CIUDAD = "_ciudad"
 SEDE_MAX_W = 1280
+HINCHAS_POR_MUNECO = 2   # lo que dice la web = aforo medido × 2 (ver `sedes.json`)
 
 # El chequeo de marcas de los ESCUDOS, misma mecánica que APROBADOS: el slug
 # tiene que estar acá o el script termina con error. Son las parodias de
@@ -827,8 +828,14 @@ def build_sedes(equipos):
                            Image.LANCZOS)
         im.save(out("assets", "sedes", sd["slug"] + ".webp"),
                 "WEBP", quality=82, method=6)
+    # 27-oct-2026 — LOS HINCHAS DE LA WEB SON EL DOBLE DEL AFORO MEDIDO. Rodrigo: *"en la web
+    # podríamos multiplicar por 2 la capacidad que dice, total es ficticio y nadie se va a poner a
+    # contar muñequitos"*. `aforo` sigue siendo el del juego (el que decide la final y el potrero);
+    # lo que se PUBLICA es `hinchas`.
+    for sd in sedes:
+        sd["hinchas"] = sd["aforo"] * HINCHAS_POR_MUNECO
     with open(out("assets", "sedes", "sedes.json"), "w", encoding="utf-8") as f:
-        json.dump([{k: sd[k] for k in ("slug", "nombre", "concepto", "aforo",
+        json.dump([{k: sd[k] for k in ("slug", "nombre", "concepto", "aforo", "hinchas",
                                        "lista", "equipos", "final", "potrero")}
                    for sd in sedes if sd["lista"]], f, ensure_ascii=False,
                   separators=(",", ":"))
@@ -884,7 +891,7 @@ def auditar_sedes(sedes):
         # el apóstrofo se publica como entidad (regen_listas.esc): L'ARENA ETERNA
         for que, espera in (("nombre", ">%s</h3>" % sd["nombre"].replace("'", "&#x27;")),
                             ("concepto", ">%s</p>" % sd["concepto"]),
-                            ("aforo", "<b>%s</b>" % _miles(sd["aforo"]))):
+                            ("aforo", "<b>%s</b>" % _miles(sd["aforo"] * HINCHAS_POR_MUNECO))):
             if espera not in li:
                 problemas.append(
                     ("TARJETA DE SEDE DESFASADA (%s) en %s: falta %r"

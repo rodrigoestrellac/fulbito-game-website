@@ -206,7 +206,7 @@ def li_sedes(sedes):
              '<span class="sede__locales-tit">De local</span> %s</p>' + NL +
              '        </li>')
             % (sd["slug"], esc(alt), marca_html, esc(sd["nombre"]),
-               esc(sd["concepto"]), miles(sd["aforo"]),
+               esc(sd["concepto"]), miles(sd.get("hinchas", sd["aforo"])),
                round(100 * sd["aforo"] / tope),
                esc(" · ".join(sd["equipos"]))))
     return NL.join(filas)
