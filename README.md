@@ -73,9 +73,9 @@ layout; la captura se queda debajo como respaldo.
 
 | archivo | sección | qué muestra | dura | de dónde sale | crop |
 |---|---|---|---|---|---|
-| `assets/video/hero.mp4` | hero | TIKI-TAKA–LA CULEBRA en el CAMP CATALÀ, juego de mitad de cancha | 13 s | `limpio2`, cuadros 3290-3680 | `1600:900:160:175` |
+| `assets/video/hero.mp4` | hero | TIKI-TAKA–LA CULEBRA en el CAMP CATALÀ, plano cerrado (`FULBITO_CAMARA=video`): de mitad de cancha al remate | 13 s | `limpio4`, cuadros 2250-2640 | `1600:900:160:175` |
 | `assets/video/gol.mp4` | El gol | el remate de lejos de Dientón, hasta que entra | 5,8 s | `limpio2`, cuadros 234-408 | `1600:900:160:175` |
-| `assets/video/firma.mp4` | firmas | El Martillazo de cerca: Mjolnir, rayos y el rival aplastado | 2,9 s | `martillo_v`, cuadros 695-781 | sin crop |
+| `assets/video/firma.mp4` | firmas | El Martillazo de cerca: el Mjolnir a dos manos, los rayos y el rival aplastado | 3,5 s | `martillo_v3`, cuadros 362-466 | sin crop |
 
 **Regrabados el 27-oct-2026 desde el build**, no con la Game Bar: el juego tiene un modo
 video (`game-unity`, `MatchDirectorRafaga272.cs`) que avanza 1/30 s por cuadro y guarda
@@ -87,6 +87,9 @@ velocidad normal.
   marcador. De ahí salen el inicio y el gol. Rodrigo, viendo la versión con firmas forzadas:
   *"hay algunos cambios de cámara que no pasan cuando juego"*.
 - `FULBITO_RAFAGA_SOLO=haaland`: la firma de uno solo, con la cámara de cerca.
+- `FULBITO_CAMARA=video`: plano cerrado para el inicio (Rodrigo: *"el video del hero debe ser con
+  cámara de cerca"*). El modo CERCA del juego cierra poco; este achica el lente a la mitad y baja
+  la cámara, siguiendo la pelota igual (`BroadcastCamera.acercarVideo`). Sólo existe para grabar.
 - El crop saca el marcador y los carteles de arriba enteros (cortados a la mitad parecen un
   error de la página), y el gol corta antes de la píldora del goleador, que aparece abajo a
   la izquierda y el crop la partía.
