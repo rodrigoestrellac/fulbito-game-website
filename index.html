@@ -85,7 +85,7 @@
 
 <!-- ══ HERO ══════════════════════════════════════════════════════════════ -->
 <section class="hero" id="inicio">
-  <div class="hero__fondo" data-video="assets/video/hero.mp4">
+  <div class="hero__fondo">
     <img src="assets/img/cancha-noche.webp" alt="Partido de Fulbito de noche visto desde la cámara de TV: los jugadores repartidos por la cancha y la pelota en juego" width="1600" height="900" fetchpriority="high">
   </div>
 
@@ -99,7 +99,8 @@
     <p class="wordmark__sub">The Game</p>
 
     <p class="hero__tagline">Fútbol arcade 7v7. <b>Gratis.</b><br>
-      Lo bajás, lo abrís y en dos minutos estás pateando.</p>
+      Lo bajás, lo abrís y en dos minutos estás pateando. Solo, con amigos en la misma
+      pantalla o <b>online</b>, de la PC al celular.</p>
 
     <div class="hero__acciones">
       <a class="btn btn--grande" href="https://github.com/rodrigoestrellac/fulbito-game-website/releases/latest" data-rel="cta">
@@ -107,13 +108,14 @@
         <span aria-hidden="true">·</span>
         <span data-rel="cta-peso">230 MB</span>
       </a>
-      <p class="hero__nota">Sin cuenta, sin instalador raro, sin publicidad. Es tuyo.
+      <p class="hero__nota">Sin cuenta y sin publicidad. Es tuyo.
         <span data-rel="cta-nota"></span></p>
     </div>
 
     <p class="zocalo">
       <span class="zocalo__fuerte">Versión <b data-rel="version">M229</b></span>
       <span>Windows <b>+</b> macOS <b>+</b> Android</span>
+      <span>Online <b>PC + Android</b></span>
       <span><b>96</b> jugadores en <b>39</b> equipos</span>
       <span data-rel="descargas-zoc" hidden><b data-rel="descargas-n">0</b> descargas</span>
     </p>
@@ -162,8 +164,8 @@
     <div class="env rev">
       <p class="minuto">Lo que estás buscando</p>
     </div>
-    <div class="banda rev" data-video="assets/video/gol.mp4">
-      <img class="banda__img" src="assets/img/gol.webp" alt="Remate dentro del área: el delantero encara con la pelota al pie y el arquero espera abierto sobre la línea" width="1600" height="900" loading="lazy">
+    <div class="banda rev">
+      <img class="banda__img" src="assets/img/gol.webp" alt="Jugada sobre el arco: el arquero, abierto contra el palo, mira cómo llega el delantero por la línea de fondo" width="1600" height="900" loading="lazy">
       <div class="banda__texto">
         <h2 id="t-gol">El gol</h2>
         <p class="tiza">«¡Gooool! ¡Golazo!»</p>
@@ -186,8 +188,8 @@
           manejando hace lo suyo: una sola cosa, siempre la misma. Para sacar el martillo hay que agarrar al Vikingo.</p>
       </div>
 
-      <div class="banda banda--suelta rev" data-video="assets/video/firma.mp4">
-        <img class="banda__img" src="assets/img/martillazo.webp" alt="El Vikingo con el martillo recién bajado: un rival quedó tendido al lado y el árbitro mira de cerca" width="1600" height="900" loading="lazy">
+      <div class="banda banda--suelta rev">
+        <img class="banda__img" src="assets/img/martillazo.webp" alt="El Vikingo de pie con la pelota y tres rivales aplastados en el piso a su alrededor" width="1600" height="900" loading="lazy">
         <p class="banda__pie">El Martillazo, recién bajado: los que estaban cerca ya están en el piso.</p>
       </div>
 
@@ -241,7 +243,7 @@
       </div>
 
       <div class="cajas rev">
-        <div class="cajas__hueco" data-video="assets/video/cajas.mp4">
+        <div class="cajas__hueco">
           <img class="cajas__foto" src="assets/img/caja-sorpresa.webp" alt="La caja sorpresa con el signo de pregunta apoyada en el círculo central, con los dos equipos alrededor" width="700" height="461" loading="lazy">
         </div>
         <div class="cajas__panel">
@@ -373,9 +375,9 @@
       </div>
 
       <figure class="pantalla rev">
-        <img src="assets/img/selector-equipos.webp" alt="La pantalla ELEGIR EQUIPOS del juego: a la izquierda La Furia, de la liga SELECCIONES, con su escudo, sus seis jugadores y sus barras; a la derecha Les Bleus; y abajo las filas de dificultad, clima, cajas sorpresa, copa amistosa y cancha" width="1600" height="953" loading="lazy">
+        <img src="assets/img/selector-equipos.webp" alt="La pantalla ELEGIR EQUIPOS del juego: a la izquierda Tiki-Taka, de la liga EQUIPOS, con su escudo, sus seis jugadores y sus cuatro barras; a la derecha Los Galácticos; y abajo las filas de dificultad, clima, cajas sorpresa, duración, copa amistosa y cancha" width="1600" height="988" loading="lazy">
         <figcaption>La pantalla, tal cual. Arriba los dos equipos, y abajo la dificultad, el clima,
-          cuántas cajas sorpresa caen, si el partido se juega como una final y en qué cancha.</figcaption>
+          cuántas cajas sorpresa caen, cuánto dura, si el partido se juega como una final y en qué cancha.</figcaption>
       </figure>
 
       <!-- Las tres ligas y sus tarjetas las escribe tools/regen_listas.py
@@ -521,7 +523,7 @@
             <li class="equipo rev">
               <img class="equipo__escudo" src="assets/equipos/scaloneta26.webp" alt="Escudo de Scaloneta 26" width="128" height="128" loading="lazy">
               <h3 class="equipo__nombre">SCALONETA 26</h3>
-              <p class="equipo__concepto">la que viene</p>
+              <p class="equipo__concepto">la del presente</p>
               <p class="equipo__meta"><b>3-2-1</b> <span aria-hidden="true">·</span> Dibu al arco</p>
               <dl class="equipo__barras"><div><dt><abbr title="Velocidad">VEL</abbr></dt><dd><i style="--v:46"></i><b>46</b></dd></div><div><dt><abbr title="Fuerza">FUE</abbr></dt><dd><i style="--v:63"></i><b>63</b></dd></div><div><dt><abbr title="Precisión">PRE</abbr></dt><dd><i style="--v:27"></i><b>27</b></dd></div><div><dt><abbr title="Defensa">DEF</abbr></dt><dd><i style="--v:65"></i><b>65</b></dd></div></dl>
             </li>

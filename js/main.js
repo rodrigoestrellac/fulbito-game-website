@@ -105,7 +105,10 @@ document.querySelectorAll('[data-voz]').forEach((boton) => {
    anotado en la consola aunque el JS lo maneje — dos errores rojos en una
    página que no tiene ninguno. Una lista explícita es más barata y más clara.
    Ver README § Clips de gameplay. */
-const CLIPS = ['hero.mp4', 'gol.mp4', 'firma.mp4', 'cajas.mp4'];
+/* 26-oct-2026: los cuatro clips se sacaron (mostraban las caras de Meshy) hasta regrabarlos con
+   el juego de hoy. Volver a ponerlos = el MP4 en assets/video/, su nombre acá y el `data-video`
+   de su hueco en index.html (hero, gol, firma, cajas). */
+const CLIPS = [];
 
 function montarVideos() {
   if (menosMovimiento || !CLIPS.length) return;

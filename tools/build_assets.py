@@ -1131,7 +1131,12 @@ SHOTS = [
     # se extrana porque el epigrafe de la banda ya nombra la jugada, y de paso el
     # golpe se ve el doble de grande.
     ("web_firma_still", "martillazo"),
-    ("web_tiro_03", "gol"),
+    # 26-oct-2026 — las cuatro fotos se rehicieron con el juego de M271 (caras de avatar):
+    # el hero sale de `web_tv_06` y el gol de `web_golazo_08` (`PocSetup.SimWeb`), el martillazo
+    # de `PocSetup.FotoMartillazo271` (cuadro 056), la caja de `PocSimCajas.FotoCajas` y el
+    # selector del build con FULBITO_FOTO_MENU + FULBITO_MENU_ABRIR=sel. Los VIDEOS se sacaron del
+    # sitio hasta regrabarlos (eran de las caras de Meshy).
+    ("web_golazo_08", "gol"),
     # M172 — la caja sorpresa en el círculo central, los dos equipos alrededor.
     # Sale de `PocSimCajas.FotoCajas` (foto ESCENIFICADA de los props, no un
     # frame de sim): los jugadores están en poses de idle, no en T-pose, así
@@ -1338,7 +1343,7 @@ def build_og():
 
     d.line([(left, top + 196), (left + 108, top + 196)], fill=ORO, width=5)
     tracked((left + 128, top + 176), "THE GAME", f_sub, ORO, 13)
-    tracked((left, top + 250), "FÚTBOL ARCADE 7v7 · GRATIS · WINDOWS Y MAC", f_tag,
+    tracked((left, top + 250), "FÚTBOL ARCADE 7v7 · GRATIS · PC, MAC Y ANDROID · ONLINE", f_tag,
             (168, 178, 165), 2.5)
 
     im.convert("RGB").save(out("assets", "brand", "og-image.jpg"), "JPEG",
