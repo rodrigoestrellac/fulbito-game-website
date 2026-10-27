@@ -153,6 +153,10 @@ APROBADOS = {
     # buzo fucsia liso; los guantes traen garabatos blancos en la muñequera y el dorso —
     # mirados sobre la TEXTURA a 4x: glifos ilegibles, ni letras ni un logo reconocible.
     "angelito", "merlin", "gigio",
+    # 27-oct-2026 — EL BISONTE (M273, DEPORTIVO CIUDAD) y FERDY RIOS (M274, EL TEATRO DE LOS
+    # DIABLOS). Zoom al torso sobre `bisonte_check_front.png` y `ferdy_check_front.png`: kit
+    # magenta liso, short blanco, sin escudo, sin sponsor y sin numero.
+    "bisonte", "ferdy",
 }
 
 # el archivo de captura cuando NO se llama como el id del juego
@@ -432,6 +436,9 @@ SEDES_APROBADAS = {
     # carteles que las aprobadas arriba, desde otro ángulo y con la ciudad de noche alrededor: lo
     # que se lee son los trapos y carteles nuestros (FULBITO / LA BANDA / VAMOS / DALE CAMPEÓN /
     # EL POTRERO) y los nombres inventados de las sedes. Los edificios del entorno no llevan texto.
+    # 27-oct-2026 — LE PARC DE FER (M274), sobre `_ciudad` con zoom a los textos: los trapos VAMOS /
+    # LA BANDA / DALE CAMPEÓN / EL POTRERO y la torre de hierro sin cartel. Nombre inventado.
+    "parcdefer",
 }
 # de qué toma cada sede su foto.
 # ⚠️ `_web` Y NO `_aerea` (25-ago-2026). Las `_tv` y `_aerea_cruce` están
@@ -1109,7 +1116,8 @@ BUST_OUT = 480
 # ⚠️ Antes esta sección usaba las capturas m24n_* del sim de firmas: salen a
 # 1280x720 SIN antialias (PocSetup.ShotWithCam) y se veían pixeladas. Los
 # retratos son renders limpios y aguantan cualquier tamaño.
-FIRMAS_BIG = [("haaland", "el-vikingo"), ("toro", "el-toro"), ("maldini", "il-capitano")]
+# 27-oct-2026 — EL CAÑONAZO en lugar de LA MURALLA (Rodrigo: «cambiaría la muralla por el Cañonazo»).
+FIRMAS_BIG = [("haaland", "el-vikingo"), ("toro", "el-toro"), ("bati", "el-canonazo")]
 FIRMA_OUT = 720
 
 # ── Capturas ─────────────────────────────────────────────────────────────────
@@ -1168,7 +1176,9 @@ SHOTS = [
     ("web_poder_abracadabra", "poder-abracadabra"),
     ("web_poder_los-tallarines", "poder-los-tallarines"),
     ("web_poder_los-flashes", "poder-los-flashes"),
-    ("web_poder_el-mareo", "poder-el-mareo"),
+    # 27-oct: LA PINTURA de Pinturicchio en lugar de EL MAREO (Rodrigo: «el mareo lo podemos cambiar
+    # por el bote de pintura de Pinturicchio»).
+    ("web_poder_la-pintura", "poder-la-pintura"),
     ("web_poder_la-bomba", "poder-la-bomba"),
     # M172 — la caja sorpresa en el círculo central, los dos equipos alrededor.
     # Sale de `PocSimCajas.FotoCajas` (foto ESCENIFICADA de los props, no un
@@ -1304,6 +1314,30 @@ def build_pizarra():
         im.save(out("assets", "pizarra", slug + ".webp"),
                 "WEBP", quality=84, method=6)
     print("pizarra: %d retratos con fondo solido" % len(ROSTER))
+
+
+# 27-oct-2026 — LA FOTO DE CADA CAJA (la sección de cajas la cambia al tocar una, js/main.js).
+# Salen del build con FULBITO_CAJA_SERIE=1 (game-unity, MatchDirectorRafaga272.cs: se usa cada caja y
+# se fotografía su efecto con la cámara de TV) y se ELIGEN a ojo: `captures/web_caja_<id>.png`, 16:9.
+# Dos anchos (960 para el celular, 1600 para la compu); la página elige con srcset/sizes.
+CAJAS_EFECTO = ["pendiente", "unomas", "arbitro", "colectivo", "turbo", "bateria", "hora", "roja", "dt",
+                "doble", "arco", "aspersor", "playa", "luz", "perro", "viento"]
+
+
+def build_cajas_efecto():
+    hechas = 0
+    for cid in CAJAS_EFECTO:
+        p = os.path.join(CAPS, "web_caja_%s.png" % cid)
+        if not os.path.exists(p):
+            print("  FALTA", p)
+            continue
+        im = Image.open(p).convert("RGB")
+        for w in (960, 1600):
+            im.resize((w, round(w * 9 / 16)), Image.LANCZOS).save(
+                out("assets", "img", "cajas-efecto", "%s-%d.webp" % (cid, w)), "WEBP", quality=76, method=6)
+        hechas += 1
+    print("cajas: %d de %d fotos de efecto" % (hechas, len(CAJAS_EFECTO)))
+    return hechas == len(CAJAS_EFECTO)
 
 
 def build_shots():
@@ -1459,7 +1493,8 @@ if __name__ == "__main__":
     build_escudos(equipos)
     sedes = build_sedes(equipos)
     build_shots()
-    ok = auditar_equipos(equipos)
+    cajas_ok = build_cajas_efecto()
+    ok = auditar_equipos(equipos) and cajas_ok
     ok = auditar_sedes(sedes) and ok
     with open(out("assets", "roster", "roster.json"), encoding="utf-8") as f:
         ok = auditar_contadores(equipos, sedes, json.load(f),

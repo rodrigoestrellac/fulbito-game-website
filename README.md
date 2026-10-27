@@ -75,7 +75,7 @@ layout; la captura se queda debajo como respaldo.
 |---|---|---|---|---|---|
 | `assets/video/hero.mp4` | hero | TIKI-TAKA–LA CULEBRA en el CAMP CATALÀ, plano cerrado (`FULBITO_CAMARA=video`): de mitad de cancha al remate | 13 s | `limpio4`, cuadros 2250-2640 | `1600:900:160:175` |
 | `assets/video/gol.mp4` | El gol | el remate de lejos de Dientón, hasta que entra | 5,8 s | `limpio2`, cuadros 234-408 | `1600:900:160:175` |
-| `assets/video/firma.mp4` | firmas | El Martillazo de cerca: el Mjolnir en el puño, los rayos y el rival aplastado | 3,3 s | `martillo_v5`, cuadros 861-960 (con `FULBITO_RAFAGA_VICTIMA=1`) | sin crop |
+| `assets/video/firma.mp4` | firmas | El Martillazo de cerca: el Mjolnir en el puño, los rayos y el rival aplastado | 2,2 s | `martillo_v5`, cuadros 861-926 (con `FULBITO_RAFAGA_VICTIMA=1`; Rodrigo: «acortar la parte final») | sin crop |
 
 **Regrabados el 27-oct-2026 desde el build**, no con la Game Bar: el juego tiene un modo
 video (`game-unity`, `MatchDirectorRafaga272.cs`) que avanza 1/30 s por cuadro y guarda

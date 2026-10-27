@@ -158,6 +158,41 @@ function montarCajas() {
   caja.style.setProperty('--cajas-t', CAJAS_T + 'ms');
   let actual = 0, timer = null, visible = false, encima = false, tocada = false;
 
+  /* 27-oct-2026 — LA FOTO ES LA DE LA CAJA ELEGIDA. Rodrigo: «una captura del efecto de cada
+     caja, que cambie al tocar cada una. Tiene que estar bien optimizado para desktop y mobile».
+     Cada caja tiene su foto del juego en dos anchos (assets/img/cajas-efecto/<id>-960.webp y
+     -1600.webp, ver tools/build_assets.py) y el navegador elige con `srcset`/`sizes`.
+     ⚠️ No se baja ninguna hasta que la sección está a la vista, y después sólo la elegida y la
+     siguiente (la que va a mostrar la rotación). La nueva se decodifica ANTES de ponerla
+     (`decode()`), así el cambio no parpadea en blanco; si el usuario ya eligió otra mientras
+     cargaba, la vieja se descarta. */
+  const foto = caja.querySelector('.cajas__foto');
+  const idDe = (k) => tiles[k].id.replace('caja-t-', '');
+  const SIZES = '(max-width: 760px) 100vw, 56vw';
+  const srcset = (id) => `assets/img/cajas-efecto/${id}-960.webp 960w, assets/img/cajas-efecto/${id}-1600.webp 1600w`;
+  const precargada = new Set();
+  const precargar = (k) => {
+    const id = idDe((k + tiles.length) % tiles.length);
+    if (precargada.has(id)) return;
+    precargada.add(id);
+    const im = new Image(); im.sizes = SIZES; im.srcset = srcset(id);
+  };
+  let pedida = '';
+  const mostrarFoto = (k) => {
+    if (!foto || !visible) return;
+    const id = idDe(k);
+    if (pedida === id) return;
+    pedida = id;
+    const im = new Image(); im.sizes = SIZES; im.srcset = srcset(id);
+    const poner = () => {
+      if (pedida !== id) return;
+      foto.sizes = SIZES; foto.srcset = srcset(id);
+      foto.alt = 'En el juego: ' + tiles[k].querySelector('.visually-hidden').textContent;
+    };
+    (im.decode ? im.decode() : Promise.resolve()).then(poner, poner);
+    precargar(k + 1);
+  };
+
   const elegir = (i, foco) => {
     actual = (i + tiles.length) % tiles.length;
     tiles.forEach((t, k) => {
@@ -169,6 +204,7 @@ function montarCajas() {
       fichas[k].setAttribute('aria-hidden', si ? 'false' : 'true');
     });
     if (foco) tiles[actual].focus();
+    mostrarFoto(actual);
   };
 
   const rotar = () => {
@@ -198,7 +234,7 @@ function montarCajas() {
   panel.addEventListener('focusin', () => { encima = true; rotar(); });
   panel.addEventListener('focusout', () => { encima = false; rotar(); });
   if ('IntersectionObserver' in window) {
-    new IntersectionObserver(([e]) => { visible = e.isIntersecting; rotar(); },
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; if (visible) mostrarFoto(actual); rotar(); },
                              { threshold: 0.35 }).observe(caja);
   } else { visible = true; }
 
