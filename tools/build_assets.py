@@ -797,7 +797,15 @@ def sedes_del_juego(equipos):
 def build_sedes(equipos):
     """El JSON + las ocho fotos. Devuelve las sedes (jugables y apagadas)."""
     sedes = sedes_del_juego(equipos)
+    # 27-oct-2026 — sólo las que se JUEGAN. Rodrigo: *"la catedral hay que sacarla porque no la
+    # usamos más en el juego"*. Estaba apagada (`lista = false`) y aun así salía su foto y su
+    # fila en sedes.json. Una sede que se vuelva a prender en Estadios.cs vuelve sola.
     for sd in sedes:
+        if not sd["lista"]:
+            viejo = out("assets", "sedes", sd["slug"] + ".webp")
+            if os.path.exists(viejo):
+                os.remove(viejo)
+    for sd in [x for x in sedes if x["lista"]]:
         p = os.path.join(CAPS, "sede_%s%s.png" % (sd["slug"], SEDE_VISTA_CIUDAD))
         if not os.path.exists(p):
             p = os.path.join(CAPS, "sede_%s%s.png"
@@ -815,10 +823,10 @@ def build_sedes(equipos):
     with open(out("assets", "sedes", "sedes.json"), "w", encoding="utf-8") as f:
         json.dump([{k: sd[k] for k in ("slug", "nombre", "concepto", "aforo",
                                        "lista", "equipos", "final", "potrero")}
-                   for sd in sedes], f, ensure_ascii=False,
+                   for sd in sedes if sd["lista"]], f, ensure_ascii=False,
                   separators=(",", ":"))
-    print("sedes.json: %d sedes (%d jugables), final en %s"
-          % (len(sedes), sum(1 for s in sedes if s["lista"]),
+    print("sedes.json: %d sedes jugables (%d apagadas fuera), final en %s"
+          % (sum(1 for s in sedes if s["lista"]), sum(1 for s in sedes if not s["lista"]),
              next(s["nombre"] for s in sedes if s["final"])))
     return sedes
 
