@@ -1136,7 +1136,16 @@ SHOTS = [
     # de `PocSetup.FotoMartillazo271` (cuadro 056), la caja de `PocSimCajas.FotoCajas` y el
     # selector del build con FULBITO_FOTO_MENU + FULBITO_MENU_ABRIR=sel. Los VIDEOS se sacaron del
     # sitio hasta regrabarlos (eran de las caras de Meshy).
-    ("web_golazo_08", "gol"),
+    # 27-oct — las fotos de juego salen del BUILD, no del editor: en el editor los cuerpos de avatar
+    # no posan y quedaban en T (Rodrigo). `MatchDirectorRafaga272` (FULBITO_RAFAGA) juega un partido
+    # CPU contra CPU, dispara firmas y saca ráfagas sin HUD; acá van las elegidas a ojo.
+    ("web_gol_m272", "gol"),
+    ("web_poder_el-expreso", "poder-el-expreso"),
+    ("web_poder_abracadabra", "poder-abracadabra"),
+    ("web_poder_los-tallarines", "poder-los-tallarines"),
+    ("web_poder_los-flashes", "poder-los-flashes"),
+    ("web_poder_el-mareo", "poder-el-mareo"),
+    ("web_poder_la-bomba", "poder-la-bomba"),
     # M172 — la caja sorpresa en el círculo central, los dos equipos alrededor.
     # Sale de `PocSimCajas.FotoCajas` (foto ESCENIFICADA de los props, no un
     # frame de sim): los jugadores están en poses de idle, no en T-pose, así
@@ -1144,7 +1153,7 @@ SHOTS = [
     # de columna, donde alcanza y sobra.
     # 27-oct: la de FotoCajas (formación quieta y la caja sola) "no parece de un partido" (Rodrigo):
     # sale de PocSetup.FotoCajaPartido271, con el partido jugándose alrededor.
-    ("web_cajapartido_2_210", "caja-sorpresa"),
+    ("web_caja_m272", "caja-sorpresa"),
     # La pantalla ELEGIR EQUIPOS (25-ago-2026). NO va recortada a 16:9 como las
     # otras: es un menu y recortarlo se come la fila de arriba y la de abajo.
     # Entra por SHOTS —y no como .webp suelto en assets/img, que es como estuvo
@@ -1220,9 +1229,17 @@ def ventana_del_busto(im):
 # de los FBX ACTUALES (avatar): `blender -b --factory-startup -P assets-src/render_check_front.py
 # -- haaland toro maldini`. `roster.json` sigue: son DATOS (nombres, firmas, stats) que usa la pizarra.
 def build_roster():
+    # 27-oct-2026: las tres tarjetas grandes muestran la FIRMA EN EL JUEGO (captures/web_card_<slug>.png,
+    # cuadradas, de la ráfaga del build) y no el retrato de estudio, que salía en T. Si falta la escena
+    # se cae al retrato de antes.
     for src, slug in FIRMAS_BIG:
-        recortar(src, slug, "firmas", FIRMA_OUT)
-    print("poderes: %d retratos grandes" % len(FIRMAS_BIG))
+        esc = os.path.join(CAPS, "web_card_%s.png" % slug)
+        if os.path.exists(esc):
+            Image.open(esc).convert("RGB").resize((FIRMA_OUT, FIRMA_OUT), Image.LANCZOS).save(
+                out("assets", "firmas", slug + ".webp"), "WEBP", quality=82, method=6)
+        else:
+            recortar(src, slug, "firmas", FIRMA_OUT)
+    print("poderes: %d tarjetas grandes" % len(FIRMAS_BIG))
 
 
 # ── retratos para la pizarra: el gris del estudio se vuelve sólido ───────────
