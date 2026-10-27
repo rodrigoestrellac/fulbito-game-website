@@ -428,6 +428,10 @@ SEDES_APROBADAS = {
     # (nombre inventado) y los trapos AGUANTE / VAMOS. L'ARENA: sólo trapos de la hinchada y la
     # ruina de ladrillo, sin texto. Ningún nombre de estadio real, ningún sponsor.
     "fossabiscione", "arenaeterna",
+    # 27-oct-2026 — las DOCE `_ciudad` (del build, con el entorno de M268). Mismos estadios y mismos
+    # carteles que las aprobadas arriba, desde otro ángulo y con la ciudad de noche alrededor: lo
+    # que se lee son los trapos y carteles nuestros (FULBITO / LA BANDA / VAMOS / DALE CAMPEÓN /
+    # EL POTRERO) y los nombres inventados de las sedes. Los edificios del entorno no llevan texto.
 }
 # de qué toma cada sede su foto.
 # ⚠️ `_web` Y NO `_aerea` (25-ago-2026). Las `_tv` y `_aerea_cruce` están
@@ -455,6 +459,16 @@ SEDE_VISTA = "_web"
 # 11-oct-2026 — `campcatala`: la `_web` entra por el hueco del techo y es casi toda cubierta;
 # la `_aerea` muestra el estadio entero con la fachada.
 SEDE_VISTA_DE = {"coliseogalactico": "_aerea", "lalamparabavara": "_aerea", "campcatala": "_aerea"}
+# ⚠️ 27-oct-2026 — `_ciudad` MANDA SOBRE TODO LO DE ARRIBA. Rodrigo: *"me gustaría que rehagamos
+# las imágenes de los estadios en la escena de las ciudades donde aparecen ahora en el juego.
+# Además que en la arena eterna se note que es el coliseo"*. `CapturarSedes` corre en el editor y
+# no prende el entorno de M268 (barrio, foro, ciudad futurista: lo arma `Mundo268` al empezar el
+# partido), así que las sedes salían flotando en la nada. Las `_ciudad` salen del BUILD con
+# `FULBITO_FOTO_SEDE` (game-unity, MatchDirectorFotoSede272.cs: el vuelo de la entrada y una
+# órbita a dos alturas y ocho rumbos), vestidas de su primer local, y se ELIGEN mirándolas: se
+# copia la elegida a `captures/sede_<slug>_ciudad.png`. La que no tenga (LA CATEDRAL, que no se
+# juega) sigue con su vista de antes.
+SEDE_VISTA_CIUDAD = "_ciudad"
 SEDE_MAX_W = 1280
 
 # El chequeo de marcas de los ESCUDOS, misma mecánica que APROBADOS: el slug
@@ -784,8 +798,10 @@ def build_sedes(equipos):
     """El JSON + las ocho fotos. Devuelve las sedes (jugables y apagadas)."""
     sedes = sedes_del_juego(equipos)
     for sd in sedes:
-        p = os.path.join(CAPS, "sede_%s%s.png"
-                         % (sd["slug"], SEDE_VISTA_DE.get(sd["slug"], SEDE_VISTA)))
+        p = os.path.join(CAPS, "sede_%s%s.png" % (sd["slug"], SEDE_VISTA_CIUDAD))
+        if not os.path.exists(p):
+            p = os.path.join(CAPS, "sede_%s%s.png"
+                             % (sd["slug"], SEDE_VISTA_DE.get(sd["slug"], SEDE_VISTA)))
         if not os.path.exists(p):
             print("  FALTA", p)
             continue

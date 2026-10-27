@@ -67,23 +67,31 @@ cambia lo que la persona va a hacer. La diferencia no es el tema, es a quién le
 
 ## Clips de gameplay
 
-Los cuatro huecos declarados en el HTML (cada uno con un `data-video`) ya tienen clip. El
-`<video>` se monta encima de la captura, en la misma caja y sin salto de layout; la
-captura se queda debajo como respaldo.
+Tres de los cuatro huecos declarados en el HTML tienen clip (`data-video`); el de cajas sigue
+con la foto. El `<video>` se monta encima de la captura, en la misma caja y sin salto de
+layout; la captura se queda debajo como respaldo.
 
-| archivo | sección | qué muestra | dura | crop |
-|---|---|---|---|---|
-| `assets/video/hero.mp4` | hero | juego de mitad de cancha — es fondo detrás del wordmark | 4,7 s | `1500:844:400:280` |
-| `assets/video/gol.mp4` | El gol | vaselina de Il Divino, palo, adentro y confeti | 4,2 s | `1728:972:288:138` |
-| `assets/video/firma.mp4` | firmas | El Martillazo: el rayo y dos rivales aplastados | 2,7 s | `1400:788:452:250` |
-| `assets/video/cajas.mp4` | cajas sorpresa | cuatro tramos: cae una caja, cancha inclinada, Calvino comprado y el colectivo | 14,7 s | `1728:972:288:138` |
+| archivo | sección | qué muestra | dura | de dónde sale | crop |
+|---|---|---|---|---|---|
+| `assets/video/hero.mp4` | hero | TIKI-TAKA–LA CULEBRA en el CAMP CATALÀ, juego de mitad de cancha | 13 s | `limpio2`, cuadros 3290-3680 | `1600:900:160:175` |
+| `assets/video/gol.mp4` | El gol | el remate de lejos de Dientón, hasta que entra | 5,8 s | `limpio2`, cuadros 234-408 | `1600:900:160:175` |
+| `assets/video/firma.mp4` | firmas | El Martillazo de cerca: Mjolnir, rayos y el rival aplastado | 2,9 s | `martillo_v`, cuadros 695-781 | sin crop |
 
-El de cajas es el único **concatenado**: cuatro tramos de ~3,7 s de momentos distintos del
-mismo partido, pegados con `-f concat -c copy`. Va con el crop ancho porque ahí el
-**cartel del juego es el contenido**: sin «¡CALVINO SE PUSO LA CAMISETA!» el tramo del
-árbitro es un muñequito amarillo cualquiera. Ojo que el cartel muestra lo último que pasó,
-no el efecto: en el tramo del colectivo dice «¡SUPER TIRO!» y cosas así. Es charla del
-juego, no un error.
+**Regrabados el 27-oct-2026 desde el build**, no con la Game Bar: el juego tiene un modo
+video (`game-unity`, `MatchDirectorRafaga272.cs`) que avanza 1/30 s por cuadro y guarda
+TODOS los cuadros en JPG, más un `eventos.txt` con el cuadro de cada gol. En pantalla el
+partido se ve más rápido o más lento según cuánto tarde en guardar; el video sale a
+velocidad normal.
+
+- `FULBITO_RAFAGA_LIMPIO=1`: CPU contra CPU sin tocar la cámara ni forzar firmas, con el
+  marcador. De ahí salen el inicio y el gol. Rodrigo, viendo la versión con firmas forzadas:
+  *"hay algunos cambios de cámara que no pasan cuando juego"*.
+- `FULBITO_RAFAGA_SOLO=haaland`: la firma de uno solo, con la cámara de cerca.
+- El crop saca el marcador y los carteles de arriba enteros (cortados a la mitad parecen un
+  error de la página), y el gol corta antes de la píldora del goleador, que aparece abajo a
+  la izquierda y el crop la partía.
+- Las cajas quedan con la foto: en la grabación con cajas la cámara salta de toma en toma y
+  no hubo un tramo limpio que mostrara una caja cayendo.
 
 Además del archivo hay que agregar su nombre al array `CLIPS` de `js/main.js` (una línea).
 Es a propósito: sondear con `HEAD` dejaba errores 404 en la consola.
