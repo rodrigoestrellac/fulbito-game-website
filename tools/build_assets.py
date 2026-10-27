@@ -1142,7 +1142,9 @@ SHOTS = [
     # frame de sim): los jugadores están en poses de idle, no en T-pose, así
     # que no le cabe la advertencia de arriba. Es 700px y se muestra a mitad
     # de columna, donde alcanza y sobra.
-    ("m172_caja_tv", "caja-sorpresa"),
+    # 27-oct: la de FotoCajas (formación quieta y la caja sola) "no parece de un partido" (Rodrigo):
+    # sale de PocSetup.FotoCajaPartido271, con el partido jugándose alrededor.
+    ("web_cajapartido_2_210", "caja-sorpresa"),
     # La pantalla ELEGIR EQUIPOS (25-ago-2026). NO va recortada a 16:9 como las
     # otras: es un menu y recortarlo se come la fila de arriba y la de abajo.
     # Entra por SHOTS —y no como .webp suelto en assets/img, que es como estuvo
