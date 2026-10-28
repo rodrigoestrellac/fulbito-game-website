@@ -223,7 +223,7 @@ function montarCajas() {
   const parar = () => { tocada = true; rotar(); };
   tiles.forEach((t, k) => t.addEventListener('click', () => { parar(); elegir(k, false); }));
   caja.querySelector('.cajas__grilla').addEventListener('keydown', (e) => {
-    const paso = { ArrowRight: 1, ArrowDown: 5, ArrowLeft: -1, ArrowUp: -5 }[e.key];
+    const paso = { ArrowRight: 1, ArrowDown: 4, ArrowLeft: -1, ArrowUp: -4 }[e.key];   // el tablero es de 4 columnas (era 5)
     if (paso !== undefined) { e.preventDefault(); parar(); elegir(actual + paso, true); }
     else if (e.key === 'Home') { e.preventDefault(); parar(); elegir(0, true); }
     else if (e.key === 'End') { e.preventDefault(); parar(); elegir(tiles.length - 1, true); }

@@ -1300,6 +1300,36 @@ code {
   .cajas--vivo .caja-ficha__ico { width: 48px; height: 48px; }
 }
 
+/* 28-oct-2026 — Rodrigo, mirando la sección en escritorio: *"podríamos dejar la imagen en un costado
+   de la grilla y el nombre y explicación debajo aprovechando bien el espacio. Y en mobile que el título
+   aparezca debajo de la imagen"*. La foto quedaba centrada en vertical contra un panel más alto (aire
+   arriba y abajo) y la ficha colgaba sola debajo de la grilla. Ahora el panel se DESARMA
+   (`display: contents`) y sus piezas se ubican en la grilla de `.cajas`:
+     escritorio:  foto y debajo la ficha y el reloj | rótulo + tablero
+     celular:     foto · ficha · reloj · rótulo · tablero  (el nombre pegado a la foto que muestra)
+   Sólo con JS (`.cajas--vivo`): sin JS no hay tablero y las dieciséis fichas van en lista como antes. */
+.cajas--vivo .cajas__panel { display: contents; }
+.cajas--vivo .cajas__hueco { grid-area: foto; }
+.cajas--vivo .cajas__rotulo { grid-area: rotulo; }
+.cajas--vivo .cajas__grilla { grid-area: grilla; }
+.cajas--vivo .cajas__fichas { grid-area: fichas; }
+.cajas--vivo .cajas__reloj { grid-area: reloj; }
+@media (min-width: 861px) {
+  /* v2 — Rodrigo: *"ahí debe ir el texto, no debajo de todo"*: la ficha va en la columna de la FOTO,
+     justo debajo de ella; el tablero ocupa solo la columna de la derecha, de arriba a abajo */
+  .cajas--vivo {
+    grid-template-areas: "foto rotulo" "foto grilla" "fichas grilla" "reloj grilla";
+    grid-template-rows: auto auto 1fr auto;
+    align-items: start; row-gap: var(--s3);
+  }
+  .cajas--vivo .cajas__rotulo { align-self: end; }
+}
+@media (max-width: 860px) {
+  .cajas--vivo { grid-template-areas: "foto" "fichas" "reloj" "rotulo" "grilla"; row-gap: var(--s3); }
+  .cajas--vivo .cajas__fichas, .cajas--vivo .cajas__reloj,
+  .cajas--vivo .cajas__rotulo, .cajas--vivo .cajas__grilla { max-width: 560px; width: 100%; justify-self: center; }
+}
+
 /* ══ EL PULIDO (PLAN_WEB_PULIDO) ═══════════════════════════════════════
    La página contaba el juego pero no lo repartía. Lo de acá abajo es lo que
    agrega el reparto (CTAs en el camino) y lo que saca el agobio en mobile.
