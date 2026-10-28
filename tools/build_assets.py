@@ -444,6 +444,11 @@ SEDES_APROBADAS = {
     # 27-oct-2026 — LE PARC DE FER (M274), sobre `_ciudad` con zoom a los textos: los trapos VAMOS /
     # LA BANDA / DALE CAMPEÓN / EL POTRERO y la torre de hierro sin cartel. Nombre inventado.
     "parcdefer",
+    # 28-oct-2026 — THE ROYAL ARCH (sede 14, M279), sobre `_ciudad` (órbita a 32°, del build): el arco
+    # de acero, la torre del reloj y la noria son siluetas genéricas de Londres, sin texto. El friso dice
+    # THE ROYAL ARCH (inventado); la tira del techo se despersonalizó (decía el lema del subte) y el
+    # roundel del subte se sacó con la estación. Sin sponsors ni nombre de estadio real.
+    "royalarch",
 }
 # de qué toma cada sede su foto.
 # ⚠️ `_web` Y NO `_aerea` (25-ago-2026). Las `_tv` y `_aerea_cruce` están
