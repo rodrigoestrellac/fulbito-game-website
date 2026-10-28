@@ -157,6 +157,11 @@ APROBADOS = {
     # DIABLOS). Zoom al torso sobre `bisonte_check_front.png` y `ferdy_check_front.png`: kit
     # magenta liso, short blanco, sin escudo, sin sponsor y sin numero.
     "bisonte", "ferdy",
+    # 28-oct-2026 — los DIEZ de EL MENGÃO y LA GARRA CHARRÚA (avatar procedural, sin Meshy).
+    # `render_check_front.py` y zoom al torso: kit magenta liso, short blanco, sin escudo, sin
+    # sponsor y sin numero; `muso` (arquero) con guantes blancos lisos de puño negro, sin logo.
+    "capacete", "peluca", "galinho", "didico",
+    "faraonch", "tota", "pajarito", "cachavacha", "matador", "muso",
 }
 
 # el archivo de captura cuando NO se llama como el id del juego
@@ -541,6 +546,11 @@ ESCUDOS_APROBADOS = {
     # sobre celeste con borde y banda azul marino. Sin texto. Dibuja la CIUDAD, no el
     # emblema del club (ni barco, ni rosa, ni aguila, ni forma redonda).
     "ciudad",
+    # 28-oct-2026 — `mengao` (EL MENGÃO) y `charrua` (LA GARRA CHARRÚA). Mirados con zoom:
+    # mengao = el Pan de Azúcar blanco sobre negro y franjas rojinegras (dibuja la CIUDAD, sin
+    # el buitre ni el monograma CRF); charrua = tres zarpazos blancos sobre celeste con franjas
+    # (la garra, sin sol, sin estrellas ni escudo de la AUF). Ninguno lleva texto.
+    "mengao", "charrua",
 }
 
 ESCUDO_OUT = 256    # los PNG fuente son 256×256; se convierten sin escalar
@@ -954,23 +964,34 @@ def en_letras(n, apocope=False):
     return _DEC[d] if u == 0 else "%s y %s" % (_DEC[d], _UNI[u])
 
 
+def mas_de(n):
+    """28-oct-2026 — Rodrigo: *"actualizá la web para que diga +40 equipos y +100 jugadores"*.
+    El copy no lleva la cuenta exacta sino la DECENA cumplida («+40», «más de cuarenta»): así un
+    equipo o un jugador nuevo no obliga a tocar el texto. El auditor sigue derivando el número del
+    juego, así que si se cruza la decena siguiente vuelve a avisar."""
+    return n // 10 * 10
+
+
 def auditar_contadores(equipos, sedes, jugadores, ligas):
     html = open(os.path.join(WEB, "index.html"), encoding="utf-8").read()
-    nj = len(jugadores)
+    # los jugadores DEL JUEGO, no los del álbum: el álbum espera el chequeo de marcas de cada
+    # retrato (`APROBADOS`) y puede ir atrás del juego; el contador habla del juego
+    txt = _leer_tuning()
+    nj = len(set(_lista_cs(txt, "BluePoolIds")) | set(_lista_cs(txt, "GkPoolIds")))
     ne = len(equipos)
     ns = sum(1 for s in sedes if s["lista"])
     campo = sum(1 for j in jugadores if not j["gk"])
     poderes = len({j["firma"] for j in jugadores if not j["gk"]})
     # (qué es, el texto que TIENE que estar, dónde vive)
     esperados = [
-        ("zócalo del hero", "<b>%d</b> jugadores en <b>%d</b> equipos" % (nj, ne)),
-        ("volanta de equipos", ">%s equipos</p>" % en_letras(ne, True).capitalize()),
+        ("zócalo del hero", "<b>+%d</b> jugadores en <b>+%d</b> equipos" % (mas_de(nj), mas_de(ne))),
+        ("volanta de equipos", ">Más de %s equipos</p>" % en_letras(mas_de(ne))),
         ("volanta de poderes", ">%s poderes</p>" % en_letras(poderes, True).capitalize()),
         ("volanta de sedes", ">%s canchas</p>" % en_letras(ns, True).capitalize()),
         # los tres poderes con tarjeta grande son a mano; el resto es el resto
         ("los poderes que faltan", "¿Los otros %s?" % en_letras(poderes - 3)),
-        ("meta description", "%d jugadores, %d equipos, %d canchas, %d poderes"
-                             % (nj, ne, ns, poderes)),
+        ("meta description", "+%d jugadores, +%d equipos, %d canchas, %d poderes"
+                             % (mas_de(nj), mas_de(ne), ns, poderes)),
     ]
     # el título de cada liga lleva SU cuenta al lado, y ése es el contador que más
     # fácil se desfasa: un equipo nuevo entra a UNA liga y las otras dos no cambian
