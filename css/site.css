@@ -1317,12 +1317,19 @@ code {
 @media (min-width: 861px) {
   /* v2 — Rodrigo: *"ahí debe ir el texto, no debajo de todo"*: la ficha va en la columna de la FOTO,
      justo debajo de ella; el tablero ocupa solo la columna de la derecha, de arriba a abajo */
+  /* v3 — *"debe llegar a la misma altura que la grilla de cajas"*: el alto lo pone el TABLERO. La foto
+     llena lo que queda arriba de la ficha (absoluta adentro de su hueco: así no empuja el alto de la
+     fila) y recorta los costados con `cover`; la ficha cierra justo donde cierra el tablero. */
   .cajas--vivo {
-    grid-template-areas: "foto rotulo" "foto grilla" "fichas grilla" "reloj grilla";
-    grid-template-rows: auto auto 1fr auto;
-    align-items: start; row-gap: var(--s3);
+    grid-template-areas: "foto rotulo" "foto grilla" "fichas grilla" "reloj reloj";
+    grid-template-rows: auto 1fr auto auto;
+    align-items: stretch; row-gap: var(--s3);
   }
   .cajas--vivo .cajas__rotulo { align-self: end; }
+  .cajas--vivo .cajas__grilla { align-self: end; }
+  .cajas--vivo .cajas__hueco { min-height: 220px; }
+  .cajas--vivo .cajas__foto { position: absolute; inset: 0; width: 100%; height: 100%; aspect-ratio: auto; }
+  .cajas--vivo .cajas__fichas { align-self: end; }
 }
 @media (max-width: 860px) {
   .cajas--vivo { grid-template-areas: "foto" "fichas" "reloj" "rotulo" "grilla"; row-gap: var(--s3); }
