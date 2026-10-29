@@ -131,6 +131,10 @@ function pintar(release) {
       { k: 'mac', so: 'macOS', que: '<em>Beta</em>. La primera vez macOS lo bloquea y hay que habilitarlo una sola vez: <a href="#paso-mac">mirá cómo</a>.' },
       { k: 'android', so: 'Android', que: 'Se juega con los dedos o con un joystick Bluetooth. Al abrir el archivo, el teléfono te pide permiso para instalar «apps de orígenes desconocidos», el mismo aviso que da Windows con el instalador. Le das permiso y listo.' },
     ];
+    /* la fila del sistema de quien mira va primero: desde un teléfono la lista
+       arrancaba con dos filas de Windows. `sort` es estable, el resto queda igual */
+    const deSO = { win: 'Windows', mac: 'macOS', android: 'Android' }[so];
+    filas.sort((a, b) => (b.so === deSO) - (a.so === deSO));
     lista.innerHTML = filas.filter((f) => archivos[f.k]).map((f) => {
       const a = archivos[f.k];
       return `<div class="bajada-item">

@@ -381,12 +381,6 @@
           <div class="cajas__reloj" aria-hidden="true"><i></i></div>
         </div>
       </div>
-
-      <div class="citas rev">
-        <p class="citas__rotulo">Dos que ya lo jugaron</p>
-        <blockquote class="cita">Literal es como si FIFA y Crash tuvieran un hijito.</blockquote>
-        <blockquote class="cita">Es muy adictivo, los poderes son muy graciosos.</blockquote>
-      </div>
     </div>
   </section>
 
@@ -1010,7 +1004,9 @@
   <section class="seccion seccion--suave" id="descargar" aria-labelledby="t-bajar">
     <div class="env">
       <div class="seccion__intro rev">
-        <p class="minuto">Windows, <span class="sin-mayus">macOS</span> y Android</p>
+        <!-- el texto va envuelto: .minuto es flex, y en flex los espacios entre el texto
+             suelto y el <span> se pierden («WINDOWS,macOSY ANDROID») -->
+        <p class="minuto"><span>Windows, <span class="sin-mayus">macOS</span> y Android</span></p>
         <h2 id="t-bajar">Es gratis. Bajalo ahora.</h2>
         <p class="bajada">Versión <strong data-rel="version">M229</strong>, recién salida del horno.
           No pide cuenta, no tiene publicidad y no manda nada a ningún lado. Elegí tu
@@ -1041,6 +1037,15 @@
           <span class="bajada-item__meta">Se juega con los dedos o con un joystick Bluetooth. Al abrir el archivo, el teléfono te pide permiso para instalar «apps de orígenes desconocidos», el mismo aviso que da Windows con el instalador. Le das permiso y listo.</span>
           <a class="btn btn--chico" href="https://github.com/rodrigoestrellac/fulbito-game-website/releases/latest">Descargar</a>
         </div>
+      </div>
+
+      <!-- 29-oct-2026: vivían abajo de las cajas sorpresa, a mitad de página. Van al lado
+           de los botones de descarga, DESPUÉS de ellos: arriba empujaban los botones media
+           pantalla para abajo en un teléfono. -->
+      <div class="citas citas--bajar rev">
+        <p class="citas__rotulo">Dos que ya lo jugaron</p>
+        <blockquote class="cita">Literal es como si FIFA y Crash tuvieran un hijito.</blockquote>
+        <blockquote class="cita">Es muy adictivo, los poderes son muy graciosos.</blockquote>
       </div>
 
       <p class="rev bajar__checksums">
