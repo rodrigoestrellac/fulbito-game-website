@@ -150,7 +150,35 @@ function pintar(release) {
   }
 }
 
+/* Los pasos de instalación y los controles son <details> (index.html § descargar):
+   se abre el del sistema de quien mira y se cierran los otros. Sin JS, o con un
+   sistema que no se reconoce, queda lo que dice el HTML (Windows abierto). */
+function abrirSegunSO() {
+  const so = detectarSO();
+  if (so === 'otro') return;
+  document.querySelectorAll('details[data-so]').forEach((d) => {
+    d.open = d.dataset.so.split(' ').includes(so);
+  });
+}
+
+/* El «mirá cómo» de la fila de Mac salta a #paso-mac: si ese paso está
+   plegado, el salto cae en un título cerrado. Se abre antes de saltar. */
+function abrirAlSaltar() {
+  const abrir = (id) => {
+    const destino = id && document.getElementById(id);
+    const d = destino && (destino.matches('details') ? destino : destino.querySelector('details'));
+    if (d) d.open = true;
+  };
+  document.addEventListener('click', (ev) => {
+    const a = ev.target.closest?.('a[href^="#"]');
+    if (a) abrir(a.getAttribute('href').slice(1));
+  });
+  abrir(location.hash.slice(1));
+}
+
 async function cargar() {
+  abrirSegunSO();
+  abrirAlSaltar();
   pintar(FALLBACK); // se pinta ya, sin esperar a la red
   try {
     /* /releases en vez de /releases/latest: cuesta el mismo pedido y trae,

@@ -1593,3 +1593,32 @@ code {
   .carril:not([data-inicio]) > :is(.poderes, .equipos, .sedes) { --fade-ini: 72px; }
   .carril[data-final] > :is(.poderes, .equipos, .sedes) { --fade-fin: 0px; }
 }
+
+/* ══ PLEGABLES: los pasos de instalación y los controles ════════════════════
+   29-oct-2026. La sección de descarga medía 4.005 px de mobile y la mayor parte
+   era el paso de los OTROS sistemas. Cada paso es un <details>: releases.js abre
+   el de quien mira y cierra el resto. El título sigue siendo un h3 (dentro del
+   summary), así el índice de títulos no cambia. */
+.plegable > summary {
+  list-style: none; cursor: pointer;
+  display: flex; align-items: baseline; justify-content: space-between; gap: var(--s3);
+}
+.plegable > summary::-webkit-details-marker { display: none; }
+.plegable > summary::after {
+  content: '+'; flex: none;
+  font-family: var(--display); font-weight: 500; font-size: 1.3rem; line-height: 1;
+  color: var(--oro); transition: rotate .2s var(--ease);
+}
+.plegable[open] > summary::after { rotate: 45deg; }
+.plegable > summary:hover h3 { color: var(--oro-claro); }
+.plegable > summary:focus-visible { outline: 2px solid var(--oro-claro); outline-offset: 4px; border-radius: var(--r-sm); }
+.plegable:not([open]) > summary h3 { margin-bottom: 0; color: var(--cal-tenue); }
+.plegable[open] > summary { margin-bottom: 6px; }
+/* los dos sueltos (controles y teléfono) van como renglones de una lista */
+.plegable--suelto {
+  margin-top: var(--s4); padding: var(--s4) 0 0;
+  border-top: 1px solid rgba(201, 169, 78, .16);
+}
+.plegable--suelto:first-of-type { margin-top: var(--s7); }
+.plegable--suelto > .bajada { margin-top: var(--s3); }
+.plegable--suelto > .controles-leyenda { margin-top: var(--s4); }

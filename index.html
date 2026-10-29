@@ -1049,17 +1049,23 @@
         <a data-rel="checksums" href="https://github.com/rodrigoestrellac/fulbito-game-website/releases/latest">Ver los SHA256 (CHECKSUMS.txt)</a>
       </p>
 
+      <!-- 29-oct-2026: cada paso es un <details> y se abre el del sistema de quien
+           mira (releases.js, abrirSegunSO). Sin JS queda abierto el de Windows. El paso
+           de Mac sólo ya medía 833 px de mobile: leerlo entero desde Windows no suma. -->
       <ol class="pasos rev">
         <li>
-          <h3>Windows te va a decir que te protegió</h3>
+          <details class="plegable" data-so="win" open>
+          <summary><h3>Windows te va a decir que te protegió</h3></summary>
           <p>Al abrir el instalador puede aparecer una pantalla azul que dice «Windows protegió tu PC».
             Es normal: pasa con todo programa que no está firmado con un certificado digital, que
             cuesta unos cuantos dólares por año. Tocá <span class="tecla">Más información</span> y
             después <span class="tecla">Ejecutar de todas formas</span>. Si querés verificar que el
             archivo es el original, compará su SHA256 con el de CHECKSUMS.txt.</p>
+          </details>
         </li>
         <li id="paso-mac">
-          <h3>En Mac, la primera vez hay que habilitarlo (una sola vez)</h3>
+          <details class="plegable" data-so="mac">
+          <summary><h3>En Mac, la primera vez hay que habilitarlo (una sola vez)</h3></summary>
           <p><strong>1.</strong> Si lo bajaste con Safari, ya viene descomprimido: en
             <span class="tecla">Descargas</span> vas a ver <em>Fulbito</em> directamente (si ves el
             <em>.zip</em>, hacele doble clic). Arrastrá <em>Fulbito</em> a la carpeta
@@ -1078,9 +1084,11 @@
             también sirve el atajo: clic derecho sobre Fulbito → <span class="tecla">Abrir</span> →
             <span class="tecla">Abrir</span>. Hace falta macOS 12 o más nuevo (menú de la manzanita →
             <em>Acerca de esta Mac</em>).</p>
+          </details>
         </li>
         <li>
-          <h3>En Android, permitile instalar el archivo</h3>
+          <details class="plegable" data-so="android">
+          <summary><h3>En Android, permitile instalar el archivo</h3></summary>
           <p>Bajá el .apk desde el teléfono y tocá el archivo cuando termine (queda en
             <span class="tecla">Descargas</span>). Android te va a decir que tu navegador
             «no tiene permiso para instalar apps desconocidas»: es el mismo aviso que da
@@ -1089,6 +1097,7 @@
             volvé atrás y dale <span class="tecla">Instalar</span>. Se hace una sola vez.</p>
           <p>Ocupa cerca de 1&nbsp;GB instalado, así que conviene bajarlo por wifi. Se juega
             con los dedos; si tenés un joystick Bluetooth, también anda.</p>
+          </details>
         </li>
         <li>
           <h3>Entrá por el Tutorial</h3>
@@ -1098,9 +1107,10 @@
         </li>
       </ol>
 
-      <h3 class="rev subtitulo-suelto">Lo mínimo para arrancar</h3>
-      <p class="controles-leyenda rev" aria-hidden="true"><span>Acción</span><span>Teclado</span><span>Joystick</span></p>
-      <ul class="controles rev">
+      <details class="plegable plegable--suelto rev" data-so="win mac" open>
+      <summary><h3>Lo mínimo para arrancar</h3></summary>
+      <p class="controles-leyenda" aria-hidden="true"><span>Acción</span><span>Teclado</span><span>Joystick</span></p>
+      <ul class="controles">
         <li><span class="controles__que">Moverse</span><span>WASD</span><span>Stick</span></li>
         <li><span class="controles__que">Correr</span><span>Shift</span><span>RB</span></li>
         <li><span class="controles__que">Pasar</span><span>X</span><span>A</span></li>
@@ -1108,15 +1118,18 @@
         <li><span class="controles__que">Centro o barrida</span><span>C</span><span>B</span></li>
         <li><span class="controles__que">Pausa</span><span>Esc</span><span>Start</span></li>
       </ul>
+      </details>
 
-      <h3 class="rev subtitulo-suelto">Y en el teléfono</h3>
-      <p class="bajada rev">El pulgar izquierdo mueve (apoyalo donde quieras, el stick nace ahí)
+      <details class="plegable plegable--suelto rev" data-so="android">
+      <summary><h3>Y en el teléfono</h3></summary>
+      <p class="bajada">El pulgar izquierdo mueve (apoyalo donde quieras, el stick nace ahí)
         y si lo empujás a fondo, corrés solo. A la derecha, cuatro botones en rombo: TIRO,
         PASE, CENTRO y FIRMA (el poder). El truco:
         <b>los botones grandes se arrastran</b>. Mantené TIRO y deslizá hacia arriba para la
         vaselina o hacia la izquierda para la rosca; mantené PASE y deslizá para el pase al
         hueco. Mientras arrastrás te aparecen los nombres alrededor del botón, así que se
         aprende probando.</p>
+      </details>
       <p class="rev nota-suelta">
         Hay mucho más: vaselina, rosca, pared, chilena, el poder de cada uno. Está todo en
         <strong>Cómo jugar</strong>, adentro del juego: en el menú principal y también en la pausa.
