@@ -27,6 +27,78 @@ if ('IntersectionObserver' in window && !menosMovimiento) {
   document.querySelectorAll('.rev').forEach((el) => el.classList.add('dentro'));
 }
 
+/* ── Carriles: poderes, equipos y sedes ──────────────────────────────────
+   El deslizamiento es CSS (scroll-snap, ver site.css § CARRILES); esto sólo
+   suma lo que el CSS no puede:
+   - las flechas, para el mouse (la rueda no desliza de costado). El CSS las
+     muestra sólo con `pointer: fine`, y se apagan en cada punta del carril.
+   - el reveal de las tarjetas que arrancan fuera de la pantalla. El observer de
+     arriba mira cada una contra la ventana, y una tarjeta tapada por el
+     overflow del carril NO intersecta: aparecería recién al deslizar, a media
+     opacidad debajo del dedo. Acá entran todas juntas cuando entra el carril.
+   - foco de teclado y nombre para los carriles que no tienen nada enfocable
+     adentro (sedes, poderes): sin eso el teclado no los puede deslizar. */
+function montarCarriles() {
+  const sel = '.poderes, .equipos, .sedes, .firmas';
+  document.querySelectorAll(sel).forEach((tira) => {
+    const envoltura = document.createElement('div');
+    envoltura.className = 'carril';
+    tira.parentNode.insertBefore(envoltura, tira);
+    envoltura.appendChild(tira);
+
+    // las tarjetas de equipo se vuelven botones en equipos.js (que corre después):
+    // el foco ya entra por ellas y el navegador desliza el carril solo
+    const sinFoco = !tira.matches('.equipos') && !tira.querySelector('a, button');
+    const titulo = tira.closest('section')?.querySelector('h2')?.textContent.trim() || '';
+
+    const flecha = (dir, texto, etiqueta) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = `carril__flecha carril__flecha--${dir}`;
+      b.textContent = texto;
+      b.setAttribute('aria-label', etiqueta);
+      b.tabIndex = -1;   // con teclado se desliza el carril mismo; la flecha es para el mouse
+      b.addEventListener('click', () => {
+        const paso = Math.max(tira.clientWidth * 0.85, 200) * (dir === 'next' ? 1 : -1);
+        tira.scrollBy({ left: paso, behavior: menosMovimiento ? 'auto' : 'smooth' });
+      });
+      envoltura.appendChild(b);
+    };
+    flecha('prev', '‹', 'Anteriores');
+    flecha('next', '›', 'Siguientes');
+
+    const puntas = () => {
+      const max = tira.scrollWidth - tira.clientWidth;
+      envoltura.toggleAttribute('data-inicio', tira.scrollLeft <= 4);
+      envoltura.toggleAttribute('data-final', tira.scrollLeft >= max - 4);
+      // .firmas es carril sólo en angosto: en desktop no tiene que ser una
+      // parada de tabulación de más
+      if (sinFoco && max > 4 && !tira.hasAttribute('tabindex')) {
+        tira.tabIndex = 0;
+        tira.setAttribute('role', 'region');
+        tira.setAttribute('aria-label', titulo + ' (se desliza de costado)');
+      } else if (sinFoco && max <= 4 && tira.hasAttribute('tabindex')) {
+        tira.removeAttribute('tabindex');
+        tira.removeAttribute('role');
+        tira.removeAttribute('aria-label');
+      }
+    };
+    tira.addEventListener('scroll', puntas, { passive: true });
+    window.addEventListener('resize', puntas);
+    puntas();
+
+    if ('IntersectionObserver' in window && !menosMovimiento) {
+      const obs = new IntersectionObserver(([e]) => {
+        if (!e.isIntersecting) return;
+        tira.querySelectorAll('.rev').forEach((el) => el.classList.add('dentro'));
+        obs.disconnect();
+      }, { rootMargin: '0px 0px -12% 0px', threshold: 0 });
+      obs.observe(tira);
+    }
+  });
+}
+montarCarriles();
+
 /* ── Marcador fijo + reloj ───────────────────────────────────────────────── */
 const marcador = document.querySelector('.marcador');
 const reloj = document.querySelector('[data-reloj]');

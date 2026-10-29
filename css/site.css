@@ -1470,3 +1470,126 @@ code {
   .sede__aforo b { font-size: 1.35rem; }
   .sede__locales { margin: var(--s3); font-size: .76rem; }
 }
+
+/* ══ CARRILES: poderes, equipos y sedes en una fila que se desliza ═══════════
+   29-oct-2026 — Rodrigo: «la web está muy larga, tanto en desktop como en
+   mobile». Medido antes del cambio: 22.276 px en desktop y 30.612 en mobile, y
+   estas tres secciones solas eran 12.000 y 17.600. Ninguna tarjeta se va: la
+   grilla pasa a ser UNA fila con scroll horizontal y snap.
+   Es CSS puro a propósito: sin JS el carril se desliza igual (con el dedo, el
+   trackpad o shift+rueda), y regen_listas.py sigue escribiendo los mismos <ul>
+   sin enterarse. main.js sólo le agrega las flechas en desktop.
+   En mobile el carril sangra hasta el borde de la pantalla (los 20 px del .env)
+   para que la tarjeta siguiente asome: eso es lo que dice «hay más». */
+.poderes, .equipos, .sedes {
+  /* el .env deja siempre 20 px o más a cada lado: sangrar eso nunca desborda */
+  --carril-borde: 20px;
+  display: grid; grid-auto-flow: column; grid-template-columns: none;
+  overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory; scroll-padding-inline: var(--carril-borde);
+  /* el padding de arriba es para el levante de 4 px del hover; el de abajo,
+     para la barrita de scroll, que en desktop es la segunda pista de que hay más */
+  margin-inline: calc(-1 * var(--carril-borde));
+  padding: 8px var(--carril-borde) 14px;
+  scrollbar-width: thin; scrollbar-color: rgba(201, 169, 78, .35) transparent;
+}
+.poderes > *, .equipos > *, .sedes > * { scroll-snap-align: start; }
+.poderes { grid-auto-columns: min(400px, 82%); }
+.equipos { grid-auto-columns: 200px; }
+.sedes   { grid-auto-columns: min(360px, 84%); }
+.ligas { gap: var(--s6); }
+/* ⚠️ sin esto la columna de .ligas crece al min-content de la fila (las 18
+   tarjetas una al lado de la otra, 3.156 px en un teléfono) y la página entera
+   se desliza de costado en vez del carril */
+.ligas { grid-template-columns: minmax(0, 1fr); }
+.carril { min-width: 0; }
+.equipos { margin-top: var(--s3); }
+/* en fila las tarjetas vuelven a estar lado a lado: el concepto de dos renglones
+   y la lista al fondo vuelven a alinear (las de mobile los apagaban para una
+   columna sola, que ya no existe) */
+.sede__concepto { min-height: 2.3em; }
+.sede__locales { margin-top: auto; }
+/* ⚠️ `p:last-child { margin-bottom: 0 }` (línea 53) le gana a `.sede__locales`
+   por especificidad: la lista de locales quedaba pegada al borde de abajo de la
+   tarjeta desde siempre. Con el padre adelante alcanza. */
+.sede > .sede__locales { margin-bottom: var(--s4); }
+/* en fila, la tarjeta más alta estira a TODAS (grid estira la fila) y el
+   concepto que envuelve a tres renglones dejaba un hueco en el medio de las
+   otras. Dos renglones como mucho: el entero está en la pizarra. */
+.equipo__concepto {
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+  line-clamp: 2; overflow: hidden;
+}
+
+@media (max-width: 900px) {
+  /* las tres firmas grandes apiladas eran 1.845 px de mobile */
+  .firmas {
+    --carril-borde: 20px;   /* misma cuenta que arriba */
+    display: grid; grid-auto-flow: column; grid-template-columns: none;
+    grid-auto-columns: min(340px, 84%);
+    overflow-x: auto; overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory; scroll-padding-inline: var(--carril-borde);
+    margin-inline: calc(-1 * var(--carril-borde));
+    padding: 8px var(--carril-borde) 14px;
+    scrollbar-width: none;
+  }
+  .firmas > * { scroll-snap-align: start; }
+  /* cuadrada, cada tarjeta medía casi una pantalla */
+  .firma img { aspect-ratio: 5 / 4; }
+}
+@media (max-width: 760px) {
+  .poderes, .equipos, .sedes { scrollbar-width: none; }
+  .poderes::-webkit-scrollbar, .equipos::-webkit-scrollbar,
+  .sedes::-webkit-scrollbar, .firmas::-webkit-scrollbar { display: none; }
+}
+@media (max-width: 560px) {
+  .equipos { grid-auto-columns: 172px; }
+  /* en la grilla de dos columnas las barras eran ruido y se escondían; en el
+     carril es una fila sola por liga, así que vuelven: el dato se ve sin abrir
+     la pizarra */
+  html:not(.no-js) .equipo__barras { display: grid; }
+  .sede__concepto { margin: 4px var(--s3) 0; }
+  .sede__locales { margin: auto var(--s3) var(--s3); padding-top: var(--s3); }
+  .sede > .sede__locales { margin-bottom: var(--s3); }
+}
+
+/* las flechas (las pone main.js): sólo con mouse, donde la rueda no desliza de
+   costado. En touch el dedo ya sabe qué hacer y el botón sería un estorbo. */
+.carril { position: relative; }
+.carril__flecha { display: none; }
+@media (hover: hover) and (pointer: fine) {
+  .carril__flecha {
+    display: grid; place-items: center;
+    position: absolute; z-index: 3; top: 50%; translate: 0 -50%;
+    width: 44px; height: 44px; border-radius: 50%; cursor: pointer;
+    background: rgba(7, 14, 8, .92); color: var(--oro-claro);
+    border: 1px solid var(--oro);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, .5);
+    font: 700 1.6rem/1 var(--display); padding-bottom: 3px;
+    transition: opacity .2s, background .2s, border-color .2s;
+  }
+  .carril__flecha:hover { background: var(--oro); color: var(--noche); border-color: var(--oro); }
+  .carril__flecha:focus-visible { outline: 2px solid var(--oro-claro); outline-offset: 3px; }
+  .carril__flecha--prev { left: -64px; }
+  .carril__flecha--next { right: -64px; }
+  .carril[data-inicio] .carril__flecha--prev,
+  .carril[data-final] .carril__flecha--next { opacity: 0; pointer-events: none; }
+}
+/* afuera del carril hacen falta 64 px de margen al costado del .env (1160 de
+   ancho): eso es desde 1288. Más angosto, van adentro, sobre las tarjetas */
+@media (hover: hover) and (pointer: fine) and (max-width: 1288px) {
+  .carril__flecha--prev { left: 6px; }
+  .carril__flecha--next { right: 6px; }
+}
+
+/* el fundido dice «sigue» del lado donde sigue. En mobile no hace falta: ahí el
+   carril llega al borde de la pantalla y la tarjeta cortada ya lo dice sola. */
+@media (min-width: 761px) {
+  .carril > :is(.poderes, .equipos, .sedes) {
+    --fade-ini: 0px; --fade-fin: 72px;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 var(--fade-ini), #000 calc(100% - var(--fade-fin)), transparent);
+            mask-image: linear-gradient(90deg, transparent, #000 var(--fade-ini), #000 calc(100% - var(--fade-fin)), transparent);
+  }
+  .carril:not([data-inicio]) > :is(.poderes, .equipos, .sedes) { --fade-ini: 72px; }
+  .carril[data-final] > :is(.poderes, .equipos, .sedes) { --fade-fin: 0px; }
+}
