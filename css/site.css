@@ -412,6 +412,20 @@ p:last-child { margin-bottom: 0; }
   letter-spacing: .09em; text-transform: uppercase; color: var(--cal);
 }
 .menu__que { grid-column: 2; color: var(--cal-tenue); font-size: .95rem; }
+/* 29-oct-2026: los tres modos largos (Amistoso, Online, Torneo) muestran una
+   frase y pliegan el resto: medían 350-470 px cada uno en mobile */
+.menu__mas { grid-column: 2; margin-top: -8px; }
+.menu__mas > summary {
+  list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--display); font-weight: 500; font-size: .7rem;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--oro);
+}
+.menu__mas > summary::-webkit-details-marker { display: none; }
+.menu__mas > summary::after { content: '+'; font-size: 1rem; line-height: 1; transition: rotate .2s var(--ease); }
+.menu__mas[open] > summary::after { rotate: 45deg; }
+.menu__mas > summary:hover { color: var(--oro-claro); }
+.menu__mas > summary:focus-visible { outline: 2px solid var(--oro-claro); outline-offset: 3px; border-radius: var(--r-sm); }
+.menu__mas > p { margin: var(--s2) 0 0; color: var(--cal-tenue); font-size: .92rem; }
 .menu__mando {
   font-family: var(--display); font-weight: 500; font-size: .68rem;
   letter-spacing: .16em; text-transform: uppercase; color: var(--oro);
@@ -420,6 +434,14 @@ p:last-child { margin-bottom: 0; }
 @media (max-width: 660px) {
   .menu li { grid-template-columns: auto 1fr; }
   .menu__mando { grid-column: 2; align-self: start; }
+}
+/* en touch no hay hover, así que la flechita nunca aparece y su columna era un
+   margen vacío; y los 16 px entre renglones hacían de cada modo un bloque suelto */
+@media (max-width: 660px) and (hover: none) {
+  .menu li { grid-template-columns: 1fr; row-gap: 6px; padding: var(--s3) 0; }
+  .menu__flecha { display: none; }
+  .menu__mando, .menu__que, .menu__mas { grid-column: 1; }
+  .menu__mas { margin-top: 2px; }
 }
 
 /* ── Requisitos ────────────────────────────────────────────────────────── */
