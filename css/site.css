@@ -1644,3 +1644,7 @@ code {
 .plegable--suelto:first-of-type { margin-top: var(--s7); }
 .plegable--suelto > .bajada { margin-top: var(--s3); }
 .plegable--suelto > .controles-leyenda { margin-top: var(--s4); }
+
+/* MI EQUIPO cierra el catálogo como una liga más (era una sección aparte) */
+.liga--propia { margin-top: var(--s6); }
+.liga--propia > .bajada { margin-top: var(--s3); max-width: 62ch; font-size: 1rem; color: var(--cal-tenue); }
