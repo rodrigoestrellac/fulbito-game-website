@@ -449,6 +449,11 @@ SEDES_APROBADAS = {
     # THE ROYAL ARCH (inventado); la tira del techo se despersonalizó (decía el lema del subte) y el
     # roundel del subte se sacó con la estación. Sin sponsors ni nombre de estadio real.
     "royalarch",
+    # 29-oct-2026 — EL CARGUERO (sede 15, M277/M280), sobre `_aerea` (ver SEDE_VISTA_DE): el buque
+    # fondeado con la jaula, las grúas, el pontón y las lanchas. Lo legible es `EL CARGUERO` en el
+    # casco (inventado); las marcas de calado son números sin texto. En el modelo hay además ALTA MAR,
+    # BOCA 1/2, BAR, BOLETERÍA y BAÑOS (`assets-src/carguero_*.py`). Trapos nuestros. Sin sponsors.
+    "elcarguero",
 }
 # de qué toma cada sede su foto.
 # ⚠️ `_web` Y NO `_aerea` (25-ago-2026). Las `_tv` y `_aerea_cruce` están
@@ -475,7 +480,10 @@ SEDE_VISTA = "_web"
 # encuadre de `_web`, que la recorta por los cuatro lados; la `_aerea` la muestra entera.
 # 11-oct-2026 — `campcatala`: la `_web` entra por el hueco del techo y es casi toda cubierta;
 # la `_aerea` muestra el estadio entero con la fachada.
-SEDE_VISTA_DE = {"coliseogalactico": "_aerea", "lalamparabavara": "_aerea", "campcatala": "_aerea"}
+# 29-oct-2026 — `elcarguero`: no tiene `_ciudad` (va en alta mar, sin ciudad) y la `_web` entra
+# desde arriba y es casi toda la red de la jaula; la `_aerea` muestra el barco entero con su nombre.
+SEDE_VISTA_DE = {"coliseogalactico": "_aerea", "lalamparabavara": "_aerea", "campcatala": "_aerea",
+                 "elcarguero": "_aerea"}
 # ⚠️ 27-oct-2026 — `_ciudad` MANDA SOBRE TODO LO DE ARRIBA. Rodrigo: *"me gustaría que rehagamos
 # las imágenes de los estadios en la escena de las ciudades donde aparecen ahora en el juego.
 # Además que en la arena eterna se note que es el coliseo"*. `CapturarSedes` corre en el editor y
