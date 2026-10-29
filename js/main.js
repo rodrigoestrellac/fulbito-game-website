@@ -39,7 +39,7 @@ if ('IntersectionObserver' in window && !menosMovimiento) {
    - foco de teclado y nombre para los carriles que no tienen nada enfocable
      adentro (sedes, poderes): sin eso el teclado no los puede deslizar. */
 function montarCarriles() {
-  const sel = '.poderes, .equipos, .sedes, .firmas';
+  const sel = '.firmas, .equipos, .sedes';   // .firmas lleva también las escenas de los poderes
   document.querySelectorAll(sel).forEach((tira) => {
     const envoltura = document.createElement('div');
     envoltura.className = 'carril';

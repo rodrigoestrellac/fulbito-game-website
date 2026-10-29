@@ -1001,8 +1001,12 @@ def auditar_contadores(equipos, sedes, jugadores, ligas):
         ("volanta de equipos", ">Más de %s equipos</p>" % en_letras(mas_de(ne))),
         ("volanta de poderes", ">%s poderes</p>" % en_letras(poderes, True).capitalize()),
         ("volanta de sedes", ">%s canchas</p>" % en_letras(ns, True).capitalize()),
-        # los tres poderes con tarjeta grande son a mano; el resto es el resto
-        ("los poderes que faltan", "¿Los otros %s?" % en_letras(poderes - 3)),
+        # los poderes con tarjeta o escena en el carril son a mano; el resto es el resto.
+        # ⚠️ Se CUENTAN en el HTML: el 27-oct entraron seis escenas al lado de las tres
+        # tarjetas y la nota siguió restando 3 («¿Los otros cincuenta y cuatro?» con
+        # nueve a la vista), porque el auditor tenía el 3 escrito a mano.
+        ("los poderes que faltan", "¿Los otros %s?" % en_letras(
+            poderes - len(re.findall(r'<(?:article class="firma|figure class="poder)\b', html)))),
         ("meta description", "+%d jugadores, +%d equipos, %d canchas, %d poderes"
                              % (mas_de(nj), mas_de(ne), ns, poderes)),
     ]
