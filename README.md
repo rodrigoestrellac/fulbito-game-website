@@ -47,6 +47,11 @@ Si cambian esos patrones, actualizar `js/releases.js`.
 **Fallback**: si la API de GitHub falla o llega al rate limit (60 req/h por IP), la web
 usa los datos hardcodeados en `FALLBACK` dentro de `js/releases.js`. Conviene actualizar
 ese bloque cuando se publica una versión nueva (es una constante, 4 líneas).
+Y con él, la versión y el peso que `index.html` trae escritos (`data-rel="version"` dos
+veces, `data-rel="cta-peso"` una): son lo que ven Google, la vista previa de un link y
+quien entra sin JS. `build_assets.py` (`auditar_release`) falla si no coinciden con
+`FALLBACK`. El «Disco» de la tabla de requisitos es el juego **descomprimido** y se mide
+a mano (M238: 987 MB → «1 GB»).
 
 ## ⚠️ El copy habla del JUEGO, nunca del estado del sitio
 

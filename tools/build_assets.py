@@ -985,6 +985,42 @@ def mas_de(n):
     return n // 10 * 10
 
 
+def auditar_release():
+    """La versión y el peso que el HTML trae ESCRITOS tienen que ser los del espejo
+    FALLBACK de js/releases.js.
+
+    Con JS, releases.js los pisa al cargar y nadie ve el HTML. Sin JS, y para Google
+    y para la vista previa de un link compartido, lo que se ve es el HTML: el 29-oct
+    decía M229 y 230 MB con M238 publicado. FALLBACK sí se actualiza en cada release
+    (su comentario lo exige), así que es la fuente: un número, un lugar.
+    El disco de la tabla de requisitos NO sale de acá (es el juego descomprimido, no
+    el instalador): se mide a mano y se redondea a GB."""
+    js = open(os.path.join(WEB, "js", "releases.js"), encoding="utf-8").read()
+    html = open(os.path.join(WEB, "index.html"), encoding="utf-8").read()
+    tag = re.search(r"const FALLBACK = \{\s*tag: '([^']+)'", js)
+    setup = re.search(r"winSetup:\s*\{[^}]*bytes:\s*(\d+)", js)
+    if not tag or not setup:
+        print("!! auditar_release no encontró FALLBACK en releases.js: quedó ciego")
+        return False
+    tag = tag.group(1)
+    mb = round(int(setup.group(1)) / 1048576)   # la misma cuenta que mb() en releases.js
+    esperados = [
+        ("versión (zócalo y descarga)", 'data-rel="version">%s<' % tag, 2),
+        ("peso del botón del hero", 'data-rel="cta-peso">%d MB<' % mb, 1),
+    ]
+    faltan = [(q, t, n) for q, t, n in esperados if html.count(t) != n]
+    if faltan:
+        print("\n" + "=" * 70)
+        print("EL HTML ESCRITO NO ES EL RELEASE DE releases.js (FALLBACK = %s)" % tag)
+        print("=" * 70)
+        for q, t, n in faltan:
+            print(" - %s: tiene que estar %d vez/veces %r" % (q, n, t))
+        print("=" * 70)
+        return False
+    print("release: el HTML escrito dice %s y %d MB, igual que FALLBACK" % (tag, mb))
+    return True
+
+
 def auditar_contadores(equipos, sedes, jugadores, ligas):
     html = open(os.path.join(WEB, "index.html"), encoding="utf-8").read()
     # los jugadores DEL JUEGO, no los del álbum: el álbum espera el chequeo de marcas de cada
@@ -1546,6 +1582,7 @@ if __name__ == "__main__":
                                 json.load(open(out("assets", "equipos",
                                                    "equipos.json"),
                                                encoding="utf-8"))["ligas"]) and ok
+    ok = auditar_release() and ok
     print("listo")
     # ⚠️ sale con error DESPUES de generar todo: los assets quedan igual, pero el
     # que corrio esto se entera. Un album incompleto que termina en verde es
