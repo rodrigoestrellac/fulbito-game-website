@@ -326,13 +326,6 @@ p:last-child { margin-bottom: 0; }
    «Cada uno tiene la suya» es una promesa, y la grilla la volvía un padrón.
    Costaba 1.601 px de mobile — casi dos pantallas. */
 /* 27-oct-2026 — escenas de los poderes, sacadas del juego (viven en el carril de .firmas) */
-.poder { margin: 0; border-radius: var(--r-lg); overflow: hidden; background: var(--glass-bg); border: 1px solid var(--glass-borde); }
-.poder img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
-.poder figcaption { padding: var(--s3) var(--s4); font-size: .95rem; color: var(--cal-tenue); }
-.poder figcaption b {
-  font-family: var(--display); font-weight: 700; letter-spacing: .06em;
-  text-transform: uppercase; color: var(--oro);   /* el mismo nombre que en .firma__nombre: van en el mismo carril */
-}
 .firmas-resto-nota {
   margin: var(--s6) 0 0; padding-top: var(--s5);
   border-top: 1px solid rgba(201, 169, 78, .16);
@@ -1517,14 +1510,10 @@ code {
   scrollbar-width: thin; scrollbar-color: rgba(201, 169, 78, .35) transparent;
 }
 .firmas > *, .equipos > *, .sedes > * { scroll-snap-align: start; }
-/* las tres tarjetas con texto y las seis escenas comparten carril (29-oct): las
-   de texto son más altas, así que la fila no estira (si estirara, las escenas
-   quedarían con un hueco abajo del pie) */
-.firmas { grid-auto-columns: min(360px, 84%); align-items: start; margin-top: var(--s6); }
-.firmas .firma img, .firmas .poder img { aspect-ratio: 4 / 3; }
-/* la escena es más baja que la tarjeta con texto: centrada, el aire se reparte
-   arriba y abajo y no queda un hueco colgando debajo del pie */
-.firmas .poder { align-self: center; }
+/* nueve tarjetas iguales (29-oct): las tres de siempre y las seis escenas, todas
+   con su descripción, así que la fila se estira pareja */
+.firmas { grid-auto-columns: min(360px, 84%); margin-top: var(--s6); }
+.firmas .firma img { aspect-ratio: 4 / 3; }
 .equipos { grid-auto-columns: 200px; }
 .sedes   { grid-auto-columns: min(360px, 84%); }
 .ligas { gap: var(--s6); }
