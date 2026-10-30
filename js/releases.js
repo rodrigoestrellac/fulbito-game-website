@@ -202,9 +202,19 @@ async function cargar() {
     const total = releases.flatMap((rel) => rel.assets || [])
       .filter((a) => /\.(exe|zip|apk)$/i.test(a.name))
       .reduce((s, a) => s + (a.download_count || 0), 0);
+    /* Redondeado PARA ABAJO y con «+» (Rodrigo, 30-oct: *"debería redondear y hacer +130
+       descargas"*): 131 → «+130», 1.234 → «+1.200». El número exacto cambia con cada bajada y
+       no dice más; el redondeo nunca promete de más. Abajo de 10 va el exacto, sin «+». */
+    const redondo = (n) => {
+      if (n < 10) return n.toLocaleString('es-AR');
+      const paso = n < 1000 ? 10 : n < 10000 ? 100 : 1000;
+      return `+${(Math.floor(n / paso) * paso).toLocaleString('es-AR')}`;
+    };
     const cont = document.querySelector('[data-rel="descargas"]');
     if (cont && total > 0) {
-      cont.textContent = `Ya se descargó ${total.toLocaleString('es-AR')} ${total === 1 ? 'vez' : 'veces'}.`;
+      cont.textContent = total < 10
+        ? `Ya se descargó ${total} ${total === 1 ? 'vez' : 'veces'}.`
+        : `Ya van ${redondo(total)} descargas.`;
       cont.hidden = false;
     }
     /* El mismo número, arriba de todo: es el único elemento de confianza de
@@ -219,7 +229,7 @@ async function cargar() {
     const zoc = document.querySelector('[data-rel="descargas-zoc"]');
     const zocN = document.querySelector('[data-rel="descargas-n"]');
     if (zoc && zocN && total >= UMBRAL_HERO) {
-      zocN.textContent = total.toLocaleString('es-AR');
+      zocN.textContent = redondo(total);
       zoc.hidden = false;
     }
 
