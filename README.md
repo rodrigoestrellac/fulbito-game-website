@@ -80,7 +80,7 @@ layout; la captura se queda debajo como respaldo.
 |---|---|---|---|---|---|
 | `assets/video/hero.mp4` | hero | TIKI-TAKA–LA CULEBRA en el CAMP CATALÀ, plano cerrado (`FULBITO_CAMARA=video`): de mitad de cancha al remate | 13 s | `limpio4`, cuadros 2250-2640 | `1600:900:160:175` |
 | `assets/video/gol.mp4` | El gol | el remate de lejos de Dientón, hasta que entra | 5,8 s | `limpio2`, cuadros 234-408 | `1600:900:160:175` |
-| `assets/video/firma.mp4` | firmas | El Martillazo de cerca: el Vikingo con las trenzas rubias, el revoleo, los rayos y el rival aplastado | 1,0 s | `martillo_v8` (28-oct, M274c: el peinado con la frente del tono de la cara), cuadros 709-738 (con `FULBITO_RAFAGA_VICTIMA=1`; arranca después del corte de cámara y termina antes de que entren cabezas en primer plano) | `1280:720:440:140` |
+| `assets/video/firma.mp4` | firmas | El Martillazo de cerca: el Vikingo con las trenzas rubias, el revoleo, los rayos y el rival aplastado | 1,1 s | `martillo_m284` (30-oct, M284: el Vikingo con sus propias trenzas, ya no el casco de El Elefante), cuadros 222-255 grabados a 2560×1600 (con `FULBITO_RAFAGA_SOLO=haaland FULBITO_RAFAGA_VICTIMA=1`; arranca después del corte de cámara y termina antes de que entren cabezas en primer plano). El póster `img/martillazo.webp` es el cuadro 240 con el mismo crop y `firmas/el-vikingo.webp` el 237 en `840:840:880:450` | `1600:900:500:450` |
 
 **Regrabados el 27-oct-2026 desde el build**, no con la Game Bar: el juego tiene un modo
 video (`game-unity`, `MatchDirectorRafaga272.cs`) que avanza 1/30 s por cuadro y guarda

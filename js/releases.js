@@ -283,6 +283,7 @@ function medirDescargas() {
       tipo: /setup.*\.exe$/i.test(archivo) ? 'win-setup'
           : /windows.*\.zip$/i.test(archivo) ? 'win-zip'
           : /mac.*\.zip$/i.test(archivo) ? 'mac'
+          : /android.*\.apk$/i.test(archivo) ? 'android'
           : /^checksums/i.test(archivo) ? 'checksums' : 'generico',
       desde: donde,
       archivo,
