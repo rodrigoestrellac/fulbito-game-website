@@ -51,7 +51,7 @@ Y con él, la versión y el peso que `index.html` trae escritos (`data-rel="vers
 veces, `data-rel="cta-peso"` una): son lo que ven Google, la vista previa de un link y
 quien entra sin JS. `build_assets.py` (`auditar_release`) falla si no coinciden con
 `FALLBACK`. El «Disco» de la tabla de requisitos es el juego **descomprimido** y se mide
-a mano (M238: 987 MB → «1 GB»).
+a mano (M238: 987 MB → «1 GB»; M283e: 1720 MB → «2 GB»).
 
 ## ⚠️ El copy habla del JUEGO, nunca del estado del sitio
 
