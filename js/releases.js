@@ -6,7 +6,7 @@
 
 const REPO = 'rodrigoestrellac/fulbito-game-website';
 
-/* Espejo estático del release M283e. Actualizar al publicar uno nuevo.
+/* Espejo estático del release M283f. Actualizar al publicar uno nuevo.
    Los bytes salen del release real (`gh release view --json assets`, stat sin
    redondeo): si no coinciden con el asset, la web muestra un tamaño equivocado
    justo cuando la API falla — o sea, justo cuando nadie lo va a poder verificar.
@@ -18,11 +18,11 @@ const REPO = 'rodrigoestrellac/fulbito-game-website';
    cinco en los que este archivo se olvidó. Si alguna vez se automatiza algo del
    proceso de publicación, que sea esto. */
 const FALLBACK = {
-  tag: 'M283e',
+  tag: 'M283f',
   archivos: {
-    winSetup: { nombre: 'FulbitoSetup-M283e.exe', bytes: 256444743 },
-    winZip:   { nombre: 'Fulbito-M283e-windows.zip', bytes: 389426005 },
-    mac:      { nombre: 'Fulbito-M283e-mac.zip', bytes: 399561203 },
+    winSetup: { nombre: 'FulbitoSetup-M283f.exe', bytes: 253448287 },
+    winZip:   { nombre: 'Fulbito-M283f-windows.zip', bytes: 385867721 },
+    mac:      { nombre: 'Fulbito-M283f-mac.zip', bytes: 396002751 },
     /* ⚠️ ANDROID YA ESTÁ ACÁ, y antes no estaba a propósito: hasta M193 ningún
        release traía el .apk y el espejo habría apuntado a un archivo inexistente.
        Ahora existe, así que corresponde. Los bytes salen de la API del release
@@ -33,9 +33,9 @@ const FALLBACK = {
        copiarlo con la etiqueta nueva (el bug del zip de Mac de M89). Apuntar el
        espejo a un archivo que el release no tiene es un 404 servido justo cuando
        la API de GitHub falla, que es la única vez que este objeto se usa. */
-    /* ⚠️ M283e salió SIN .apk (el de builds/android era de M274 y pack_release lo salteó): la
+    /* ⚠️ M283e y M283f salieron SIN .apk (el de builds/android era de M274 y pack_release lo salteó): la
        línea queda comentada hasta que un release vuelva a traerlo. */
-    // android:  { nombre: 'Fulbito-M283e-android.apk', bytes: 0 },
+    // android:  { nombre: 'Fulbito-M283f-android.apk', bytes: 0 },
     checksums:{ nombre: 'CHECKSUMS.txt', bytes: 319 },
   },
 };
