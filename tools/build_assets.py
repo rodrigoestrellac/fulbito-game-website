@@ -454,6 +454,12 @@ SEDES_APROBADAS = {
     # casco (inventado); las marcas de calado son números sin texto. En el modelo hay además ALTA MAR,
     # BOCA 1/2, BAR, BOLETERÍA y BAÑOS (`assets-src/carguero_*.py`). Trapos nuestros. Sin sponsors.
     "elcarguero",
+    # 30-oct-2026 — EL ÚLTIMO PISO (sede 16, M285), sobre `_ciudad` AL ATARDECER (órbita a 18°, rumbo
+    # 45, del build con `FULBITO_HORA=ATARDECER`): las dos torres, la ciudad de rascacielos y el cielo
+    # de la HORA nueva. Zoom a los carteles: AGUANTE / VAMOS / LA BANDA / DALE CAMPEÓN / EL POTRERO
+    # (trapos nuestros) y el marcador LOB 0-0 CIU. El helipuerto lleva una H. Sin sponsors ni nombre
+    # de estadio real; las torres son genéricas (pódium, fuste escalonado y aguja).
+    "ultimopiso",
 }
 # de qué toma cada sede su foto.
 # ⚠️ `_web` Y NO `_aerea` (25-ago-2026). Las `_tv` y `_aerea_cruce` están
