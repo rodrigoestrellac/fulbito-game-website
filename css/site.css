@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   site.css — Fulbito: The Game
+   site.css — Fulbito: The Beautiful Game
    Idea rectora: la página es un partido. El scroll es el reloj, la barra fija
    es el marcador de la transmisión y cada sección entra con su minuto.
    ═══════════════════════════════════════════════════════════════════════════ */
@@ -927,7 +927,7 @@ code {
   html:not(.no-js) .hero__cuerpo > :nth-child(3) { animation-delay: .28s; }
   html:not(.no-js) .hero__cuerpo > :nth-child(4) { animation-delay: .4s; }
   html:not(.no-js) .hero__cuerpo > :nth-child(5) { animation-delay: .52s; }
-  /* la línea de THE GAME se dibuja sola, después de que llegó el texto */
+  /* la línea de THE BEAUTIFUL GAME se dibuja sola, después de que llegó el texto */
   @keyframes traza { from { transform: scaleX(0); } }
   html:not(.no-js) .wordmark__sub::before {
     transform-origin: left center;

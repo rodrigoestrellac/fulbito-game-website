@@ -24,6 +24,7 @@ Produce:
 """
 import json
 import os
+import shutil
 import re
 import sys
 import numpy as np
@@ -1465,8 +1466,22 @@ def build_brand():
     # los iconos son otra cosa: el logo de la app + «The Game» manuscrito
     from build_icono import construir as construir_icono
     construir_icono(out)
+    iconos_del_juego()
     build_og()
     print("brand: pelota.webp + iconos (build_icono.py) + og-image")
+
+def iconos_del_juego():
+    """2026-10-31 — «Fulbito: The Beautiful Game». El apple-touch y el .ico salen del MISMO logo que el juego
+    (el dibujo de Rodrigo con la cinta «The Beautiful Game», game-unity/assets-src/logo_base/), no del que dibuja
+    build_icono.py con «The Game». El favicon chico (svg/32) sigue siendo la pelota sola: a 32 px la cinta no se lee."""
+    unity = os.path.join(os.path.dirname(WEB), "game-unity")
+    master = os.path.join(unity, "assets-src", "logo_base", "icon-fulbito-the-beautiful-game.png")
+    logo = Image.open(master).convert("RGBA")
+    fondo = Image.new("RGBA", (180, 180), NOCHE + (255,))   # iOS no respeta el alfa: fondo noche como el viejo
+    fondo.alpha_composite(logo.resize((168, 168), Image.LANCZOS), (6, 6))
+    fondo.convert("RGB").save(out("assets", "brand", "apple-touch-180.png"))
+    shutil.copyfile(os.path.join(unity, "installer", "fulbito.ico"), out("assets", "brand", "fulbito.ico"))
+
 
 def build_og():
     """1200x630 — el wordmark sobre la cancha de noche, oscurecida."""
@@ -1506,7 +1521,7 @@ def build_og():
     im.alpha_composite(m, (int(end) + 30, top + 34))
 
     d.line([(left, top + 196), (left + 108, top + 196)], fill=ORO, width=5)
-    tracked((left + 128, top + 176), "THE GAME", f_sub, ORO, 13)
+    tracked((left + 128, top + 176), "THE BEAUTIFUL GAME", f_sub, ORO, 13)   # 2026-10-31: renombre
     tracked((left, top + 250), "FÚTBOL ARCADE 7v7 · GRATIS · PC, MAC Y ANDROID · ONLINE", f_tag,
             (168, 178, 165), 2.5)
 
