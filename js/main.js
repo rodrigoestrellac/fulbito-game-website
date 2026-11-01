@@ -188,7 +188,10 @@ function montarVideos() {
   if (menosMovimiento || !CLIPS.length) return;
   document.querySelectorAll('[data-video]').forEach((hueco) => {
     const src = hueco.dataset.video;
-    if (!CLIPS.some((f) => src.endsWith(f))) return;
+    /* el `?v=` que fuerza a bajar el clip regrabado no es parte del nombre: con él, el
+       endsWith fallaba y el Martillazo quedaba en foto (M286). */
+    const archivo = src.split('?')[0];
+    if (!CLIPS.some((f) => archivo.endsWith(f))) return;
 
     const poster = hueco.querySelector('img');
     const v = document.createElement('video');
