@@ -91,8 +91,20 @@ function pintar(release) {
      abre la página desde el teléfono quiere jugar en el teléfono. Si todavía no
      hay apk en el release, cae al camino de siempre y no se le ofrece un .exe
      que no puede usar (por eso el `&& archivos.android`). */
-  const principal = so === 'android' && archivos.android
-    ? { a: archivos.android, txt: 'Descargar para Android' }
+  /* ⚠️ 2-nov-2026: Android se juega por la PRUEBA DE GOOGLE PLAY (página probar/), no con un .apk suelto:
+     desde un Android el botón grande lleva ahí, haya o no apk en el release. */
+  if (so === 'android') {
+    document.querySelectorAll('[data-rel="cta"]').forEach((el) => {
+      el.href = 'probar/';
+      el.removeAttribute('aria-disabled');
+      const etiqueta = el.querySelector('[data-rel="cta-texto"]');
+      if (etiqueta) etiqueta.textContent = el.dataset.corto ? 'Probar' : 'Probalo en Android';
+      const peso = el.querySelector('[data-rel="cta-peso"]');
+      if (peso) peso.textContent = 'Google Play';
+    });
+  }
+  const principal = so === 'android'
+    ? { a: null }
     : so === 'mac'
       ? { a: archivos.mac, txt: 'Descargar para macOS' }
       : { a: archivos.winSetup || archivos.winZip, txt: 'Descargar para Windows' };
@@ -131,20 +143,23 @@ function pintar(release) {
       { k: 'winSetup', so: 'Windows', que: 'Instalador. Se instala solo, sin permisos de administrador.' },
       { k: 'winZip', so: 'Windows', que: 'Portable. Lo descomprimís y ejecutás <em>Fulbito.exe</em>. Sirve si la PC no te deja instalar nada.' },
       { k: 'mac', so: 'macOS', que: '<em>Beta</em>. La primera vez macOS lo bloquea y hay que habilitarlo una sola vez: <a href="#paso-mac">mirá cómo</a>.' },
-      { k: 'android', so: 'Android', que: 'Se juega con los dedos o con un joystick Bluetooth. Al abrir el archivo, el teléfono te pide permiso para instalar «apps de orígenes desconocidos», el mismo aviso que da Windows con el instalador. Le das permiso y listo.' },
+      { k: 'android', so: 'Android', que: 'En prueba en Google Play: sumate como tester en dos pasos y te llegan las actualizaciones solas. Se juega con los dedos o con un joystick Bluetooth.', href: 'probar/', boton: 'Probarlo' },
     ];
     /* la fila del sistema de quien mira va primero: desde un teléfono la lista
        arrancaba con dos filas de Windows. `sort` es estable, el resto queda igual */
     const deSO = { win: 'Windows', mac: 'macOS', android: 'Android' }[so];
     filas.sort((a, b) => (b.so === deSO) - (a.so === deSO));
-    lista.innerHTML = filas.filter((f) => archivos[f.k]).map((f) => {
+    lista.innerHTML = filas.filter((f) => f.href || archivos[f.k]).map((f) => {
       const a = archivos[f.k];
+      const boton = f.href
+        ? `<a class="btn btn--chico" href="${f.href}">${f.boton}</a>`
+        : `<a class="btn btn--chico" href="${urlDescarga(tag, a.nombre)}">
+          Descargar <span aria-hidden="true">·</span> ${mb(a.bytes)}
+        </a>`;
       return `<div class="bajada-item">
         <span class="bajada-item__so">${f.so}</span>
         <span class="bajada-item__meta">${f.que}</span>
-        <a class="btn btn--chico" href="${urlDescarga(tag, a.nombre)}">
-          Descargar <span aria-hidden="true">·</span> ${mb(a.bytes)}
-        </a>
+        ${boton}
       </div>`;
     }).join('');
   }
