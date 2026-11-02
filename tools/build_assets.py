@@ -464,6 +464,14 @@ SEDES_APROBADAS = {
     # (trapos nuestros) y el marcador LOB 0-0 CIU. El helipuerto lleva una H. Sin sponsors ni nombre
     # de estadio real; las torres son genéricas (pódium, fuste escalonado y aguja).
     "ultimopiso",
+    # 2-nov-2026 — ARENA DE LOS FARAONES (sede 17, M288), sobre `_ciudad` AL ATARDECER (órbita a 18°, rumbo
+    # 270, del build con `FULBITO_FOTO_SEDE` + `FULBITO_SEDE=ArenaFaraones` + `FULBITO_HORA=ATARDECER`): la
+    # pirámide abierta, el desierto, el Nilo con palmeras y una pirámide chica. Lo legible: el marcador
+    # FUL 0-0 COL y los trapos LA BANDA / FULBITO / AGUANTE / VAMOS; el friso y los pilonos son jeroglíficos
+    # (dibujos, no texto). Nombre inventado, sin sponsors ni estadio real. Neutral: no es la cancha de nadie.
+    # ⚠️ Las `_ciudad` de las otras sedes se borraron en la limpieza de disco del 2-nov (no estaban en git):
+    # NO correr este script entero hasta volver a sacarlas, o rehace sus webp con la vista de editor.
+    "arenafaraones",
 }
 # de qué toma cada sede su foto.
 # ⚠️ `_web` Y NO `_aerea` (25-ago-2026). Las `_tv` y `_aerea_cruce` están
