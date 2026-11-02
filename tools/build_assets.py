@@ -327,8 +327,11 @@ def stats_del_juego():
 
 
 def firmas_del_juego():
-    """{id: 'LA FIRMA'} desde el switch del HUD (DrawHumanMeters)."""
-    txt = open(MATCHDIRECTOR, encoding="utf-8").read()
+    """{id: 'LA FIRMA'} desde el switch del HUD (`FirmaHud`).
+    ⚠️ M287: el switch se mudó de MatchDirector.cs a MatchDirectorFirmas287.cs (lo usa también
+    la tienda). Se leen los dos para que un renglón olvidado en el viejo no se pierda."""
+    txt = "".join(open(f, encoding="utf-8-sig").read() for f in (
+        MATCHDIRECTOR, MATCHDIRECTOR.replace("MatchDirector.cs", "MatchDirectorFirmas287.cs")))
     return dict(re.findall(r'"([a-z0-9_]+)"\s*=>\s*"([^"]+) \(F\)"', txt))
 
 
