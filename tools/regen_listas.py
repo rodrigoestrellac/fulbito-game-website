@@ -203,12 +203,14 @@ def li_sedes(sedes):
              '          <p class="sede__aforo"><b>%s</b> hinchas'
              '<i style="--v:%d" aria-hidden="true"></i></p>' + NL +
              '          <p class="sede__locales">'
-             '<span class="sede__locales-tit">De local</span> %s</p>' + NL +
+             '<span class="sede__locales-tit">%s</span> %s</p>' + NL +
              '        </li>')
             % (sd["slug"], esc(alt), marca_html, esc(sd["nombre"]),
                esc(sd["concepto"]), miles(sd.get("hinchas", sd["aforo"])),
                round(100 * sd["aforo"] / tope),
-               esc(" · ".join(sd["equipos"]))))
+               # 3-nov-2026 — una sede sin local (SAKURA DŌJŌ, neutral a propósito) no deja el rótulo vacío
+               "De local" if sd["equipos"] else "Neutral",
+               esc(" · ".join(sd["equipos"])) if sd["equipos"] else "no es la cancha de nadie"))
     return NL.join(filas)
 
 

@@ -163,6 +163,17 @@ APROBADOS = {
     # sponsor y sin numero; `muso` (arquero) con guantes blancos lisos de puño negro, sin logo.
     "capacete", "peluca", "galinho", "didico",
     "faraonch", "tota", "pajarito", "cachavacha", "matador", "muso",
+    # 3-nov-2026 — los VEINTE de M292 (ATLÉTICO CAFETEROS, LOS LUSOS, LOS DIABLOS y ACADÉMICOS; avatar
+    # procedural). `render_check_front.py` + contact sheet: kit magenta liso, short blanco, sin escudo,
+    # sin sponsor y sin numero; los guantes de los cuatro arqueros lisos (puño negro, rojo o marrón),
+    # la vincha de EL TIGRE blanca lisa.
+    "escorpion", "minero", "resorte", "zurdita", "pibe", "botin", "tigre",
+    "richardao", "guardian", "trivelinho", "duende", "sietebravo",
+    "dragon", "hermanito", "tronco", "bocha",
+    "centinela", "mariscal", "pacificador", "principe",
+    # 3-nov-2026 — EL GALGO (M286, IL DIAVOLO ROSSONERO), mismo chequeo: kit magenta liso, short blanco,
+    # sin escudo, sin sponsor y sin numero.
+    "kaka",
 }
 
 # el archivo de captura cuando NO se llama como el id del juego
@@ -472,6 +483,12 @@ SEDES_APROBADAS = {
     # ⚠️ Las `_ciudad` de las otras sedes se borraron en la limpieza de disco del 2-nov (no estaban en git):
     # NO correr este script entero hasta volver a sacarlas, o rehace sus webp con la vista de editor.
     "arenafaraones",
+    # 3-nov-2026 — SAKURA DŌJŌ (sede 18, M291), sobre `_ciudad` AL ATARDECER (órbita a 32°, rumbo 0, del
+    # build con `FULBITO_FOTO_SEDE` + `FULBITO_SEDE=SakuraDojo` + `FULBITO_HORA=ATARDECER`): el techo de
+    # cinco niveles con la cancha adentro, las dos pagodas, los torii, los cerezos y el estanque. Lo
+    # legible: el marcador CAF 0-0 LUS; los estandartes de la fachada son símbolos, sin letras. Nombre
+    # inventado, sin sponsors ni estadio real. Neutral: no es la cancha de nadie.
+    "sakuradojo",
 }
 # de qué toma cada sede su foto.
 # ⚠️ `_web` Y NO `_aerea` (25-ago-2026). Las `_tv` y `_aerea_cruce` están
@@ -513,6 +530,7 @@ SEDE_VISTA_DE = {"coliseogalactico": "_aerea", "lalamparabavara": "_aerea", "cam
 # juega) sigue con su vista de antes.
 SEDE_VISTA_CIUDAD = "_ciudad"
 SEDE_MAX_W = 1280
+SEDES_NEUTRALES = {"sakuradojo"}   # sin local a propósito (ver auditar_sedes)
 HINCHAS_POR_MUNECO = 2   # lo que dice la web = aforo medido × 2 (ver `sedes.json`)
 
 # El chequeo de marcas de los ESCUDOS, misma mecánica que APROBADOS: el slug
@@ -582,6 +600,12 @@ ESCUDOS_APROBADOS = {
     # el buitre ni el monograma CRF); charrua = tres zarpazos blancos sobre celeste con franjas
     # (la garra, sin sol, sin estrellas ni escudo de la AUF). Ninguno lleva texto.
     "mengao", "charrua",
+    # 3-nov-2026 — los cuatro de M292, mirados con zoom: cafeteros = un grano de café sobre franjas
+    # amarillo/azul/rojo (la bandera, sin escudo de federación); lusos = una carabela sobre olas (sin la
+    # cruz ni la esfera armilar); diablos = tridente y cuernos blancos sobre rojo (sin el diablo con
+    # tridente de ningún club ni federación); academicos = una corona de laurel azul sobre celeste y
+    # blanco partido. Ninguno lleva texto.
+    "cafeteros", "lusos", "diablos", "academicos",
 }
 
 ESCUDO_OUT = 256    # los PNG fuente son 256×256; se convierten sin escalar
@@ -938,7 +962,9 @@ def auditar_sedes(sedes):
                     ("TARJETA DE SEDE DESFASADA (%s) en %s: falta %r"
                      % (que, sd["nombre"], espera)) + SALTO
                     + "   -> el juego manda; corre tools/regen_listas.py.")
-        if not sd["equipos"]:
+        # 3-nov-2026 — SAKURA DŌJŌ es NEUTRAL a propósito (Rodrigo: "que quede neutral por ahora"): sale
+        # elegida a mano en el amistoso, en la Copa y en el online, no como cancha de un local
+        if not sd["equipos"] and sd["slug"] not in SEDES_NEUTRALES:
             problemas.append(
                 "SEDE SIN DUENO: %s no es la cancha de ningun equipo\n"
                 "   -> en el juego eso es contenido muerto (nunca sale en un\n"
