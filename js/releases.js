@@ -6,7 +6,7 @@
 
 const REPO = 'rodrigoestrellac/fulbito-game-website';
 
-/* Espejo estático del release M283f. Actualizar al publicar uno nuevo.
+/* Espejo estático del release M293. Actualizar al publicar uno nuevo.
    Los bytes salen del release real (`gh release view --json assets`, stat sin
    redondeo): si no coinciden con el asset, la web muestra un tamaño equivocado
    justo cuando la API falla — o sea, justo cuando nadie lo va a poder verificar.
@@ -18,11 +18,13 @@ const REPO = 'rodrigoestrellac/fulbito-game-website';
    cinco en los que este archivo se olvidó. Si alguna vez se automatiza algo del
    proceso de publicación, que sea esto. */
 const FALLBACK = {
-  tag: 'M283f',
+  tag: 'M293',
   archivos: {
-    winSetup: { nombre: 'FulbitoSetup-M283f.exe', bytes: 253448287 },
-    winZip:   { nombre: 'Fulbito-M283f-windows.zip', bytes: 385867721 },
-    mac:      { nombre: 'Fulbito-M283f-mac.zip', bytes: 396002751 },
+    winSetup: { nombre: 'FulbitoSetup-M293.exe', bytes: 295328078 },
+    winZip:   { nombre: 'Fulbito-M293-windows.zip', bytes: 452563106 },
+    /* ⚠️ M293 salió SIN zip de Mac (el build de Mac era del 31-oct y pack_release lo salteó): comentada hasta
+       que un release vuelva a traerlo, para no apuntar a un 404. */
+    // mac:      { nombre: 'Fulbito-M293-mac.zip', bytes: 0 },
     /* ⚠️ ANDROID YA ESTÁ ACÁ, y antes no estaba a propósito: hasta M193 ningún
        release traía el .apk y el espejo habría apuntado a un archivo inexistente.
        Ahora existe, así que corresponde. Los bytes salen de la API del release
@@ -35,8 +37,8 @@ const FALLBACK = {
        la API de GitHub falla, que es la única vez que este objeto se usa. */
     /* ⚠️ M283e y M283f salieron SIN .apk (el de builds/android era de M274 y pack_release lo salteó): la
        línea queda comentada hasta que un release vuelva a traerlo. */
-    // android:  { nombre: 'Fulbito-M283f-android.apk', bytes: 0 },
-    checksums:{ nombre: 'CHECKSUMS.txt', bytes: 319 },
+    // android:  { nombre: 'Fulbito-M293-android.apk', bytes: 0 },
+    checksums:{ nombre: 'CHECKSUMS.txt', bytes: 227 },
   },
 };
 
