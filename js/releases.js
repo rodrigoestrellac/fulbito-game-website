@@ -151,6 +151,8 @@ function pintar(release) {
        arrancaba con dos filas de Windows. `sort` es estable, el resto queda igual */
     const deSO = { win: 'Windows', mac: 'macOS', android: 'Android' }[so];
     filas.sort((a, b) => (b.so === deSO) - (a.so === deSO));
+    /* 9-nov-2026 (M299): la versión web va primera siempre: es la única que no pide instalar nada (y la del iPad) */
+    filas.unshift({ k: 'web', so: 'Navegador', que: 'Sin instalar nada: abrilo en la PC, la Mac o el iPad y jugá.', href: 'https://jugar.fulbito.futbol/', boton: 'Jugar ahora' });
     lista.innerHTML = filas.filter((f) => f.href || archivos[f.k]).map((f) => {
       const a = archivos[f.k];
       const boton = f.href
