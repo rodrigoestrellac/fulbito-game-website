@@ -658,9 +658,9 @@ def equipos_del_juego():
     ligas = re.findall(r'"([^"]+)"',
                        re.search(r"LigaNombre\s*=\s*[^{]*\{(.*?)\};", txt,
                                  re.S).group(1))
-    liga_de = re.findall(r"Liga(Clubes|Selecciones|Combinados)",
+    liga_de = re.findall(r"Liga(Clubes|Selecciones|Combinados|TuEquipo)",   # M299: la 4.ª liga (FULBITO FC y MI GRUPO)
                          re.search(r"LigaDe\s*=\s*\{(.*?)\};", txt, re.S).group(1))
-    orden = {"Clubes": 0, "Selecciones": 1, "Combinados": 2}
+    orden = {"Clubes": 0, "Selecciones": 1, "Combinados": 2, "TuEquipo": 3}
     escudos = re.findall(r'"([a-z0-9_]+)"',
                          re.search(r"EscudoId\s*=\s*\{(.*?)\};", txt,
                                    re.S).group(1))
@@ -1039,29 +1039,26 @@ def auditar_release():
     (su comentario lo exige), así que es la fuente: un número, un lugar.
     El disco de la tabla de requisitos NO sale de acá (es el juego descomprimido, no
     el instalador): se mide a mano y se redondea a GB."""
+    # 9-nov-2026 (M299): las descargas son de itch.io; la fuente de la versión es `VERSION` en releases.js
+    # (ya no hay FALLBACK ni peso: itch no expone el tamaño sin clave y el botón dice «itch.io»)
     js = open(os.path.join(WEB, "js", "releases.js"), encoding="utf-8").read()
     html = open(os.path.join(WEB, "index.html"), encoding="utf-8").read()
-    tag = re.search(r"const FALLBACK = \{\s*tag: '([^']+)'", js)
-    setup = re.search(r"winSetup:\s*\{[^}]*bytes:\s*(\d+)", js)
-    if not tag or not setup:
-        print("!! auditar_release no encontró FALLBACK en releases.js: quedó ciego")
+    tag = re.search(r"const VERSION = '([^']+)'", js)
+    if not tag:
+        print("!! auditar_release no encontró VERSION en releases.js: quedó ciego")
         return False
     tag = tag.group(1)
-    mb = round(int(setup.group(1)) / 1048576)   # la misma cuenta que mb() en releases.js
-    esperados = [
-        ("versión (zócalo y descarga)", 'data-rel="version">%s<' % tag, 2),
-        ("peso del botón del hero", 'data-rel="cta-peso">%d MB<' % mb, 1),
-    ]
+    esperados = [("versión (zócalo y descarga)", 'data-rel="version">%s<' % tag, 2)]
     faltan = [(q, t, n) for q, t, n in esperados if html.count(t) != n]
     if faltan:
         print("\n" + "=" * 70)
-        print("EL HTML ESCRITO NO ES EL RELEASE DE releases.js (FALLBACK = %s)" % tag)
+        print("EL HTML ESCRITO NO ES LA VERSIÓN DE releases.js (VERSION = %s)" % tag)
         print("=" * 70)
         for q, t, n in faltan:
             print(" - %s: tiene que estar %d vez/veces %r" % (q, n, t))
         print("=" * 70)
         return False
-    print("release: el HTML escrito dice %s y %d MB, igual que FALLBACK" % (tag, mb))
+    print("release: el HTML escrito dice %s, igual que VERSION" % tag)
     return True
 
 

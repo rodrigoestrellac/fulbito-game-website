@@ -1,193 +1,81 @@
-/* releases.js — las descargas salen del ÚLTIMO release de este repo.
-   No hay versiones hardcodeadas en el HTML: se publica un release y la web se
-   entera sola. Si la API de GitHub no contesta (rate limit: 60 pedidos por hora
-   por IP, o el usuario sin red) se usa FALLBACK, que hay que actualizar a mano
-   cuando se publica una versión nueva. Ver README. */
+/* releases.js — adónde llevan los botones de descarga.
+   9-nov-2026 (M299): LAS DESCARGAS SON DE ITCH.IO. Antes salían del último release de GitHub de este repo, y
+   ese release se quedó en M293 mientras el juego seguía (itch tenía M299): quien bajaba desde la web se
+   llevaba una versión que ya no encontraba servidor online. Rodrigo eligió un solo lugar de descarga.
+   · Windows y Mac → la página de itch (butler sube los canales `windows` y `mac`; itch ofrece el de tu sistema).
+   · Android → la prueba de Google Play (probar/).
+   · Navegador → jugar.fulbito.futbol.
+   ⚠️ `VERSION` se actualiza A MANO al publicar en itch (es sólo el número que muestra la página; los
+   botones no dependen de él). La API de itch que dice la versión de un canal pide clave.
+   El contador de descargas sigue saliendo de los releases VIEJOS de GitHub (el histórico real). */
 
-const REPO = 'rodrigoestrellac/fulbito-game-website';
-
-/* Espejo estático del release M293. Actualizar al publicar uno nuevo.
-   Los bytes salen del release real (`gh release view --json assets`, stat sin
-   redondeo): si no coinciden con el asset, la web muestra un tamaño equivocado
-   justo cuando la API falla — o sea, justo cuando nadie lo va a poder verificar.
-   ⚠️ Se quedó en M133 durante DOS releases (M155 y M174 se publicaron sin tocarlo),
-   así que cualquiera que cayera con la API caída veía una versión de tres semanas
-   atrás y un tamaño que no era el del archivo. Es el paso del checklist que más
-   fácil se saltea porque vive en OTRO repo.
-   ⚠️ Y VOLVIÓ A PASAR: se quedó en M183 durante M186 y M190. Van cuatro releases de
-   cinco en los que este archivo se olvidó. Si alguna vez se automatiza algo del
-   proceso de publicación, que sea esto. */
-const FALLBACK = {
-  tag: 'M293',
-  archivos: {
-    winSetup: { nombre: 'FulbitoSetup-M293.exe', bytes: 295328078 },
-    winZip:   { nombre: 'Fulbito-M293-windows.zip', bytes: 452563106 },
-    /* ⚠️ M293 salió SIN zip de Mac (el build de Mac era del 31-oct y pack_release lo salteó): comentada hasta
-       que un release vuelva a traerlo, para no apuntar a un 404. */
-    // mac:      { nombre: 'Fulbito-M293-mac.zip', bytes: 0 },
-    /* ⚠️ ANDROID YA ESTÁ ACÁ, y antes no estaba a propósito: hasta M193 ningún
-       release traía el .apk y el espejo habría apuntado a un archivo inexistente.
-       Ahora existe, así que corresponde. Los bytes salen de la API del release
-       (`gh release view <TAG> --json assets`), sin redondear.
-       ⚠️ El apk de M229 se compiló DESPUÉS de armar el resto del release, así que
-       esta línea estuvo comentada un rato: `pack_release.ps1` había detectado que
-       el .apk de `builds/android` todavía era el de M227 y lo salteó en vez de
-       copiarlo con la etiqueta nueva (el bug del zip de Mac de M89). Apuntar el
-       espejo a un archivo que el release no tiene es un 404 servido justo cuando
-       la API de GitHub falla, que es la única vez que este objeto se usa. */
-    /* ⚠️ M283e y M283f salieron SIN .apk (el de builds/android era de M274 y pack_release lo salteó): la
-       línea queda comentada hasta que un release vuelva a traerlo. */
-    // android:  { nombre: 'Fulbito-M293-android.apk', bytes: 0 },
-    checksums:{ nombre: 'CHECKSUMS.txt', bytes: 227 },
-  },
-};
-
-const urlDescarga = (tag, nombre) =>
-  `https://github.com/${REPO}/releases/download/${encodeURIComponent(tag)}/${encodeURIComponent(nombre)}`;
-
-const mb = (bytes) => bytes >= 1024 * 1024
-  ? `${Math.round(bytes / 1048576)} MB`
-  : `${Math.max(1, Math.round(bytes / 1024))} KB`;
-
-/* Clasifica los assets del release por nombre. Si cambian los nombres que
-   genera pack_release.ps1, hay que tocar estos patrones. */
-function clasificar(assets) {
-  const buscar = (re) => {
-    const a = assets.find((x) => re.test(x.name));
-    return a ? { nombre: a.name, bytes: a.size } : null;
-  };
-  return {
-    winSetup: buscar(/setup.*\.exe$/i),
-    winZip: buscar(/windows.*\.zip$/i),
-    mac: buscar(/mac.*\.zip$/i),
-    /* Android: `Fulbito-<TAG>-android.apk` (PLAN_ANDROID §3.E.1). La fila se dibuja
-       sola cuando el release trae el archivo. ⚠️ Hasta M193 NO estaba en `FALLBACK`
-       a propósito —ningún release traía el .apk, y el espejo estático habría
-       apuntado a un 404 justo cuando la API de GitHub falla—; desde M193 sí está,
-       y hay que mantenerlo al día como los otros tres. */
-    android: buscar(/android.*\.apk$/i),
-    checksums: buscar(/^checksums.*\.txt$/i),
-  };
-}
+const VERSION = 'M299';
+const ITCH = 'https://rodrigoestrellac.itch.io/fulbito';
+const JUGAR = 'https://jugar.fulbito.futbol/';
+const REPO = 'rodrigoestrellac/fulbito-game-website';   // sólo para el contador histórico
 
 function detectarSO() {
   const ua = navigator.userAgent;
   const plat = navigator.userAgentData?.platform || navigator.platform || '';
   /* ⚠️ Android se pregunta PRIMERO: su user-agent dice «Linux» y además «Android»,
-     y varios navegadores de celular mienten con el resto. Si quedara después del
-     test de Mac/Windows, un teléfono podría llevarse el .exe. */
+     y varios navegadores de celular mienten con el resto. */
   if (/Android/i.test(ua)) return 'android';
-  if (/Mac|iPhone|iPad|iPod/i.test(plat + ua)) return 'mac';
+  if (/iPhone|iPad|iPod/i.test(plat + ua) || (/Mac/i.test(plat + ua) && navigator.maxTouchPoints > 1)) return 'ios';
+  if (/Mac/i.test(plat + ua)) return 'mac';
   if (/Win/i.test(plat + ua)) return 'win';
   return 'otro';
 }
 
-function pintar(release) {
-  const { tag, archivos } = release;
+function pintar() {
   const so = detectarSO();
+  document.querySelectorAll('[data-rel="version"]').forEach((el) => { el.textContent = VERSION; });
 
-  document.querySelectorAll('[data-rel="version"]').forEach((el) => { el.textContent = tag; });
-
-  /* ── CTA principal: el archivo que le sirve a quien está mirando ── */
-  /* ⚠️ Si entrás desde un Android y HAY apk, el botón grande es el apk: quien
-     abre la página desde el teléfono quiere jugar en el teléfono. Si todavía no
-     hay apk en el release, cae al camino de siempre y no se le ofrece un .exe
-     que no puede usar (por eso el `&& archivos.android`). */
-  /* ⚠️ 2-nov-2026: Android se juega por la PRUEBA DE GOOGLE PLAY (página probar/), no con un .apk suelto:
-     desde un Android el botón grande lleva ahí, haya o no apk en el release. */
-  if (so === 'android') {
-    document.querySelectorAll('[data-rel="cta"]').forEach((el) => {
-      el.href = 'probar/';
-      el.removeAttribute('aria-disabled');
-      const etiqueta = el.querySelector('[data-rel="cta-texto"]');
-      if (etiqueta) etiqueta.textContent = el.dataset.corto ? 'Probar' : 'Probalo en Android';
-      const peso = el.querySelector('[data-rel="cta-peso"]');
-      if (peso) peso.textContent = 'Google Play';
-    });
-  }
-  const principal = so === 'android'
-    ? { a: null }
-    : so === 'mac'
-      ? { a: archivos.mac, txt: 'Descargar para macOS' }
-      : { a: archivos.winSetup || archivos.winZip, txt: 'Descargar para Windows' };
-
+  /* ── CTA principal: lo que le sirve a quien está mirando ── */
+  const cta = so === 'android' ? { href: 'probar/', largo: 'Probalo en Android', corto: 'Probar', peso: 'Google Play' }
+            : so === 'ios'     ? { href: JUGAR, largo: 'Jugar en el iPad', corto: 'Jugar', peso: 'en el navegador' }
+            : so === 'mac'     ? { href: ITCH, largo: 'Descargar para macOS', corto: 'Descargar', peso: 'itch.io' }
+            :                    { href: ITCH, largo: 'Descargar para Windows', corto: 'Descargar', peso: 'itch.io' };
   document.querySelectorAll('[data-rel="cta"]').forEach((el) => {
-    if (!principal.a) return;
-    el.href = urlDescarga(tag, principal.a.nombre);
+    el.href = cta.href;
     el.removeAttribute('aria-disabled');
     const etiqueta = el.querySelector('[data-rel="cta-texto"]');
-    // el botón del marcador es angosto: ahí va sólo "Descargar"
-    if (etiqueta) etiqueta.textContent = el.dataset.corto ? 'Descargar' : principal.txt;
+    if (etiqueta) etiqueta.textContent = el.dataset.corto ? cta.corto : cta.largo;
     const peso = el.querySelector('[data-rel="cta-peso"]');
-    if (peso) peso.textContent = mb(principal.a.bytes);
+    if (peso) peso.textContent = cta.peso;
   });
+  // en el iPad el botón grande ya es «jugar»: el de al lado sobra
+  if (so === 'ios') document.querySelectorAll('[data-rel="jugar"]').forEach((el) => { el.hidden = true; });
 
-  /* El hueco de la nota YA trae texto fijo en el HTML ("sin cuenta, sin
-     instalador raro…"): esto le AGREGA el link al otro sistema operativo, no lo
-     reemplaza. Antes el hueco estaba vacío hasta que contestaba la API, o sea
-     que en el primer paint el hero no decía una sola razón para bajarlo.
-     Y el zip de Mac ya no se anuncia acá como beta: la advertencia se lee
-     completa en la sección de descarga, que es donde cambia lo que la persona
-     va a hacer. En el hero era un freno de mano. */
-  const nota = document.querySelector('[data-rel="cta-nota"]');
-  if (nota) {
-    if (so === 'mac' && archivos.winSetup) {
-      nota.innerHTML = ` ¿Estás en Windows? <a href="${urlDescarga(tag, archivos.winSetup.nombre)}">Bajá el instalador</a>.`;
-    } else if (archivos.mac) {
-      nota.innerHTML = ` ¿Mac? <a href="${urlDescarga(tag, archivos.mac.nombre)}">Bajá el zip</a>.`;
-    }
-  }
-
-  /* ── Lista completa de descargas ── */
+  /* ── Lista completa ── */
   const lista = document.querySelector('[data-rel="lista"]');
   if (lista) {
     const filas = [
-      { k: 'winSetup', so: 'Windows', que: 'Instalador. Se instala solo, sin permisos de administrador.' },
-      { k: 'winZip', so: 'Windows', que: 'Portable. Lo descomprimís y ejecutás <em>Fulbito.exe</em>. Sirve si la PC no te deja instalar nada.' },
-      { k: 'mac', so: 'macOS', que: '<em>Beta</em>. La primera vez macOS lo bloquea y hay que habilitarlo una sola vez: <a href="#paso-mac">mirá cómo</a>.' },
-      { k: 'android', so: 'Android', que: 'En prueba en Google Play: sumate como tester en dos pasos y te llegan las actualizaciones solas. Se juega con los dedos o con un joystick Bluetooth.', href: 'probar/', boton: 'Probarlo' },
+      { so: 'Navegador', que: 'Sin instalar nada: abrilo en la PC, la Mac o el iPad y jugá.', href: JUGAR, boton: 'Jugar ahora' },
+      { so: 'Windows', que: 'En itch.io: bajás el zip, lo descomprimís y abrís <em>Fulbito.exe</em>. Con la app de itch se actualiza solo.', href: ITCH, boton: 'Descargar' },
+      { so: 'macOS', que: '<em>Beta</em>, en itch.io. La primera vez macOS lo bloquea y hay que habilitarlo una sola vez: <a href="#paso-mac">mirá cómo</a>.', href: ITCH, boton: 'Descargar' },
+      { so: 'Android', que: 'En prueba en Google Play: sumate como tester en dos pasos y te llegan las actualizaciones solas. Se juega con los dedos o con un joystick Bluetooth.', href: 'probar/', boton: 'Probarlo' },
     ];
-    /* la fila del sistema de quien mira va primero: desde un teléfono la lista
-       arrancaba con dos filas de Windows. `sort` es estable, el resto queda igual */
+    /* la fila del sistema de quien mira va justo después del navegador */
     const deSO = { win: 'Windows', mac: 'macOS', android: 'Android' }[so];
-    filas.sort((a, b) => (b.so === deSO) - (a.so === deSO));
-    /* 9-nov-2026 (M299): la versión web va primera siempre: es la única que no pide instalar nada (y la del iPad) */
-    filas.unshift({ k: 'web', so: 'Navegador', que: 'Sin instalar nada: abrilo en la PC, la Mac o el iPad y jugá.', href: 'https://jugar.fulbito.futbol/', boton: 'Jugar ahora' });
-    lista.innerHTML = filas.filter((f) => f.href || archivos[f.k]).map((f) => {
-      const a = archivos[f.k];
-      const boton = f.href
-        ? `<a class="btn btn--chico" href="${f.href}">${f.boton}</a>`
-        : `<a class="btn btn--chico" href="${urlDescarga(tag, a.nombre)}">
-          Descargar <span aria-hidden="true">·</span> ${mb(a.bytes)}
-        </a>`;
-      return `<div class="bajada-item">
+    const resto = filas.slice(1).sort((a, b) => (b.so === deSO) - (a.so === deSO));
+    lista.innerHTML = [filas[0], ...resto].map((f) => `<div class="bajada-item">
         <span class="bajada-item__so">${f.so}</span>
         <span class="bajada-item__meta">${f.que}</span>
-        ${boton}
-      </div>`;
-    }).join('');
-  }
-
-  const chk = document.querySelector('[data-rel="checksums"]');
-  if (chk && archivos.checksums) {
-    chk.href = urlDescarga(tag, archivos.checksums.nombre);
-    chk.hidden = false;
+        <a class="btn btn--chico" href="${f.href}">${f.boton}</a>
+      </div>`).join('');
   }
 }
 
-/* Los pasos de instalación y los controles son <details> (index.html § descargar):
-   se abre el del sistema de quien mira y se cierran los otros. Sin JS, o con un
-   sistema que no se reconoce, queda lo que dice el HTML (Windows abierto). */
+/* Los pasos de instalación son <details> (index.html § descargar): se abre el del sistema de quien mira. */
 function abrirSegunSO() {
-  const so = detectarSO();
+  const so = detectarSO() === 'ios' ? 'mac' : detectarSO();
   if (so === 'otro') return;
   document.querySelectorAll('details[data-so]').forEach((d) => {
     d.open = d.dataset.so.split(' ').includes(so);
   });
 }
 
-/* El «mirá cómo» de la fila de Mac salta a #paso-mac: si ese paso está
-   plegado, el salto cae en un título cerrado. Se abre antes de saltar. */
+/* El «mirá cómo» de la fila de Mac salta a #paso-mac: si ese paso está plegado, se abre antes de saltar. */
 function abrirAlSaltar() {
   const abrir = (id) => {
     const destino = id && document.getElementById(id);
@@ -201,29 +89,18 @@ function abrirAlSaltar() {
   abrir(location.hash.slice(1));
 }
 
-async function cargar() {
-  abrirSegunSO();
-  abrirAlSaltar();
-  pintar(FALLBACK); // se pinta ya, sin esperar a la red
+/* El contador: las descargas históricas de los releases de GitHub (hasta M293). Sin dato, queda oculto. */
+async function contar() {
   try {
-    /* /releases en vez de /releases/latest: cuesta el mismo pedido y trae,
-       además del último release, el download_count de TODOS los assets — de
-       ahí sale el contador de descargas. */
     const r = await fetch(`https://api.github.com/repos/${REPO}/releases?per_page=100`, {
       headers: { Accept: 'application/vnd.github+json' },
     });
     if (!r.ok) throw new Error(`GitHub respondió ${r.status}`);
     const releases = await r.json();
-
-    /* contador: los binarios de todas las versiones (CHECKSUMS.txt no es una
-       descarga del juego). Sin dato de la API el elemento queda oculto — un
-       número hardcodeado acá envejecería mintiendo. */
     const total = releases.flatMap((rel) => rel.assets || [])
       .filter((a) => /\.(exe|zip|apk)$/i.test(a.name))
       .reduce((s, a) => s + (a.download_count || 0), 0);
-    /* Redondeado PARA ABAJO y con «+» (Rodrigo, 30-oct: *"debería redondear y hacer +130
-       descargas"*): 131 → «+130», 1.234 → «+1.200». El número exacto cambia con cada bajada y
-       no dice más; el redondeo nunca promete de más. Abajo de 10 va el exacto, sin «+». */
+    /* Redondeado PARA ABAJO y con «+» (Rodrigo, 30-oct): 131 → «+130». Abajo de 10, el exacto. */
     const redondo = (n) => {
       if (n < 10) return n.toLocaleString('es-AR');
       const paso = n < 1000 ? 10 : n < 10000 ? 100 : 1000;
@@ -236,79 +113,48 @@ async function cargar() {
         : `Ya van ${redondo(total)} descargas.`;
       cont.hidden = false;
     }
-    /* El mismo número, arriba de todo: es el único elemento de confianza de
-       terceros que tiene el sitio y vivía solo en la sección de descarga, a 29
-       pantallas de scroll. Sigue oculto si la API no contesta — un número
-       hardcodeado envejecería mintiendo.
-       ⚠️ Con UMBRAL: en el zócalo del hero el número es prueba social, y «10
-       descargas» en la primera pantalla prueba lo contrario. Abajo del umbral
-       el dato igual se lee completo en la sección de descarga, donde es
-       información y no argumento. */
-    const UMBRAL_HERO = 100;
+    const UMBRAL_HERO = 100;   // en el hero el número es prueba social: abajo del umbral prueba lo contrario
     const zoc = document.querySelector('[data-rel="descargas-zoc"]');
     const zocN = document.querySelector('[data-rel="descargas-n"]');
     if (zoc && zocN && total >= UMBRAL_HERO) {
       zocN.textContent = redondo(total);
       zoc.hidden = false;
     }
-
-    const data = releases.find((rel) => !rel.draft && !rel.prerelease);
-    if (!data) return;
-    const archivos = clasificar(data.assets || []);
-    /* ⚠️ `android` VA EN ESTA LISTA. Sin él, un release que trajera SÓLO el .apk se
-       descartaba entero y ni siquiera aparecía la fila de Android — la guarda decía
-       "release sin binarios" mirando tres plataformas de las cuatro. Es el mismo
-       descuido que tener el .apk clasificado y no ofrecido. */
-    if (!archivos.winSetup && !archivos.winZip && !archivos.mac && !archivos.android) return;
-    pintar({ tag: data.tag_name, archivos });
   } catch (e) {
-    console.info('[releases] queda el release estático:', e.message);
+    console.info('[releases] sin contador:', e.message);
   }
 }
 
-/* GA estaba cargado pero NINGÚN click de descarga disparaba evento: no había
-   forma de saber qué porcentaje baja el juego ni desde qué CTA. Un solo
-   listener en el documento, en captura, porque releases.js reescribe la lista
-   de descargas entera y los botones de antes dejan de existir. */
+/* GA: un solo listener en captura, porque la lista se reescribe entera. */
 function medirDescargas() {
   document.addEventListener('click', (ev) => {
     if (typeof gtag !== 'function') return;
-
-    /* los botones del medio del recorrido no bajan nada: llevan a la seccion.
-       Se miden aparte para saber cual de los dos tramos convence. */
     const salto = ev.target.closest?.('a[href="#descargar"]');
     if (salto) {
       const seccion = salto.closest('section')?.querySelector('h2')?.textContent.trim();
       gtag('event', 'cta_inline', { desde: seccion || (salto.closest('.pie') ? 'pie' : 'otro') });
       return;
     }
-
-    /* el gameplay largo se va del sitio: es la unica salida que vale la pena
-       medir, porque compite con el boton de bajar y hay que saber si suma. */
     if (ev.target.closest?.('a[href*="youtu.be"], a[href*="youtube.com"]')) {
       gtag('event', 'ver_gameplay', { desde: 'gol' });
       return;
     }
-
-    const a = ev.target.closest?.('a[href*="/releases/"]');
+    const a = ev.target.closest?.('a[href*="itch.io"], a[href*="jugar.fulbito.futbol"], a[href^="probar/"]');
     if (!a) return;
-    const archivo = decodeURIComponent(a.href.split('/').pop() || '');
     const donde = a.closest('.marcador') ? 'marcador'
                 : a.closest('.hero') ? 'hero'
                 : a.closest('[data-rel="lista"]') ? 'lista'
                 : 'otro';
     gtag('event', 'descarga', {
-      // el CHECKSUMS.txt y el link a /releases/latest sin archivo no son el juego
-      tipo: /setup.*\.exe$/i.test(archivo) ? 'win-setup'
-          : /windows.*\.zip$/i.test(archivo) ? 'win-zip'
-          : /mac.*\.zip$/i.test(archivo) ? 'mac'
-          : /android.*\.apk$/i.test(archivo) ? 'android'
-          : /^checksums/i.test(archivo) ? 'checksums' : 'generico',
+      tipo: a.href.includes('jugar.fulbito.futbol') ? 'web' : a.href.includes('itch.io') ? 'itch' : 'android',
       desde: donde,
-      archivo,
+      so: detectarSO(),
     });
   }, true);
 }
-medirDescargas();
 
-cargar();
+medirDescargas();
+abrirSegunSO();
+abrirAlSaltar();
+pintar();
+contar();

@@ -26,9 +26,13 @@ tools/          build_assets.py — regenera TODO lo binario de assets/
 
 ## Cómo publicar un build nuevo del juego
 
-Las descargas de la web salen del **último release de este repo** (`releases/latest`),
-leído en vivo por `js/releases.js`. Publicar un build nuevo = crear el release; la web
-se actualiza sola, sin tocar HTML.
+**Desde el 9-nov-2026 (M299) las descargas son de itch.io** (https://rodrigoestrellac.itch.io/fulbito):
+Windows y Mac se suben con butler (`game-unity/tools/pack_release.ps1 -Itch rodrigoestrellac/fulbito`),
+Android va por la prueba de Play (`probar/`) y el navegador es https://jugar.fulbito.futbol/.
+Publicar una versión nueva en la web = cambiar `VERSION` en `js/releases.js` y las dos
+`data-rel="version"` de `index.html` (`build_assets.py` → `auditar_release` lo controla).
+Los releases de GitHub quedaron como histórico (hasta M293) y sólo alimentan el contador
+de descargas. Lo que sigue en esta sección es el proceso VIEJO, por si se vuelve a GitHub.
 
 ```powershell
 # 1) empaquetar (en el repo del juego, game-unity)
