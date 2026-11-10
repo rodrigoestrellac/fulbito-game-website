@@ -9,7 +9,7 @@
    botones no dependen de él). La API de itch que dice la versión de un canal pide clave.
    El contador de descargas sigue saliendo de los releases VIEJOS de GitHub (el histórico real). */
 
-const VERSION = 'M299';
+const VERSION = 'M300';
 const ITCH = 'https://rodrigoestrellac.itch.io/fulbito';
 const JUGAR = 'https://jugar.fulbito.futbol/';
 const REPO = 'rodrigoestrellac/fulbito-game-website';   // sólo para el contador histórico

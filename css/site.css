@@ -1632,3 +1632,17 @@ code {
 
 /* en la descarga las citas van justo después de los botones, con su regla arriba */
 .citas--bajar { margin-top: var(--s5); padding-top: var(--s4); }
+
+/* 10-nov-2026 — la tira de pelotas (sección del menú) */
+.pelotas { margin-top: var(--s6); }
+.pelotas__titulo { color: var(--cal-tenue); margin-bottom: var(--s4); }
+.pelotas__titulo strong { color: var(--cal); }
+.pelotas__tira { list-style: none; margin: 0; padding: 0; display: grid;
+                 grid-template-columns: repeat(8, minmax(0, 1fr)); gap: var(--s3); }
+.pelotas__tira li { display: flex; flex-direction: column; align-items: center; gap: var(--s2); text-align: center; }
+.pelotas__tira img { width: 100%; max-width: 96px; height: auto; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .45));
+                     transition: transform .35s var(--ease); }
+.pelotas__tira li:hover img { transform: rotate(-18deg) translateY(-3px); }
+.pelotas__tira span { font-family: var(--display); font-size: var(--t-micro); letter-spacing: .12em;
+                      text-transform: uppercase; color: var(--oro-claro); }
+@media (max-width: 720px) { .pelotas__tira { grid-template-columns: repeat(4, minmax(0, 1fr)); row-gap: var(--s4); } }

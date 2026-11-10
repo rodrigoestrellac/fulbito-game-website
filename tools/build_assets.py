@@ -489,6 +489,15 @@ SEDES_APROBADAS = {
     # legible: el marcador CAF 0-0 LUS; los estandartes de la fachada son símbolos, sin letras. Nombre
     # inventado, sin sponsors ni estadio real. Neutral: no es la cancha de nadie.
     "sakuradojo",
+    # 10-nov-2026 — las CUATRO de M296-M300, sobre `_web` elegida a mano de las capturas de cada sede
+    # (`captures/m296_caballo/general`, `m297_hundida/gol`, `m299_valhalla/general_v4`,
+    # `m300_kukulkan/general`): no hay `_ciudad` del build de ninguna. Lo legible son los trapos nuestros
+    # (LA BANDA / DALE CAMPEÓN / EL POTRERO / VAMOS) y los carteles perimetrales FULBITO / EL CLÁSICO /
+    # MVP. El caballo de madera, el dios con el tridente bajo la cúpula, el drakkar y el puente del
+    # arcoíris, y la pirámide escalonada en la selva son dibujos nuestros, sin texto. Nombres inventados,
+    # sin sponsors ni estadio real. LA CIUDAD HUNDIDA va desde la cancha (la vista de afuera es todo agua
+    # celeste y no se lee el estadio).
+    "arenacaballo", "ciudadhundida", "elvalhalla", "templokukulkan",
 }
 # de qué toma cada sede su foto.
 # ⚠️ `_web` Y NO `_aerea` (25-ago-2026). Las `_tv` y `_aerea_cruce` están
@@ -606,6 +615,12 @@ ESCUDOS_APROBADOS = {
     # tridente de ningún club ni federación); academicos = una corona de laurel azul sobre celeste y
     # blanco partido. Ninguno lleva texto.
     "cafeteros", "lusos", "diablos", "academicos",
+    # 10-nov-2026 — los tres de M294/M300, mirados con zoom: samurai = una flor de cerezo rosa sobre negro
+    # con borde y banda roja (la flor, sin mon de clan ni kanji); jaguar = cabeza de jaguar sobre verde con
+    # una pirámide escalonada abajo (la selva y el templo, sin glifos ni letras); atlantes = un tridente
+    # blanco sobre olas en celeste con borde azul marino (el mar, sin corona ni monograma). Ninguno lleva
+    # texto ni reproduce un escudo registrado.
+    "samurai", "jaguar", "atlantes",
 }
 
 ESCUDO_OUT = 256    # los PNG fuente son 256×256; se convierten sin escalar
@@ -678,6 +693,11 @@ def equipos_del_juego():
     # su fila de fábrica no es lo que nadie va a ver. Lo cuenta la sección MI EQUIPO del sitio.
     # Va al final del catálogo, así que sacarlo no corre el índice de ningún otro.
     equipos = [e for e in equipos if e["slug"] != "grupo"]
+    # M299 — TU EQUIPO es la última liga y en la web queda VACÍA (adentro sólo está MI GRUPO, que no se
+    # publica): una liga sin equipos no lleva sección. Sólo se recortan las del FINAL, así no se corre
+    # el índice de ninguna otra.
+    while ligas and not any(e["liga"] == len(ligas) - 1 for e in equipos):
+        ligas.pop()
     return equipos, ligas
 
 
@@ -1186,13 +1206,8 @@ def auditar_equipos(equipos):
         if afuera or eq["gk"] not in gks:
             problemas.append("ID FUERA DEL POOL en %s: %s"
                              % (eq["nombre"], afuera or eq["gk"]))
-        # la ficha dibuja los retratos: un jugador sin aprobar en la web se
-        # veria como figurita vacia en la mini-cancha
-        sin_retrato = [i for i in eq["ids"] + [eq["gk"]]
-                       if i not in APROBADOS]
-        if sin_retrato:
-            problemas.append("SIN RETRATO EN LA WEB, %s: %s"
-                             % (eq["nombre"], ", ".join(sin_retrato)))
+        # 9-nov-2026: la pizarra ya NO dibuja retratos (discos con el número desde el 26-oct; Rodrigo:
+        # "no hacen falta los retratos"), así que un jugador sin retrato aprobado no rompe la ficha.
         if ("assets/equipos/%s.webp" % eq["slug"]) not in html:
             problemas.append("SIN TARJETA EN index.html: %s (%s)"
                              % (eq["slug"], eq["nombre"]))
@@ -1476,6 +1491,28 @@ def build_shots():
     print("capturas:", len(SHOTS))
 
 
+# 10-nov-2026 — LA TIRA DE PELOTAS (Rodrigo: las de OPCIONES › PELOTA, muy breve). Las fotos salen del
+# editor con `PocPelotasWeb300.Fotos` (game-unity: escena vacía, fondo transparente) en
+# `captures/web_pelota_<n>.png`, n = el índice de `Pelota.Nombres` (AUTO, el 0, no es una pelota).
+PELOTAS = [(1, "clasica"), (2, "fulbito"), (3, "cuero"), (4, "tradicional"), (5, "estrellas-oro"),
+           (6, "estrellas-verde"), (7, "invierno"), (8, "sala")]
+PELOTA_OUT = 192
+
+
+def build_pelotas():
+    for n, slug in PELOTAS:
+        p = os.path.join(CAPS, "web_pelota_%d.png" % n)
+        if not os.path.exists(p):
+            print("  FALTA", p, "(queda la publicada)")
+            continue
+        im = Image.open(p).convert("RGBA")
+        x0, y0, x1, y1 = im.getchannel("A").getbbox()
+        m = round((x1 - x0) * 0.03)
+        im = im.crop((x0 - m, y0 - m, x1 + m, y1 + m)).resize((PELOTA_OUT, PELOTA_OUT), Image.LANCZOS)
+        im.save(out("assets", "img", "pelotas", slug + ".webp"), "WEBP", quality=86, method=6)
+    print("pelotas: %d" % len(PELOTAS))
+
+
 # ── El mark de la pelota ─────────────────────────────────────────────────────
 def mark(size):
     """El render con alfa, recortado a la pelota y centrado en un cuadrado."""
@@ -1520,7 +1557,13 @@ def iconos_del_juego():
 def build_og():
     """1200x630 — el wordmark sobre la cancha de noche, oscurecida."""
     W, H = 1200, 630
-    base = Image.open(os.path.join(CAPS, "web_tv_08.png")).convert("RGB")
+    src = os.path.join(CAPS, "web_tv_08.png")
+    # 10-nov-2026: captures/ está fuera de git y la foto se perdió; sin ella se deja la og-image
+    # publicada como está (igual que los otros builders cuando falta su captura)
+    if not os.path.exists(src):
+        print("  FALTA", src, "(queda la og-image publicada)")
+        return
+    base = Image.open(src).convert("RGB")
     s = max(W / base.width, H / base.height)
     base = base.resize((round(base.width * s), round(base.height * s)), Image.LANCZOS)
     x = (base.width - W) // 2
@@ -1629,6 +1672,7 @@ if __name__ == "__main__":
     build_escudos(equipos)
     sedes = build_sedes(equipos)
     build_shots()
+    build_pelotas()
     cajas_ok = build_cajas_efecto()
     ok = auditar_equipos(equipos) and cajas_ok
     ok = auditar_sedes(sedes) and ok
