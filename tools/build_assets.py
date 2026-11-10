@@ -498,6 +498,12 @@ SEDES_APROBADAS = {
     # sin sponsors ni estadio real. LA CIUDAD HUNDIDA va desde la cancha (la vista de afuera es todo agua
     # celeste y no se lee el estadio).
     "arenacaballo", "ciudadhundida", "elvalhalla", "templokukulkan",
+    # 10-nov-2026 — LUNAR PARK (sede 23, M302), sobre `captures/m302_lunar/general.png` (ver SEDE_FOTO_DE): el
+    # cráter con las dos bandejas y los visores dorados, la marquesina de bombitas, la Tierra en el cielo y la
+    # torre con el cohete. Lo legible: la marquesina LUNAR PARK / ESTA NOCHE / FULBITO EN LA LUNA (la pinta
+    # `assets-src/lunarpark_fbx.py`; nombre inventado del juego, juego de palabras con la Luna) y, chiquitos,
+    # los trapos y carteles nuestros. Sin sponsors ni estadio real.
+    "lunarpark",
 }
 # de qué toma cada sede su foto.
 # ⚠️ `_web` Y NO `_aerea` (25-ago-2026). Las `_tv` y `_aerea_cruce` están
@@ -538,6 +544,10 @@ SEDE_VISTA_DE = {"coliseogalactico": "_aerea", "lalamparabavara": "_aerea", "cam
 # copia la elegida a `captures/sede_<slug>_ciudad.png`. La que no tenga (LA CATEDRAL, que no se
 # juega) sigue con su vista de antes.
 SEDE_VISTA_CIUDAD = "_ciudad"
+# 10-nov-2026 — la foto ELEGIDA A MANO de la carpeta de capturas del hito, sin copiarla a `captures/` (la web no
+# escribe en game-unity). MANDA SOBRE `_ciudad` y `_web`. LUNAR PARK: `general` es la toma de TV del vuelo (el
+# cráter con la marquesina, la Tierra y el cohete); la `aerea` es cenital y oscura, la `tierra` es desde la cancha.
+SEDE_FOTO_DE = {"lunarpark": os.path.join("m302_lunar", "general.png")}
 SEDE_MAX_W = 1280
 SEDES_NEUTRALES = {"sakuradojo"}   # sin local a propósito (ver auditar_sedes)
 HINCHAS_POR_MUNECO = 2   # lo que dice la web = aforo medido × 2 (ver `sedes.json`)
@@ -621,6 +631,9 @@ ESCUDOS_APROBADOS = {
     # blanco sobre olas en celeste con borde azul marino (el mar, sin corona ni monograma). Ninguno lleva
     # texto ni reproduce un escudo registrado.
     "samurai", "jaguar", "atlantes",
+    # 10-nov-2026 — `lunatico` (ATLÉTICO LUNÁTICO, M302), mirado con zoom: una medialuna gris con cráteres y un
+    # cohete rojo y blanco despegando, sobre azul noche con borde plateado. Sin texto ni escudo registrado.
+    "lunatico",
 }
 
 ESCUDO_OUT = 256    # los PNG fuente son 256×256; se convierten sin escalar
@@ -899,7 +912,7 @@ def build_sedes(equipos):
             if os.path.exists(viejo):
                 os.remove(viejo)
     for sd in [x for x in sedes if x["lista"]]:
-        p = os.path.join(CAPS, "sede_%s%s.png" % (sd["slug"], SEDE_VISTA_CIUDAD))
+        p = os.path.join(CAPS, SEDE_FOTO_DE.get(sd["slug"], "sede_%s%s.png" % (sd["slug"], SEDE_VISTA_CIUDAD)))
         if not os.path.exists(p):
             p = os.path.join(CAPS, "sede_%s%s.png"
                              % (sd["slug"], SEDE_VISTA_DE.get(sd["slug"], SEDE_VISTA)))

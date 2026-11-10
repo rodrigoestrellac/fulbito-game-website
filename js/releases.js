@@ -9,7 +9,7 @@
    botones no dependen de él). La API de itch que dice la versión de un canal pide clave.
    El contador de descargas sigue saliendo de los releases VIEJOS de GitHub (el histórico real). */
 
-const VERSION = 'M300';
+const VERSION = 'M302';
 const ITCH = 'https://rodrigoestrellac.itch.io/fulbito';
 const JUGAR = 'https://jugar.fulbito.futbol/';
 const REPO = 'rodrigoestrellac/fulbito-game-website';   // sólo para el contador histórico
@@ -50,7 +50,7 @@ function pintar() {
   const lista = document.querySelector('[data-rel="lista"]');
   if (lista) {
     const filas = [
-      { so: 'Navegador', que: 'Sin instalar nada: abrilo en la PC, la Mac o el iPad y jugá.', href: JUGAR, boton: 'Jugar ahora' },
+      { so: 'Navegador', que: 'Sin instalar nada: abrilo en la PC, la Mac, el iPad o el celular y jugá. Bajado se juega mejor, sobre todo en Windows.', href: JUGAR, boton: 'Jugar ahora' },
       { so: 'Windows', que: 'En itch.io: bajás el zip, lo descomprimís y abrís <em>Fulbito.exe</em>. Con la app de itch se actualiza solo.', href: ITCH, boton: 'Descargar' },
       { so: 'macOS', que: '<em>Beta</em>, en itch.io. La primera vez macOS lo bloquea y hay que habilitarlo una sola vez: <a href="#paso-mac">mirá cómo</a>.', href: ITCH, boton: 'Descargar' },
       { so: 'Android', que: 'En prueba en Google Play: sumate como tester en dos pasos y te llegan las actualizaciones solas. Se juega con los dedos o con un joystick Bluetooth.', href: 'probar/', boton: 'Probarlo' },
